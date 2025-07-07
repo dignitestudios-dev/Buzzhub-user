@@ -16,8 +16,8 @@ async function getDeviceFingerprint() {
 const instance = axios.create({
   baseURL: baseUrl,
   headers: {
-    devicemodel: await getDeviceFingerprint(),
-    deviceuniqueid: await getDeviceFingerprint(),
+    // devicemodel: await getDeviceFingerprint(),
+    // deviceuniqueid: await getDeviceFingerprint(),
   },
   timeout: 10000, // 10 seconds timeout
 });
