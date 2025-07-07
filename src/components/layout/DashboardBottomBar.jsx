@@ -18,7 +18,7 @@ const DashboardBottomBar = () => {
   };
 
   return (
-    <nav className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-md bg-green-600 rounded-full shadow-lg px-6 py-3 flex justify-between items-center">
+    <nav className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-md bg-green-600 rounded-full shadow-lg px-12 py-3 flex justify-between items-center">
       {bottomBarLinks.map((item) => (
         <NavLink
           key={item.link}

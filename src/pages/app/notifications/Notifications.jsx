@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
-import { FiTrash2 } from "react-icons/fi";
+import { FiArrowLeft, FiTrash2 } from "react-icons/fi";
+import { useNavigate } from "react-router"; // Import useNavigate from react-router-dom
+
 
 // Sample notification data
 const sampleNotifications = [
@@ -31,21 +33,36 @@ const sampleNotifications = [
 ];
 
 const Notifications = () => {
+    const navigate = useNavigate(); // Get navigate function
+  
   const [notifications, setNotifications] = useState(sampleNotifications);
 
   const handleRemove = (id) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
+
+  // Function to navigate back
+  const handleBackClick = () => {
+    navigate(-1); // Navigate one step back in history
+  };
   return (
     <div className="w-full  mx-auto bg-white min-h-screen">
       {/* Header */}
-      <div className="flex items-center gap-2 mb-6">
-        {/* <button className="p-1 text-gray-600 hover:text-black">
-          <IoMdArrowBack size={24} />
-        </button> */}
-        <h2 className="text-2xl font-semibold">Notifications</h2>
-      </div>
+        <div className="flex items-center justify-between mb-8">
+              {/* Back Button */}
+              <button 
+                className="text-gray-800 pr-3" 
+                onClick={handleBackClick} // Handle the back button click
+              >
+                <FiArrowLeft size={20} />
+              </button>
+      
+              {/* Heading (centered on mobile, beside back button on desktop) */}
+              <h3 className="text-[16px] lg:text-3xl font-semibold text-gray-800 mx-auto sm:mx-0 sm:flex-1 sm:text-left">
+                Notifications
+              </h3>
+            </div>
 
       {/* Notification List */}
       {notifications.length === 0 ? (

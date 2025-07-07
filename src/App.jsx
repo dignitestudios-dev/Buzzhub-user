@@ -17,6 +17,8 @@ import OrderDetails from "./pages/app/orders/OrderDetails";
 import ReviewOrder from "./pages/app/orders/ReviewOrder";
 import OrderTracking from "./pages/app/orders/OrderTracking";
 import Documents from "./pages/app/profile/Documents";
+import Login from "./pages/onboarding/Login";
+import Dispensaries from "./pages/app/dispensary/Dispensaries";
 
 function App() {
   return (
@@ -24,9 +26,7 @@ function App() {
       <Route
         path="/"
         element={
-          <div className="text-7xl">
-            Project Template || Please read readme file
-          </div>
+          <Login />
         }
       />
 
@@ -88,9 +88,13 @@ function App() {
         <Route path="documents" element={<Documents />} />
       </Route>
 
+       <Route path="app" element={<DashboardLayout />}>
+        <Route path="dispensaries" element={<Dispensaries />} />
+      </Route>
+
 
       <Route path="auth" element={<AuthLayout />}>
-        <Route path="login" element={<DummyLogin />} />
+        <Route path="login" element={<Login />} />
       </Route>
 
       <Route

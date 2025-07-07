@@ -19,63 +19,45 @@ const ReviewOrder = () => {
   const total = subtotal - platformFee;
 
   return (
-    <div className="w-full mx-auto bg-white  border border-gray-200 p-4 pb-12 rounded-2xl   ">
+    <div className="w-full mx-auto bg-white lg:border lg:border-gray-200 lg:p-4 pb-20 lg:pb-4 rounded-2xl">
       {/* Header */}
-      <div className="text-left">
-        <h2 className="text-lg font-semibold"> Review Order </h2>
+      <h2 className="text-lg font-semibold mb-4">Review Order</h2>
+
+      {/* Shipping Address */}
+      <span className="font-medium block mb-1 mt-2">Shipping Address</span>
+      <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
+        <p className="text-gray-700 leading-6">
+          John Doe 123 Cannabis Ave, Toronto, ON M4B 1B3, Canada
+        </p>
       </div>
 
-      {/* Customer Info Section */}
-<div className="bg-gray-50 p-4 rounded-xl mt-4 space-y-4 text-sm">
-  
+      {/* Phone Number */}
+      <span className="font-medium block mt-2 pr-2 pt-2">Phone Number</span>
+      <div className="bg-gray-50 p-4 rounded-xl  text-sm space-y-1">
+        <p className="text-gray-700">+1 (555) 123-4567</p>
+      </div>
 
-  
+      {/* Medical Cards */}
+      <div className=" p-4 rounded-xl  text-sm space-y-2">
+        <span className="font-medium block">Medical Cards</span>
+        <div className="flex gap-3">
+          <img
+            src="https://via.placeholder.com/100x60?text=Card+Front"
+            alt="Medical Card Front"
+            className="w-28 h-16 object-cover rounded-lg border"
+          />
+          <img
+            src="https://via.placeholder.com/100x60?text=Card+Back"
+            alt="Medical Card Back"
+            className="w-28 h-16 object-cover rounded-lg border"
+          />
+        </div>
+      </div>
 
-  {/* Shipping Address */}
-  <div >
-    <span className="font-medium  block mb-1">Shipping Address</span>
-    <p className="text-gray-700">
-      John Doe<br />
-      123 Cannabis Ave,<br />
-      Toronto, ON M4B 1B3,<br />
-      Canada
-    </p>
-  </div>
-
-  {/* Phone Number */}
-  <div>
-    <span className="font-medium">Phone Number</span>
-    <p className="text-gray-700">+1 (555) 123-4567</p>
-  </div>
-
-  {/* Medical Card Images */}
-  <div>
-    <span className="font-medium block mb-2">Medical Cards</span>
-    <div className="flex gap-3">
-      <img
-        src="https://via.placeholder.com/100x60?text=Card+Front"
-        alt="Medical Card Front"
-        className="w-28 h-16 object-cover rounded-lg border"
-      />
-      <img
-        src="https://via.placeholder.com/100x60?text=Card+Back"
-        alt="Medical Card Back"
-        className="w-28 h-16 object-cover rounded-lg border"
-      />
-    </div>
-  </div>
-</div>
-
-
-
-      
-
-      {/* Product Details */}
+      {/* Purchased Items */}
       <div>
-        <h3 className="text-sm font-semibold mb-2 mt-4">Purchased Items</h3>
+        <h3 className="text-sm font-semibold mb-2 ">Purchased Items</h3>
         <div className="bg-gray-50 p-4 rounded-xl space-y-2">
-          
-
           <div className="flex items-start gap-3">
             <img
               src={cartItem.image}
@@ -84,23 +66,18 @@ const ReviewOrder = () => {
             />
             <div className="flex-1">
               <p className="font-medium text-sm">{cartItem.name}</p>
-            
-
-
-               <p className="text-green-600 font-semibold text-sm">
-                  ${cartItem.price.toFixed(2)}
-                </p>
-            
-                <span className="text-xs text-gray-600">{cartItem.weight}</span>
+              <p className="text-green-600 font-semibold text-sm">
+                ${cartItem.price.toFixed(2)}
+              </p>
+              <span className="text-xs text-gray-600">{cartItem.weight}</span>
             </div>
-            
           </div>
         </div>
       </div>
 
       {/* Billing Summary */}
       <div>
-        <h3 className="text-sm font-semibold mb-2 mt-2">Billing</h3>
+        <h3 className="text-sm font-semibold mb-2 mt-4">Billing</h3>
         <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
           <div className="flex justify-between">
             <span>Subtotal</span>
@@ -110,7 +87,7 @@ const ReviewOrder = () => {
             <span>1% platform fees</span>
             <span>${platformFee.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between font-semibold text-green-700 text-base pt-2 border-t border-gray-200">
+          <div className="flex justify-between font-semibold text-green-700 text-base pt-2 ">
             <span>Total</span>
             <span>${total.toFixed(2)}</span>
           </div>

@@ -43,9 +43,27 @@ const ProductDetails = () => {
             4.8
           </div>
         </div>
+        {/* Dispensary Info */}
+        <div className="mt-6 flex justify-between items-center">
+          <div className="flex gap-3 items-center">
+            <img
+              src="https://i.pravatar.cc/100?img=1"
+              alt="dispensary"
+              className="w-12 h-12 rounded-full object-cover"
+            />
+            <div>
+              <p className="text-sm font-semibold text-gray-800">Dispensary Name</p>
+              <p className="text-xs text-gray-500">Toronto, Canada • 8 miles away</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-red-500 text-sm font-semibold">Delivery / Pickup</p>
+            <button className="text-blue-600 text-xs underline" onClick={() => navigate("/app/dispensary-profile")}>View Profile</button>
+          </div>
+        </div>
 
         {/* Input & Fulfillment */}
-        <div className="space-y-4 mt-4">
+        <div className="space-y-4 mt-4  border-t pt-4">
           <div>
             <label className="text-sm font-medium text-gray-700">Enter Grams</label>
             <input
@@ -80,28 +98,11 @@ const ProductDetails = () => {
 
         </div>
 
-        {/* Dispensary Info */}
-        <div className="mt-6 flex justify-between items-center border-t pt-4">
-          <div className="flex gap-3 items-center">
-            <img
-              src="https://i.pravatar.cc/100?img=1"
-              alt="dispensary"
-              className="w-12 h-12 rounded-full object-cover"
-            />
-            <div>
-              <p className="text-sm font-semibold text-gray-800">Dispensary Name</p>
-              <p className="text-xs text-gray-500">Toronto, Canada • 8 miles away</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-red-500 text-sm font-semibold">Delivery / Pickup</p>
-            <button className="text-blue-600 text-xs underline" onClick={() => navigate("/app/dispensary-profile")}>View Profile</button>
-          </div>
-        </div>
+        
 
         {/* Description */}
-        <div className="mt-6">
-          <h3 className="text-base font-semibold text-gray-800 mb-2">Product Description</h3>
+        <div className="mt-6 ">
+          <h3 className="text-base font-semibold text-gray-800 mb-2 border-t pt-4">Product Description</h3>
           <p className="text-sm text-gray-600 mb-2">
             A brief overview of the product including origin, effectiveness and ingredients. Helps users make informed decisions.
           </p>
@@ -119,7 +120,7 @@ const ProductDetails = () => {
         </div>
 
         {/* Warnings */}
-        <div className="mt-6">
+        <div className="mt-6  border-t pt-4">
           <h3 className="text-base font-semibold text-gray-800 mb-1">Warnings</h3>
           <p className="text-sm text-gray-600">
             Use responsibly. Keep out of reach of children. Always consult your doctor before using cannabis-based products.
@@ -127,38 +128,45 @@ const ProductDetails = () => {
         </div>
 
         {/* Reviews */}
-        <div className="mt-6">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-base font-semibold text-gray-800">Reviews</h3>
-            <button className="text-blue-600 text-xs underline">See all</button>
-          </div>
 
-          {[1, 2].map((_, idx) => (
-            <div key={idx} className="bg-gray-50 p-3 rounded-lg mb-2 shadow-sm">
-              <div className="flex items-center text-yellow-500 mb-1">
-                {Array.from({ length: 5 }, (_, i) => (
-                  <FaStar key={i} className="text-sm" />
-                ))}
-              </div>
-              <p className="text-sm text-gray-700">
-                {idx === 0
-                  ? "Great product. Fast delivery and well-packed."
-                  : "Impressed with the quality. Would order again!"}
-              </p>
-              <div className="mt-2 flex items-center gap-2">
-                <img
-                  src={`https://i.pravatar.cc/100?img=${idx + 1}`}
-                  
-                  className="w-6 h-6 rounded-full"
-                  alt="Reviewer"
-                />
-                <span className="text-sm font-medium text-gray-800">
-                  {idx === 0 ? "Mike Smith" : "Sarah Lee"}
-                </span>
-              </div>
-            </div>
+<div className="mt-6">
+  <div className="flex justify-between items-center mb-3">
+    <h3 className="text-base font-semibold text-gray-800">Reviews</h3>
+    <button className="text-blue-600 text-xs underline">See all</button>
+  </div>
+
+  {/* Scrollable Review Container */}
+  <div className="flex overflow-x-auto space-x-4 snap-x snap-mandatory scrollbar-hide">
+    {[1, 2].map((_, idx) => (
+      <div
+        key={idx}
+        className="w-[321px] h-[225px] snap-center bg-gray-50 p-4 rounded-lg shadow-sm shrink-0"
+      >
+        <div className="flex items-center text-yellow-500 mb-2">
+          {Array.from({ length: 5 }, (_, i) => (
+            <FaStar key={i} className="text-sm" />
           ))}
         </div>
+        <p className="text-sm text-gray-700">
+          {idx === 0
+            ? "Great product. Fast delivery and well-packed."
+            : "Impressed with the quality. Would order again!"}
+        </p>
+        <div className="mt-3 flex items-center gap-2">
+          <img
+            src={`https://i.pravatar.cc/100?img=${idx + 1}`}
+            className="w-6 h-6 rounded-full"
+            alt="Reviewer"
+          />
+          <span className="text-sm font-medium text-gray-800">
+            {idx === 0 ? "Mike Smith" : "Sarah Lee"}
+          </span>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
 
         {/* Add to Cart */}
         <button
