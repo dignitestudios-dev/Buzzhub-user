@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { FaStar, FaHeart, FaFilter } from "react-icons/fa";
 import { CiFilter } from "react-icons/ci";
-import { FiSearch } from "react-icons/fi"
-import { useNavigate } from "react-router";
+import { FiSearch } from "react-icons/fi";
+import { useNavigate } from "react-router"; // Import useNavigate
 import FilterModal from './../../components/app/dashboard/FilterModal';
 
-
+// Card Component
 const Card = ({ item }) => {
   const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ const Card = ({ item }) => {
       <img
         src={item.image}
         alt={item.name}
-        className="w-full h-[130px] object-cover rounded-t-xl" // Keep the height fixed for the image
+        className="w-full h-[130px] object-cover rounded-t-xl"
       />
 
       {/* Card Content */}
@@ -47,7 +47,7 @@ const Card = ({ item }) => {
         <div className="flex items-center mt-1">
           {/* Dispensary Profile Image */}
           <img
-            src={item.dispensaryImage} // Assuming you have the dispensary image URL here
+            src={item.dispensaryImage}
             alt="Dispensary Profile"
             className="w-[24px] h-[24px] rounded-full object-cover mr-2"
           />
@@ -62,13 +62,23 @@ const Card = ({ item }) => {
   );
 };
 
-
+// Section Component
 const Section = ({ title, data }) => {
+  const navigate = useNavigate(); // useNavigate hook to handle navigation
+
+  // Handle "See All" button click
+  const handleSeeAll = () => {
+    navigate("/app/dispensaries"); // Navigate to dispensaries page
+  };
+
   return (
     <div className="mb-12 -mt-5">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-        <button className="text-[#1D7C42] hover:text-green-600  rounded-full text-xs font-medium">
+        <button
+          onClick={handleSeeAll} // Add onClick handler for navigation
+          className="text-[#1D7C42] hover:text-green-600 rounded-full text-xs font-medium"
+        >
           See all
         </button>
       </div>
@@ -83,9 +93,7 @@ const Section = ({ title, data }) => {
   );
 };
 
-
-
-
+// DummyHome Component
 const DummyHome = () => {
   const demoData = [
     {
@@ -127,16 +135,14 @@ const DummyHome = () => {
   ];
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-
-
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen">
       {/* Search + Filter */}
-      <div className="flex justify-end items-center mb-10 border-b border-gray-100 pb-5 px-2 ">
-  {/* Right: Search + Filter */}
-  <div className="flex items-center gap-4 w-full md:w-auto">
-    {/* Search Input with Icon */}
-   <div className="relative w-full md:w-72">
+      <div className="flex justify-end items-center mb-10 border-b border-gray-100 pb-5 px-2">
+        {/* Right: Search + Filter */}
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          {/* Search Input with Icon */}
+          <div className="relative w-full md:w-72">
             <span className="absolute inset-y-0 left-4 flex items-center text-gray-400 text-base">
               <FiSearch />
             </span>
@@ -154,17 +160,13 @@ const DummyHome = () => {
             <CiFilter className="text-lg" />
           </button>
         </div>
-</div>
-
-
-
+      </div>
 
       {/* Sections */}
-      <Section title="Dispensaries Nearby" data={demoData}   />
-      <Section title="Popular Products" data={demoData}  />
-      <Section title="New Products" data={demoData}  />
-            <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
-
+      <Section title="Dispensaries Nearby" data={demoData} />
+      <Section title="Popular Products" data={demoData} />
+      <Section title="New Products" data={demoData} />
+      <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
     </div>
   );
 };
