@@ -1,5 +1,4 @@
 import { Route, Routes } from "react-router";
-import "./App.css";
 import DashboardLayout from "./layouts/DashboardLayout";
 import DummyHome from "./pages/app/DummyHome";
 import DummyLogin from "./pages/authentication/DummyLogin";
@@ -19,6 +18,13 @@ import OrderTracking from "./pages/app/orders/OrderTracking";
 import Documents from "./pages/app/profile/Documents";
 import Login from "./pages/onboarding/Login";
 import Dispensaries from "./pages/app/dispensary/Dispensaries";
+import ChangePassword from "./pages/app/profile/ChangePassword";
+import DeleteAccount from "./pages/app/profile/DeleteAccount";
+import EditProfile from "./pages/app/profile/EditProfile";
+import SignUp from "./pages/onboarding/Signup";
+import Verification from "./pages/onboarding/Verification";
+import VerifyOtp from "./pages/onboarding/VerifyOtp";
+import UserInfo from "./pages/onboarding/UserInfo";
 
 function App() {
   return (
@@ -92,10 +98,41 @@ function App() {
         <Route path="dispensaries" element={<Dispensaries />} />
       </Route>
 
+      <Route path="app" element={<DashboardLayout />}>
+        <Route path="change-password" element={<ChangePassword />} />
+      </Route>
+
+      <Route path="app" element={<DashboardLayout />}>
+        <Route path="delete-account" element={<DeleteAccount />} />
+      </Route>
+
+       <Route path="app" element={<DashboardLayout />}>
+        <Route path="edit-profile" element={<EditProfile />} />
+      </Route>
+
 
       <Route path="auth" element={<AuthLayout />}>
         <Route path="login" element={<Login />} />
       </Route>
+
+       <Route path="auth" element={<AuthLayout />}>
+        <Route path="signup" element={<SignUp />} />
+      </Route>
+
+       <Route path="auth" element={<AuthLayout />}>
+        <Route path="verification" element={<Verification />} />
+      </Route>
+
+         <Route path="auth" element={<AuthLayout />}>
+        <Route path="verify-otp" element={<VerifyOtp />} />
+      </Route>
+
+
+      <Route path="auth">
+        <Route path="user-info" element={<UserInfo />} />
+      </Route>
+
+      
 
       <Route
         path="*"

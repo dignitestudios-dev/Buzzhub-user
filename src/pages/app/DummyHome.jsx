@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaStar, FaHeart, FaFilter } from "react-icons/fa";
 import { CiFilter } from "react-icons/ci";
 import { FiSearch } from "react-icons/fi"
 import { useNavigate } from "react-router";
-
+import FilterModal from './../../components/app/dashboard/FilterModal';
 
 
 const Card = ({ item }) => {
@@ -125,6 +125,7 @@ const DummyHome = () => {
       rating: "4.8",
     },
   ];
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
 
 
@@ -135,22 +136,24 @@ const DummyHome = () => {
   {/* Right: Search + Filter */}
   <div className="flex items-center gap-4 w-full md:w-auto">
     {/* Search Input with Icon */}
-    <div className="relative w-full md:w-72">
-      <span className="absolute inset-y-0 left-4 flex items-center text-gray-400 text-base">
-        <FiSearch />
-      </span>
-      <input
-        type="text"
-        placeholder="Search for products or dispensaries..."
-        className="w-full bg-[#F3F3F3]  focus:ring-2 focus:ring-green-500 focus:outline-none rounded-full pl-10 pr-4 py-2 placeholder-gray-400 text-sm"
-      />
-    </div>
+   <div className="relative w-full md:w-72">
+            <span className="absolute inset-y-0 left-4 flex items-center text-gray-400 text-base">
+              <FiSearch />
+            </span>
+            <input
+              type="text"
+              placeholder="Search for products or dispensaries..."
+              className="w-full bg-[#F3F3F3] focus:ring-2 focus:ring-green-500 focus:outline-none rounded-full pl-10 pr-4 py-2 placeholder-gray-400 text-sm"
+            />
+          </div>
 
-    {/* Filter Button */}
-    <button className="flex items-center gap-2 bg-[#F3F3F3]  hover:border-green-500 text-gray-700 hover:text-green-600 px-2 py-2 rounded-full  transition duration-200 text-sm">
-      <CiFilter className="text-lg" />
-    </button>
-  </div>
+          <button
+            onClick={() => setIsFilterOpen(true)}
+            className="flex items-center gap-2 bg-[#F3F3F3] hover:border-green-500 text-gray-700 hover:text-green-600 px-2 py-2 rounded-full transition duration-200 text-sm"
+          >
+            <CiFilter className="text-lg" />
+          </button>
+        </div>
 </div>
 
 
@@ -160,6 +163,8 @@ const DummyHome = () => {
       <Section title="Dispensaries Nearby" data={demoData}   />
       <Section title="Popular Products" data={demoData}  />
       <Section title="New Products" data={demoData}  />
+            <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+
     </div>
   );
 };

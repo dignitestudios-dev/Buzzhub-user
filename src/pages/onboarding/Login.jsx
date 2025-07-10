@@ -72,6 +72,7 @@ const Login = () => {
             <button
               type="button"
               className="outline-none text-[13px] border-none text-green-600 font-bold"
+              onClick={() => navigate("/auth/signup")} 
             >
               Create one
             </button>
@@ -88,9 +89,9 @@ const Login = () => {
             className="relative w-[95%] h-auto mb-20 object-contain rounded-full"
           />
         </div>
-        <div className="absolute bottom-60 text-[#074F57] text-center z-20">
+        <div className="absolute bottom-60 text-[#074F57] text-center z-20 ">
           <div className="flex flex-col items-center">
-            <h3 className="text-lg font-medium">Buzzhub Dispensary Panel</h3>
+            <h3 className="text-lg font-medium ">Buzzhub</h3>
             <p className="text-sm">Login with your credentials to continue.</p>
           </div>
         </div>
