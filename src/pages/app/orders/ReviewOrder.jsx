@@ -1,5 +1,6 @@
-import React from "react";
+import React from "react"; 
 import { HiOutlineLocationMarker } from "react-icons/hi";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const cartItem = {
   id: "1",
@@ -14,9 +15,15 @@ const cartItem = {
 };
 
 const ReviewOrder = () => {
+  const navigate = useNavigate(); // Initialize navigate function
   const subtotal = 160;
   const platformFee = 10;
   const total = subtotal - platformFee;
+
+  // Function to handle "Place Order" button click
+  const handlePlaceOrder = () => {
+    navigate("/app/order-details"); // Navigate to order-details page
+  };
 
   return (
     <div className="w-full mx-auto bg-white lg:border lg:border-gray-200 lg:p-4 pb-20 lg:pb-4 rounded-2xl">
@@ -95,7 +102,10 @@ const ReviewOrder = () => {
       </div>
 
       {/* CTA Button */}
-      <button className="w-full mt-4 bg-green-700 text-white py-3 rounded-xl font-semibold text-sm">
+      <button
+        className="w-full mt-4 bg-green-700 text-white py-3 rounded-xl font-semibold text-sm"
+        onClick={handlePlaceOrder} // Navigate to order-details when clicked
+      >
         Place Order
       </button>
     </div>

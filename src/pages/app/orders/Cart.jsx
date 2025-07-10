@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { FiTrash2 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const cartItems = [
   {
@@ -30,6 +31,7 @@ const cartItems = [
 
 const Cart = () => {
   const [items, setItems] = useState(cartItems);
+  const navigate = useNavigate(); // Initialize navigate function
 
   const handleRemove = (id) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
@@ -56,6 +58,11 @@ const Cart = () => {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.grams, 0);
   const platformFee = 10;
   const total = subtotal - platformFee;
+
+  // Function to handle "Proceed to Checkout" button click
+  const handleProceedToCheckout = () => {
+    navigate("/app/review-order"); // Navigate to review-order page
+  };
 
   return (
     <div className="w-full mx-auto bg-white min-h-screen">
@@ -89,27 +96,21 @@ const Cart = () => {
               <p className="text-green-600 text-sm font-bold mt-1">
                 ${item.price.toFixed(2)} 
               </p>
-              {/* <div className="mt-2 flex gap-2 items-center">
-                <span className="bg-gray-100 px-2 py-1 text-xs rounded-full">
-                  {item.weight}
-                </span>
-                
-              </div> */}
             </div>
 
             {/* Right side: Delete and Gram Controls */}
             <div className="flex flex-col items-end justify-between h-full">
-             <div className="flex items-center gap-2">
-  <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
-    {item.type}
-  </span>
-  <button
-    onClick={() => handleRemove(item.id)}
-    className="text-red-500"
-  >
-    <FiTrash2 size={18} />
-  </button>
-</div>
+              <div className="flex items-center gap-2">
+                <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
+                  {item.type}
+                </span>
+                <button
+                  onClick={() => handleRemove(item.id)}
+                  className="text-red-500"
+                >
+                  <FiTrash2 size={18} />
+                </button>
+              </div>
 
               {/* Gram Control Buttons BELOW Delete */}
               <div className="flex items-center mt-4 space-x-4 p-1 border border-gray-400 rounded-md">
@@ -145,17 +146,20 @@ const Cart = () => {
           <span>${subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between mb-2">
-          <span  >1% platform fees</span>
+          <span>1% platform fees</span>
           <span>${platformFee.toFixed(2)}</span>
         </div>
         <div className="flex justify-between font-semibold text-green-700 text-base">
-          <span >Total</span>
+          <span>Total</span>
           <span>${total.toFixed(2)}</span>
         </div>
       </div>
 
       {/* Checkout Button */}
-      <button className="w-full bg-green-700 text-white py-3 rounded-xl font-semibold">
+      <button
+        className="w-full bg-green-700 text-white py-3 rounded-xl font-semibold"
+        onClick={handleProceedToCheckout} // Navigate when button is clicked
+      >
         Proceed To Checkout
       </button>
     </div>
