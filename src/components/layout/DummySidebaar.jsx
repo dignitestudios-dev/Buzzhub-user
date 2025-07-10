@@ -26,13 +26,23 @@ const DummySidebaar = ({ isMobile, toggleSidebar }) => {
           key={item.link}
           to={item.link}
           className={({ isActive }) =>
+            // Check if the current item is 'Logout' to apply special styles
             `group flex items-center gap-3 w-full lg:px-4 lg:py-3 rounded-xl transition-all duration-300 font-medium
-            ${isActive ? "lg:border lg:border-[#1D7C42] text-[#1D7C42] lg:shadow-sm" : "lg:text-gray-600 hover:border lg:border-[#1D7C42]/30 text-[#1D7C42] "}` // Fixed typo
+            ${item.title === "Logout" 
+              ? "text-red-600 hover:text-red-600" // Red text for Logout
+              : isActive 
+                ? "lg:border lg:border-[#1D7C42] text-[#1D7C42] lg:shadow-sm" 
+                : "lg:text-gray-600 hover:border lg:border-[#1D7C42]/30 text-[#1D7C42]"}`
           }
           onClick={() => isMobile && toggleSidebar()} // Close sidebar on mobile click
         >
-          <span className="text-lg ">{item.icon}</span>
-          <span className="text-sm">{item.title}</span>
+          {/* Only apply red icon for Logout */}
+          <span className={`text-lg ${item.title === "Logout" ? "text-red-600" : ""}`}>
+            {item.icon}
+          </span>
+          <span className={`${item.title === "Logout" ? "text-red-600" : ""} text-sm`}>
+            {item.title}
+          </span>
         </NavLink>
       ))}
     </div>

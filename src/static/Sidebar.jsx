@@ -12,6 +12,8 @@ import { CiHeart } from "react-icons/ci";
 import { GiShoppingCart } from "react-icons/gi";
 
 import { CiHome } from "react-icons/ci";
+import { IoIosLogOut } from "react-icons/io";
+
 
 
 
@@ -28,5 +30,6 @@ export const sidebarData = [
   { title: "Cart", link: "/app/cart", icon: <CiShoppingCart /> },
       { title: "Order History", link: "/app/orders", icon: <GiShoppingCart /> },
 
+      { title: "Logout", link: "/auth/login", icon: <IoIosLogOut /> },
 
 ];
