@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { HiOutlineLocationMarker } from "react-icons/hi";
+import { useNavigate } from "react-router";  // Import useNavigate
 
 const orders = [
   {
@@ -50,6 +51,7 @@ const statusColors = {
 const OrderHistory = () => {
   const [activeTab, setActiveTab] = useState("Order Request");
   const [filter, setFilter] = useState("All");
+  const navigate = useNavigate();  // Set up useNavigate
 
   const getFilters = () => {
     return activeTab === "Order Request"
@@ -65,10 +67,19 @@ const OrderHistory = () => {
       : order.type === filter;
   });
 
+  // Navigation functions
+  const handleOrderDetailsClick = (orderId) => {
+    navigate(`/app/order-details`);
+  };
+
+  const handleTrackOrderClick = (orderId) => {
+    navigate(`/app/order-tracking`);
+  };
+
   return (
     <div className="w-full lg:mb-0 md:mb-0 mb-24 bg-white min-h-screen ">
       {/* Header */}
-      <div className="flex items-center  gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-4">
         <button className="p-1">
           <IoMdArrowBack size={24} />
         </button>
@@ -84,7 +95,7 @@ const OrderHistory = () => {
               setActiveTab(tab);
               setFilter("All");
             }}
-            className={`w-1/2 py-2 rounded-lg text-sm  transition ${
+            className={`w-1/2 py-2 rounded-lg text-sm transition ${
               activeTab === tab ? "bg-[#1D7C42] text-white" : "text-black"
             }`}
           >
@@ -115,7 +126,7 @@ const OrderHistory = () => {
         {filteredOrders.map((order, i) => (
           <div
             key={i}
-            className=" rounded-2xl p-3 shadow-sm bg-[#F9FAFA] border border-[#E5E5E5]"
+            className="rounded-2xl p-3 shadow-sm bg-[#F9FAFA] border border-[#E5E5E5]"
           >
             {/* Order ID + Status */}
             <div className="flex justify-between items-center mb-2 border-b pb-2">
@@ -136,60 +147,48 @@ const OrderHistory = () => {
               />
               <div className="flex flex-col justify-between flex-1">
                 <div>
-<div className="flex justify-between items-center">
-  <p className="font-semibold text-sm">Item name</p>
-  <span className="text-xs text-[#1D7C42] font-medium">{order.weight}</span>
-</div>
+                  <div className="flex justify-between items-center">
+                    <p className="font-semibold text-sm">Item name</p>
+                    <span className="text-xs text-[#1D7C42] font-medium">{order.weight}</span>
+                  </div>
                   <div className="flex items-center text-xs text-gray-500 mt-1">
                     <HiOutlineLocationMarker className="mr-1" />
                     {order.location}
                   </div>
-                                    <p className="text-[18px] font-bold text-black">{order.price}</p>
-
+                  <p className="text-[18px] font-bold text-black">{order.price}</p>
                 </div>
-                <div className="flex justify-between items-end">
-                  <p ></p>
-                  {order.status === "Approved" ? (
-  <div className="flex items-center gap-2"> {/* Adjust gap here */}
-    <button className="text-[12px] text-white bg-[#1D7C42] w-[83px] h-[38px] rounded-lg">
-      Track order
-    </button>
-    <button className="bg-[#1D7C42] p-2.5  w-[38px] h-[38px]  rounded-lg text-white">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 5l7 7-7 7"
-        />
-      </svg>
-    </button>
-  </div>
-) : (
-  <button className="bg-[#1D7C42] p-2.5  w-[38px] h-[38px]  rounded-lg text-white">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M9 5l7 7-7 7"
-      />
-    </svg>
-  </button>
-)}
 
+                {/* Buttons on the right side */}
+                <div className="flex justify-end items-center gap-2 mt-2">
+                  {order.status === "Approved" && (
+                    <button
+                      onClick={() => handleTrackOrderClick(order.id)}  // Track order button
+                      className="text-[12px] text-white bg-[#1D7C42] w-[83px] h-[38px] rounded-lg"
+                    >
+                      Track order
+                    </button>
+                  )}
+
+                  {/* ">" button */}
+                  <button
+                    onClick={() => handleOrderDetailsClick(order.id)}  // ">" button
+                    className="bg-[#1D7C42] p-2.5 w-[38px] h-[38px] rounded-lg text-white"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>

@@ -22,12 +22,13 @@ const FilterModal = ({ isOpen, onClose }) => {
       {/* Modal */}
       <div className="relative w-full h-full bg-white p-5 overflow-y-auto md:max-w-md md:h-auto md:rounded-xl md:shadow-lg md:mx-auto md:my-20">
         {/* Close Button */}
-        <button onClick={onClose} className="absolute top-4 right-4 text-black text-2xl">
+                  <h2 className="text-[24px] font-bold text-[#1D7C42] mb-6">Filters</h2>
+
+        <button onClick={onClose} className="absolute top-4 right-4 border-2 rounded-full p-0.5 border-black text-black text-xl">
           <IoMdClose />
         </button>
 
-        <div className="pt-6">
-          <h2 className="text-[24px] font-bold text-[#1D7C42] mb-6">Filters</h2>
+        <div className="">
 
           {/* Fulfillment Method */}
           <div className="mb-6">

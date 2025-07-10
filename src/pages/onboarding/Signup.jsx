@@ -1,12 +1,24 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";  // Import useNavigate from react-router-dom
 import { FiMail, FiEye, FiEyeOff } from "react-icons/fi";
 import { CiLock, CiUser, CiPhone } from "react-icons/ci";
 import { PiEnvelopeLight } from "react-icons/pi";
 
 const SignUp = () => {
-
-    const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const navigate = useNavigate(); // Initialize the navigate function
+
+  // Function to handle the login button click
+  const handleLoginClick = () => {
+    navigate("/auth/login"); // Navigate to /auth/login
+  };
+
+  // Function to handle the sign-up button click
+  const handleSignUpClick = () => {
+    navigate("/auth/user-info"); // Navigate to /auth/user-info
+  };
 
   return (
     <div className="flex justify-center items-center h-full w-full ">
@@ -43,18 +55,6 @@ const SignUp = () => {
                 />
               </div>
             </div>
-
-            {/* Secondary Email/Icon */}
-            {/* <div className="relative mb-4">
-              <div className="w-full h-[56px] bg-light shadow-sm rounded-[12px] flex items-center">
-                <FiMail size={20} className="text-gray-600 absolute left-4" />
-                <input
-                  type="email"
-                  placeholder="Confirm Email (optional)"
-                  className="w-full pl-12 text-sm text-[#1D7C42] placeholder:text-black px-4 py-3 rounded-xl outline-none bg-light"
-                />
-              </div>
-            </div> */}
 
             {/* Phone */}
             <div className="relative mb-4">
@@ -109,24 +109,12 @@ const SignUp = () => {
               </div>
             </div>
 
-            {/* Confirm Password */}
-            <div className="relative mb-4">
-              <div className="w-full h-[56px]  rounded-[12px] flex items-center">
-                <CiLock size={20} className="text-gray-600 absolute left-4" />
-                <input
-                  type="password"
-                  placeholder="Confirm your password"
-                  maxLength="12"
-                  className="w-full pl-12 text-sm bg-[#F3F3F3] text-[#1D7C42] placeholder:text-black px-4 py-3 rounded-xl outline-none bg-light"
-                />
-              </div>
-            </div>
-
             {/* Submit Button */}
             <div className="pt-1 mb-4">
               <button
                 type="button"
                 className="w-full h-[48px] bg-[#1D7C42] text-white rounded-[12px] flex items-center justify-center text-[14px] font-medium leading-[21.6px] tracking-[-0.24px]"
+                onClick={handleSignUpClick} // Trigger sign-up navigation
               >
                 <span className="mr-1">Sign Up</span>
               </button>
@@ -141,48 +129,20 @@ const SignUp = () => {
           </div>
 
           {/* Signup Redirect */}
-        <div className="w-full flex flex-col gap-1 justify-center items-center mt-4">
-          <div className="w-full lg:w-[434px] flex gap-1 justify-center items-center">
-            <span className="text-[13px] font-medium text-[#C2C6CB]">
-              Already have an account?
-            </span>
-            <button
-              type="button"
-              className="outline-none text-[13px] border-none text-green-600 font-bold"
-            >
-              Log In
-            </button>
+          <div className="w-full flex flex-col gap-1 justify-center items-center mt-4">
+            <div className="w-full lg:w-[434px] flex gap-1 justify-center items-center">
+              <span className="text-[13px] font-medium text-[#C2C6CB]">
+                Already have an account?
+              </span>
+              <button
+                type="button"
+                className="outline-none text-[13px] border-none text-green-600 font-bold"
+                onClick={handleLoginClick} // Trigger login navigation
+              >
+                Log In
+              </button>
+            </div>
           </div>
-        </div>
-
-          {/* Social Button */}
-          {/* <div className="flex justify-center mt-4">
-            <button className="text-blue-600 text-sm underline">
-              Continue with Google
-            </button>
-          </div> */}
-
-          {/* Terms */}
-          {/* <div className="flex items-center mt-6  text-sm text-center text-secondary">
-            By registering, you accept our  
-            <a
-              href="https://buzzhub-landing.vercel.app/termsandconditions2"
-              className="text-primary"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Terms of Services 
-            </a>{" "}
-            and{" "}
-            <a
-              href="https://buzzhub-landing.vercel.app/privacypolicy2"
-              className="text-primary"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Privacy Policy
-            </a>.
-          </div> */}
         </div>
       </div>
     </div>
