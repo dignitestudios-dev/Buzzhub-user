@@ -25,6 +25,7 @@ import SignUp from "./pages/onboarding/Signup";
 import Verification from "./pages/onboarding/Verification";
 import VerifyOtp from "./pages/onboarding/VerifyOtp";
 import UserInfo from "./pages/onboarding/UserInfo";
+import Feedback from "./pages/app/orders/Feedback";
 
 function App() {
   return (
@@ -108,6 +109,10 @@ function App() {
 
        <Route path="app" element={<DashboardLayout />}>
         <Route path="edit-profile" element={<EditProfile />} />
+      </Route>
+
+       <Route path="app" element={<DashboardLayout />}>
+        <Route path="feedback" element={<Feedback />} />
       </Route>
 
 

@@ -1,6 +1,5 @@
-import React from "react"; 
-import { HiOutlineLocationMarker } from "react-icons/hi";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const cartItem = {
   id: "1",
@@ -15,6 +14,8 @@ const cartItem = {
 };
 
 const ReviewOrder = () => {
+  const [fulfillmentMethod, setFulfillmentMethod] = useState("Delivery"); // State to manage fulfillment method
+  const [phoneNumber, setPhoneNumber] = useState("+1 (555) 123-4567"); // State for editable phone number
   const navigate = useNavigate(); // Initialize navigate function
   const subtotal = 160;
   const platformFee = 10;
@@ -30,22 +31,60 @@ const ReviewOrder = () => {
       {/* Header */}
       <h2 className="text-lg font-semibold mb-4">Review Order</h2>
 
-      {/* Shipping Address */}
-      <span className="font-medium block mb-1 mt-2">Shipping Address</span>
-      <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
-        <p className="text-gray-700 leading-6">
-          John Doe 123 Cannabis Ave, Toronto, ON M4B 1B3, Canada
-        </p>
+      {/* Fulfillment Method (Delivery or Self Pickup) */}
+      <div className="mb-4">
+        <span className="font-medium block mb-2">Fulfillment Method</span>
+        <div className="flex gap-4">
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="fulfillment"
+              value="Delivery"
+              checked={fulfillmentMethod === "Delivery"}
+              onChange={() => setFulfillmentMethod("Delivery")}
+              className="mr-2"
+            />
+            Delivery
+          </label>
+          <label className="flex items-center">
+            <input
+              type="radio"
+              name="fulfillment"
+              value="Self Pickup"
+              checked={fulfillmentMethod === "Self Pickup"}
+              onChange={() => setFulfillmentMethod("Self Pickup")}
+              className="mr-2"
+            />
+            Self Pickup
+          </label>
+        </div>
       </div>
 
-      {/* Phone Number */}
+      {/* Conditionally render Shipping Address */}
+      {fulfillmentMethod === "Delivery" && (
+        <>
+          <span className="font-medium block mb-1 mt-2">Shipping Address</span>
+          <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
+            <p className="text-gray-700 leading-6">
+              John Doe 123 Cannabis Ave, Toronto, ON M4B 1B3, Canada
+            </p>
+          </div>
+        </>
+      )}
+
+      {/* Phone Number (Editable) */}
       <span className="font-medium block mt-2 pr-2 pt-2">Phone Number</span>
-      <div className="bg-gray-50 p-4 rounded-xl  text-sm space-y-1">
-        <p className="text-gray-700">+1 (555) 123-4567</p>
+      <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-1">
+        <input
+          type="text"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+          className="w-full text-gray-700 p-2 rounded-md border"
+        />
       </div>
 
       {/* Medical Cards */}
-      <div className=" p-4 rounded-xl  text-sm space-y-2">
+      <div className="p-4 rounded-xl text-sm space-y-2">
         <span className="font-medium block">Medical Cards</span>
         <div className="flex gap-3">
           <img
@@ -63,7 +102,7 @@ const ReviewOrder = () => {
 
       {/* Purchased Items */}
       <div>
-        <h3 className="text-sm font-semibold mb-2 ">Purchased Items</h3>
+        <h3 className="text-sm font-semibold mb-2">Purchased Items</h3>
         <div className="bg-gray-50 p-4 rounded-xl space-y-2">
           <div className="flex items-start gap-3">
             <img
@@ -94,7 +133,7 @@ const ReviewOrder = () => {
             <span>1% platform fees</span>
             <span>${platformFee.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between font-semibold text-green-700 text-base pt-2 ">
+          <div className="flex justify-between font-semibold text-green-700 text-base pt-2">
             <span>Total</span>
             <span>${total.toFixed(2)}</span>
           </div>
@@ -104,7 +143,7 @@ const ReviewOrder = () => {
       {/* CTA Button */}
       <button
         className="w-full mt-4 bg-green-700 text-white py-3 rounded-xl font-semibold text-sm"
-        onClick={handlePlaceOrder} // Navigate to order-details when clicked
+        onClick={handlePlaceOrder}
       >
         Place Order
       </button>
