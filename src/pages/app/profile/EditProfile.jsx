@@ -1,14 +1,45 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
+import axios from "../../../axios"; // Import the axios instance from your custom setup
+import { ErrorToast, SuccessToast } from "../../../components/global/Toaster"; // Toast components for feedback
 
 const EditProfile = () => {
-  const [avatar, setAvatar] = useState("https://i.pravatar.cc/?img=12");
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("john@example.com");
-  const [phone, setPhone] = useState("+1 416-555-7890");
-  const [address, setAddress] = useState("123 Main Street, Toronto, ON");
-
+  const [avatar, setAvatar] = useState(""); // Avatar state
+  const [name, setName] = useState(""); // Name state
+  const [email, setEmail] = useState(""); // Email state
+  const [phone, setPhone] = useState(""); // Phone state
+  const [address, setAddress] = useState(""); // Address state
+  const [loading, setLoading] = useState(false); // Loading state
+  const [user, setUser] = useState(null); // Store fetched user data
   const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
+  // Fetch profile data to pre-fill the form
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get("/user/get-my-profile");
+      if (response.data.success) {
+        const userData = response.data.data;
+        setUser(userData);
+        setAvatar(userData.profilePicture);
+        setName(userData.fullName);
+        setEmail(userData.email);
+        setPhone(userData.phoneNumber);
+        setAddress(userData.streetAddress);
+      } else {
+        ErrorToast("Failed to fetch profile data.");
+      }
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      ErrorToast("Error fetching profile data.");
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  // Handle profile picture change
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -18,20 +49,56 @@ const EditProfile = () => {
     }
   };
 
-  const handleSave = () => {
-    // Submit logic here
-    alert("Profile updated successfully.");
+  // Handle Save Profile (submit form)
+  const handleSave = async () => {
+    setLoading(true); // Show loading state
+    try {
+      const formData = new FormData();
+      formData.append("fullName", name);
+      formData.append("streetAddress", address);
+      formData.append("phoneNumber", phone);
+
+      if (fileInputRef.current.files[0]) {
+        formData.append("profilePicture", fileInputRef.current.files[0]);
+      }
+
+      const response = await axios.post("/user/update-profile", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Required for FormData
+        },
+      });
+
+      if (response.data.success) {
+        SuccessToast("Profile updated successfully.");
+        navigate("/app/profile");
+      } else {
+        ErrorToast(response.data.message || "Failed to update profile.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      ErrorToast("An error occurred. Please try again.");
+    } finally {
+      setLoading(false); // Hide loading state
+    }
   };
+
+  if (!user) {
+    return <div className="text-center py-10 text-gray-600">Loading profile...</div>;
+  }
 
   return (
     <div className="mx-auto bg-white min-h-screen md:p-8 rounded-xl mb-8 md:border md:border-gray-200">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Edit Profile</h2>
 
       <div className="max-w-md w-full mx-auto space-y-6">
-        {/* Profile Picture Centered */}
+        {/* Profile Picture */}
         <div className="flex flex-col items-center justify-center">
           <div className="w-24 h-24 rounded-full overflow-hidden border border-gray-200">
-            <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
+            <img
+              src={avatar || "https://i.pravatar.cc/?img=12"}
+              alt="Avatar"
+              className="w-full h-full object-cover"
+            />
           </div>
           <button
             type="button"
@@ -60,7 +127,7 @@ const EditProfile = () => {
           />
         </div>
 
-        {/* Email Field */}
+        {/* Email Field (read-only) */}
         <div>
           <input
             type="email"
@@ -68,6 +135,7 @@ const EditProfile = () => {
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled
           />
         </div>
 
@@ -97,8 +165,9 @@ const EditProfile = () => {
         <button
           onClick={handleSave}
           className="w-full bg-[#1D7C42] text-white py-3 rounded-xl text-sm font-medium hover:bg-green-700 transition"
+          disabled={loading}
         >
-          Save 
+          {loading ? "Saving..." : "Save"}
         </button>
       </div>
     </div>

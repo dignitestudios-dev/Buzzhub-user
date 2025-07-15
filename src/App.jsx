@@ -26,6 +26,7 @@ import Verification from "./pages/onboarding/Verification";
 import VerifyOtp from "./pages/onboarding/VerifyOtp";
 import UserInfo from "./pages/onboarding/UserInfo";
 import Feedback from "./pages/app/orders/Feedback";
+import Products from "./pages/app/products/Products";
 
 function App() {
   return (
@@ -42,7 +43,7 @@ function App() {
       </Route>
 
       <Route path="app" element={<DashboardLayout />}>
-        <Route path="product-details" element={<ProductDetails />} />
+        <Route path="product-details/:productId" element={<ProductDetails />} />
       </Route>
 
         <Route path="app" element={<DashboardLayout />}>
@@ -71,7 +72,7 @@ function App() {
 
 
       <Route path="app" element={<DashboardLayout />}>
-        <Route path="dispensary-profile" element={<DispensaryProfile />} />
+        <Route path="/app/dispensary-profile/:dispensaryId" element={<DispensaryProfile />} />
       </Route>
 
       <Route path="app" element={<DashboardLayout />}>
@@ -97,6 +98,11 @@ function App() {
 
        <Route path="app" element={<DashboardLayout />}>
         <Route path="dispensaries" element={<Dispensaries />} />
+      </Route>
+
+
+        <Route path="app" element={<DashboardLayout />}>
+        <Route path="products" element={<Products />} />
       </Route>
 
       <Route path="app" element={<DashboardLayout />}>

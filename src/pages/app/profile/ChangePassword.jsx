@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import axios from "../../../axios"; // Importing axios instance
+import { ErrorToast, SuccessToast } from "../../../components/global/Toaster"; // Toaster components for feedback
+import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -10,14 +13,61 @@ const ChangePassword = () => {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleUpdate = () => {
+  const [loading, setLoading] = useState(false); // Loading state to show during API request
+
+  const [errors, setErrors] = useState({}); // Object to hold error messages for each field
+  const navigate = useNavigate(); // Initialize navigate function
+
+  // Validation Function
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!currentPassword) {
+      newErrors.currentPassword = "Current password is required.";
+    }
+    if (!newPassword) {
+      newErrors.newPassword = "New password is required.";
+    }
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Confirm password is required.";
+    }
     if (newPassword !== confirmPassword) {
-      alert("New passwords do not match.");
-      return;
+      newErrors.confirmPassword = "New password and Confirm password do not match.";
     }
 
-    // Add password update logic here
-    alert("Password updated successfully.");
+    setErrors(newErrors);
+
+    // If there are errors, return false to prevent form submission
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle password change request
+  const handleUpdate = async () => {
+    if (!validateForm()) return; // Validate form before submitting
+
+    setLoading(true); // Set loading to true while making the API request
+
+    try {
+      const response = await axios.post("/user/change-password", {
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      });
+
+      if (response.data.success) {
+        SuccessToast("Password updated successfully.");
+        // Redirect to the profile page after successful password change
+        navigate("/app/profile");
+      } else {
+        // Show error from the API in a toast
+        ErrorToast(response?.data?.message);
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      ErrorToast(error?.response?.data?.message );
+    } finally {
+      setLoading(false); // Hide loading state after API call
+    }
   };
 
   return (
@@ -41,6 +91,9 @@ const ChangePassword = () => {
           >
             {showCurrent ? <FiEyeOff size={20} /> : <FiEye size={20} />}
           </button>
+          {errors.currentPassword && (
+            <p className="text-red-500 text-sm mt-1">{errors.currentPassword}</p>
+          )}
           <p className="text-sm text-gray-500 mt-1">
             You must enter your current password to change your password
           </p>
@@ -62,6 +115,9 @@ const ChangePassword = () => {
           >
             {showNew ? <FiEyeOff size={20} /> : <FiEye size={20} />}
           </button>
+          {errors.newPassword && (
+            <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>
+          )}
         </div>
 
         {/* Confirm Password */}
@@ -80,13 +136,17 @@ const ChangePassword = () => {
           >
             {showConfirm ? <FiEyeOff size={20} /> : <FiEye size={20} />}
           </button>
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+          )}
         </div>
 
         <button
           onClick={handleUpdate}
           className="w-full bg-[#1D7C42] text-white py-3 rounded-xl text-sm font-medium hover:bg-green-700 transition"
+          disabled={loading}
         >
-          Update
+          {loading ? "Updating..." : "Update"}
         </button>
       </div>
     </div>

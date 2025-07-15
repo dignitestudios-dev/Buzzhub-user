@@ -1,20 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "../../../axios"; // Importing the axios instance
 
 const Profile = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const user = {
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1 416-555-7890",
-    avatar: "https://i.pravatar.cc/?img=12",
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get("/user/get-my-profile");
+      if (response.data.success) {
+        setUser(response.data.data);
+      } else {
+        console.error("Failed to fetch profile");
+      }
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center py-10 text-gray-600">Loading profile...</div>;
+  }
+
+  if (!user) {
+    return <div className="text-center py-10 text-red-500">Failed to load profile.</div>;
+  }
+
+  const documents = [
+    { title: "Medical License", image: user.medicalCardFront },
+    { title: "Medical License Back", image: user.medicalCardBack },
+    { title: "Driving License", image: user.drivingLicenseFront },
+    { title: "Driving License Back", image: user.drivingLicenseBack },
+  ];
 
   return (
     <div className="mx-auto bg-white min-h-screen md:p-8 rounded-xl mb-8 md:border md:border-gray-200">
       {/* Profile Header */}
-      <h2 className="text-2xl hidden md:block lg:block font-bold text-gray-800 mb-6">Profile</h2>
+      <h2 className="text-2xl hidden md:block font-bold text-gray-800 mb-6">Profile</h2>
 
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-4">
         {/* User Info */}
@@ -22,7 +52,7 @@ const Profile = () => {
           {/* Profile Image */}
           <div className="w-[100px] h-[100px] md:w-32 md:h-32 rounded-full overflow-hidden p-1 shadow-inner md:mr-4">
             <img
-              src={user.avatar}
+              src={user.profilePicture}
               alt="User"
               className="w-full h-full rounded-full object-cover"
             />
@@ -30,8 +60,8 @@ const Profile = () => {
 
           {/* User Info Text */}
           <div className="text-center md:text-left">
-            <h3 className="text-xl font-bold text-gray-800">{user.name}</h3>
-            <p className="text-sm text-gray-500">{user.phone}</p>
+            <h3 className="text-xl font-bold text-gray-800">{user.fullName}</h3>
+            <p className="text-sm text-gray-500">{user.phoneNumber}</p>
             <p className="text-sm text-gray-500 mt-1">{user.email}</p>
           </div>
         </div>
@@ -47,7 +77,7 @@ const Profile = () => {
         </button>
 
         <button
-          onClick={() => navigate("/app/documents")}
+          onClick={() => navigate("/app/documents", { state: { documents } })}
           className="flex items-center justify-between gap-1 bg-[#F9FAFA] text-black px-4 py-3 rounded-xl text-sm font-normal transition hover:bg-gray-100 mt-4 md:mt-0"
         >
           Personal Documents
@@ -69,7 +99,7 @@ const Profile = () => {
           <span className="text-[#B7B8B8]">&gt;</span>
         </button>
 
-        <button
+        <button 
           onClick={() => navigate("/app/delete-account")}
           className="flex items-center justify-between gap-1 bg-[#F9FAFA] text-black px-4 py-3 rounded-xl text-sm font-normal transition hover:bg-gray-100"
         >
