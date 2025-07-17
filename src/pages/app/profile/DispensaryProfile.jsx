@@ -79,6 +79,8 @@ const DispensaryProfile = () => {
 
             Operating Hours: {new Date(dispensary.openingHourTime).toLocaleTimeString()} - {new Date(dispensary.closingHourTime).toLocaleTimeString()}
           </p>
+                    <p className="text-gray-500 text-sm mt-1">Dispensary Type : <span className="text-gray-500 text-sm font-medium mt-1"> {dispensary.disType} </span></p>
+
           <p className="text-red-500 text-sm font-medium mt-1">{dispensary.fulfillmentMethod}</p>
           <span className="text-[#1D7C42] text-xs mt-1 block bg-[#1D7C421F] rounded-full p-2">{dispensary.deliveryRadius} Delivery Radius</span>
         </div>

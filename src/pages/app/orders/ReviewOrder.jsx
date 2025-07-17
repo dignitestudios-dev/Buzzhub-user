@@ -1,37 +1,65 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-const cartItem = {
-  id: "1",
-  name: "Item name",
-  weight: "50gram",
-  grams: 1,
-  price: 40,
-  location: "Toronto, Canada",
-  type: "Delivery",
-  image:
-    "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80",
-};
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const ReviewOrder = () => {
-  const [fulfillmentMethod, setFulfillmentMethod] = useState("Delivery"); // State to manage fulfillment method
-  const [phoneNumber, setPhoneNumber] = useState("+1 (555) 123-4567"); // State for editable phone number
-  const navigate = useNavigate(); // Initialize navigate function
-  const subtotal = 160;
+  const { state } = useLocation(); // Get the cartData passed from the Cart component
+  const [cartData, setCartData] = useState(state?.cartData || []); // Initialize cartData from the state
+  const [fulfillmentMethod, setFulfillmentMethod] = useState("Delivery");
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [medicalCards, setMedicalCards] = useState({
+    front: "",
+    back: "",
+  });
+  const [drivingLicense, setDrivingLicense] = useState({
+    front: "",
+    back: "",
+  });
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+  const navigate = useNavigate();
+  
+  // Calculate totals
+  const subtotal = cartData?.items?.reduce((sum, item) => sum + item.productPrice * item.grams, 0);
   const platformFee = 10;
-  const total = subtotal - platformFee;
+  const total = subtotal + platformFee;  // Adding platform fee to the total
 
   // Function to handle "Place Order" button click
   const handlePlaceOrder = () => {
     navigate("/app/order-details"); // Navigate to order-details page
   };
 
+  useEffect(() => {
+    if (fulfillmentMethod === "Self Pickup") {
+      setShippingAddress("123 Pickup Ave, Toronto, ON M4B 1B3, Canada"); // Prefilled address for self pickup
+    } else {
+      setShippingAddress(""); // Clear address when changing fulfillment method to delivery
+    }
+
+    // Retrieve user data from localStorage
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    if (userData) {
+      // Set medical card images from localStorage
+      setMedicalCards({
+        front: userData.medicalCardFront,
+        back: userData.medicalCardBack,
+      });
+      
+      // Set driving license images from localStorage
+      setDrivingLicense({
+        front: userData.drivingLicenseFront,
+        back: userData.drivingLicenseBack,
+      });
+
+      // Set phone number from localStorage
+      setPhoneNumber(userData.phoneNumber);
+    }
+  }, [fulfillmentMethod]);
+
   return (
     <div className="w-full mx-auto bg-white lg:border lg:border-gray-200 lg:p-4 pb-20 lg:pb-4 rounded-2xl">
-      {/* Header */}
       <h2 className="text-lg font-semibold mb-4">Review Order</h2>
 
-      {/* Fulfillment Method (Delivery or Self Pickup) */}
+      {/* Fulfillment Method */}
       <div className="mb-4">
         <span className="font-medium block mb-2">Fulfillment Method</span>
         <div className="flex gap-4">
@@ -61,20 +89,31 @@ const ReviewOrder = () => {
       </div>
 
       {/* Conditionally render Shipping Address */}
-      {fulfillmentMethod === "Delivery" && (
+      {fulfillmentMethod === "Delivery" ? (
         <>
           <span className="font-medium block mb-1 mt-2">Shipping Address</span>
-          <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
-            <p className="text-gray-700 leading-6">
-              John Doe 123 Cannabis Ave, Toronto, ON M4B 1B3, Canada
-            </p>
+          <div className="p-1 rounded-xl text-sm space-y-2">
+            <input
+              type="text"
+              value={shippingAddress}
+              onChange={(e) => setShippingAddress(e.target.value)}
+              className="w-full text-gray-700 p-2 rounded-md border"
+              placeholder="Enter your delivery address"
+            />
+          </div>
+        </>
+      ) : (
+        <>
+          <span className="font-medium block mb-1 mt-2">Pickup Address</span>
+          <div className="p-1 rounded-xl text-sm space-y-2">
+            <p className="text-gray-700 leading-6">{shippingAddress}</p>
           </div>
         </>
       )}
 
-      {/* Phone Number (Editable) */}
+      {/* Phone Number */}
       <span className="font-medium block mt-2 pr-2 pt-2">Phone Number</span>
-      <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-1">
+      <div className=" p-1 rounded-xl text-sm space-y-1">
         <input
           type="text"
           value={phoneNumber}
@@ -87,16 +126,49 @@ const ReviewOrder = () => {
       <div className="p-4 rounded-xl text-sm space-y-2">
         <span className="font-medium block">Medical Cards</span>
         <div className="flex gap-3">
-          <img
-            src="https://via.placeholder.com/100x60?text=Card+Front"
-            alt="Medical Card Front"
-            className="w-28 h-16 object-cover rounded-lg border"
-          />
-          <img
-            src="https://via.placeholder.com/100x60?text=Card+Back"
-            alt="Medical Card Back"
-            className="w-28 h-16 object-cover rounded-lg border"
-          />
+          {medicalCards.front ? (
+            <img
+              src={medicalCards.front}
+              alt="Medical Card Front"
+              className="w-28 h-16 object-cover rounded-lg border"
+            />
+          ) : (
+            <div className="w-28 h-16 bg-gray-200 rounded-lg"></div> // Placeholder if no image
+          )}
+          {medicalCards.back ? (
+            <img
+              src={medicalCards.back}
+              alt="Medical Card Back"
+              className="w-28 h-16 object-cover rounded-lg border"
+            />
+          ) : (
+            <div className="w-28 h-16 bg-gray-200 rounded-lg"></div> // Placeholder if no image
+          )}
+        </div>
+      </div>
+
+      {/* Driving License */}
+      <div className="p-4 rounded-xl text-sm space-y-2">
+        <span className="font-medium block">Driving License</span>
+        <div className="flex gap-3">
+          {drivingLicense.front ? (
+            <img
+              src={drivingLicense.front}
+              alt="Driving License Front"
+              className="w-28 h-16 object-cover rounded-lg border"
+            />
+          ) : (
+            <div className="w-28 h-16 bg-gray-200 rounded-lg"></div> // Placeholder if no image
+          )}
+          {drivingLicense.back ? (
+            <img
+              src={drivingLicense.back}
+              alt="Driving License Back"
+              className="w-28 h-16 object-cover rounded-lg border"
+            />
+          ) : (
+            <div className="w-28 h-16 bg-gray-200 rounded-lg"></div> // Placeholder if no image
+          )}
         </div>
       </div>
 
@@ -104,20 +176,22 @@ const ReviewOrder = () => {
       <div>
         <h3 className="text-sm font-semibold mb-2">Purchased Items</h3>
         <div className="bg-gray-50 p-4 rounded-xl space-y-2">
-          <div className="flex items-start gap-3">
-            <img
-              src={cartItem.image}
-              alt={cartItem.name}
-              className="w-16 h-16 rounded-lg object-cover"
-            />
-            <div className="flex-1">
-              <p className="font-medium text-sm">{cartItem.name}</p>
-              <p className="text-green-600 font-semibold text-sm">
-                ${cartItem.price.toFixed(2)}
-              </p>
-              <span className="text-xs text-gray-600">{cartItem.weight}</span>
+          {cartData?.items?.map((item) => (
+            <div key={item._id} className="flex items-start gap-3">
+              <img
+                src={item.productImage}
+                alt={item.productName}
+                className="w-16 h-16 rounded-lg object-cover"
+              />
+              <div className="flex-1">
+                <p className="font-medium text-sm">{item.productName}</p>
+                <p className="text-green-600 font-semibold text-sm">
+                  ${item.productPrice.toFixed(2)}
+                </p>
+                <span className="text-xs text-gray-600">{item.grams} grams</span>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
 

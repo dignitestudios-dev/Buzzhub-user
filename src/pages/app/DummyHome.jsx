@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import FilterModal from './../../components/app/dashboard/FilterModal';
 import axios from "../../axios"; // Importing the axios instance
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster"; // Importing Toasts
+import Loader from "../../components/global/Loader";
 
 // Dispensary Card Component
 const DispensaryCard = ({ item, addToWishlist }) => {
@@ -28,7 +29,7 @@ const DispensaryCard = ({ item, addToWishlist }) => {
       onClick={handleCardClick}
     >
       <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-        {item.distance ? `${item.distance.toFixed(1)} miles` : "N/A"}
+        {item.distance ? `${item.distance.toFixed(1)} miles` : "0.0"}
       </div>
 
       <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
@@ -48,7 +49,7 @@ const DispensaryCard = ({ item, addToWishlist }) => {
         <div className="flex justify-between items-center">
           <h3 className="text-[13px] font-semibold text-gray-900">{item.dispensaryName}</h3>
           <div className="flex items-center text-sm text-yellow-500 font-semibold">
-            <FaStar className="mr-1" /> {item.rating || "N/A"}
+            <FaStar className="mr-1" /> {item.rating || "0.0"}
           </div>
         </div>
 
@@ -65,7 +66,7 @@ const ProductCard = ({ item, addToWishlist }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`/app/product-details/${item._id}`); // Product Details
+    navigate(`/app/product-details/${item._id}`); // Product Details page
   };
 
   const handleWishlistClick = (e) => {
@@ -76,14 +77,15 @@ const ProductCard = ({ item, addToWishlist }) => {
 
   return (
     <div
-      className="relative bg-white rounded-xl shadow hover:shadow-lg transition duration-300 
-        min-w-[168px] min-h-[250px] w-full h-full"
+      className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[250px] w-full h-full"
       onClick={handleCardClick}
     >
+      {/* Location Badge */}
       <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-        {item.productPrice ? `$${item.productPrice.toFixed(2)}` : "N/A"}
+        {item.dispensaryId.city}, {item.dispensaryId.state}
       </div>
 
+      {/* Wishlist Icon */}
       <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
         <FaHeart
           className="text-gray-400 hover:text-red-500 cursor-pointer"
@@ -91,35 +93,64 @@ const ProductCard = ({ item, addToWishlist }) => {
         />
       </div>
 
+      {/* Product Image */}
       <img
-        src={item.productImage[0]} // Assuming productImage is an array
+        src={item.productImage[0]} // Assuming the productImage is an array
         alt={item.productName}
         className="w-full h-[130px] object-cover rounded-t-xl"
       />
 
+      {/* Product Details */}
       <div className="p-4">
         <div className="flex justify-between items-center">
           <h3 className="text-[13px] font-semibold text-gray-900">{item.productName}</h3>
           <div className="flex items-center text-sm text-yellow-500 font-semibold">
-            <FaStar className="mr-1" /> {item.averageRating || "N/A"}
+            <FaStar className="mr-1" /> {item.averageRating || "0.0"}
           </div>
         </div>
 
-        <div className="text-sm text-gray-500 mt-1">{item.productType || "N/A"}</div>
+        <div className="text-sm text-gray-500 mt-1">{item.productType || "Not Specified"}</div>
 
-        <p className="text-sm text-gray-600 mt-2">{item.productDescription?.slice(0, 80)}...</p> {/* Short description */}
+        <div className="flex items-center mt-2 justify-between">
+          {/* Dispensary Name and Profile Picture */}
+          <div className="flex items-center space-x-2">
+            <img
+              src={item.dispensaryId.profilePicture}
+              alt={item.dispensaryId.dispensaryName}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <div className="text-sm text-gray-700 font-semibold">{item.dispensaryId.dispensaryName}</div>
+          </div>
+
+          {/* Price */}
+          <div className="text-green-600 font-semibold text-[14px]">
+            ${item.productPrice?.toFixed(2) || "0.0"}
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 // Section Component to display a title and cards
-const Section = ({ title, data, type, addToWishlist }) => {
+const Section = ({ title, data, type, addToWishlist, loading }) => {
   const navigate = useNavigate();
 
   const handleSeeAll = () => {
     navigate("/app/dispensaries");
   };
+
+  if (loading) {
+    return (
+      <div className="mb-12 -mt-5 text-center">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+        </div>
+        {/* <p className="text-center text-gray-600">Loading...</p> */}
+        <Loader /> {/* Assuming you have a Loader component */}
+      </div>
+    );
+  }
 
   if (!Array.isArray(data) || data.length === 0) {
     return (
@@ -165,6 +196,7 @@ const DummyHome = () => {
   const [searchQuery, setSearchQuery] = useState("");  // Search query state
   const [filteredDispensaries, setFilteredDispensaries] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const fetchNearbyDispensaries = async () => {
@@ -204,8 +236,14 @@ const DummyHome = () => {
       }
     };
 
+    // Start loading
+    setLoading(true);
+
     fetchNearbyDispensaries();
     fetchPopularProducts();
+
+    // Set loading to false when done
+    setLoading(false);
   }, []);
 
   // Handle search input change and filter results
@@ -284,8 +322,8 @@ const DummyHome = () => {
       </div>
 
       {/* Sections displaying Nearby Dispensaries and Popular Products */}
-      <Section title="Nearby Dispensaries" data={filteredDispensaries} type="dispensary" addToWishlist={addToWishlist} />
-      <Section title="Popular Products" data={filteredProducts} type="product" addToWishlist={addToWishlist} />
+      <Section title="Nearby Dispensaries" data={filteredDispensaries} type="dispensary" addToWishlist={addToWishlist} loading={loading} />
+      <Section title="Popular Products" data={filteredProducts} type="product" addToWishlist={addToWishlist} loading={loading} />
 
       {/* Filter Modal */}
       <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />

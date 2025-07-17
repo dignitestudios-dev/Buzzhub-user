@@ -3,6 +3,21 @@ import { sidebarData } from "../../static/Sidebar";
 import { Logo } from "../../assets/export";
 
 const DummySidebaar = ({ isMobile, toggleSidebar }) => {
+  // Function to handle logout
+  const handleLogout = () => {
+    // Clear localStorage and cookies
+    localStorage.clear();
+    
+    // Delete cookies (if you want to remove specific cookies, do it individually)
+    document.cookie.split(';').forEach((cookie) => {
+      const cookieName = cookie.split('=')[0].trim();
+      document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    });
+    
+    // Optionally, you can redirect the user to a login page or home page
+    // window.location.href = "/login"; // Or any route you wish to redirect to
+  };
+
   return (
     <div
       className={`${
@@ -32,9 +47,16 @@ const DummySidebaar = ({ isMobile, toggleSidebar }) => {
               ? "text-red-600 hover:text-red-600" // Red text for Logout
               : isActive 
                 ? "lg:border lg:border-[#1D7C42] text-[#1D7C42] lg:shadow-sm" 
-                : "lg:text-gray-600 hover:border lg:border-[#1D7C42]/30 text-[#1D7C42]"}`
+                : "lg:text-gray-600 hover:border lg:border-[#1D7C42]/30 text-[#1D7C42]"}`  
           }
-          onClick={() => isMobile && toggleSidebar()} // Close sidebar on mobile click
+          onClick={() => {
+            if (item.title === "Logout") {
+              handleLogout(); // Trigger logout logic when the user clicks Logout
+            }
+            if (isMobile) {
+              toggleSidebar(); // Close sidebar on mobile click
+            }
+          }}
         >
           {/* Only apply red icon for Logout */}
           <span className={`text-lg ${item.title === "Logout" ? "text-red-600" : ""}`}>

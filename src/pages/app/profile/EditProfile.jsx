@@ -146,6 +146,7 @@ const EditProfile = () => {
             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600"
             placeholder="Phone number"
             value={phone}
+            maxLength={11} // This limits the input field to 11 characters
             onChange={(e) => setPhone(e.target.value)}
           />
         </div>

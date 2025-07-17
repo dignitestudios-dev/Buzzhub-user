@@ -27,6 +27,8 @@ import VerifyOtp from "./pages/onboarding/VerifyOtp";
 import UserInfo from "./pages/onboarding/UserInfo";
 import Feedback from "./pages/app/orders/Feedback";
 import Products from "./pages/app/products/Products";
+import ForgotPassword from "./pages/onboarding/ForgotPassword";
+import UpdatePassword from "./pages/onboarding/UpdatePassword";
 
 function App() {
   return (
@@ -141,6 +143,14 @@ function App() {
 
       <Route path="auth">
         <Route path="user-info" element={<UserInfo />} />
+      </Route>
+
+          <Route path="auth">
+        <Route path="forgot-password" element={<ForgotPassword />} />
+      </Route>
+
+        <Route path="auth">
+        <Route path="update-password" element={<UpdatePassword />} />
       </Route>
 
       
