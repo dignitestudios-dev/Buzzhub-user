@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { BiArrowBack } from "react-icons/bi";
 import { Logo } from "../../assets/export";
 import { useNavigate } from "react-router-dom";
-import axios from "../../axios";
+import axios from "axios";
 
 const AuthInput = ({ text, placeholder, type, state, setState }) => {
   return (
@@ -41,6 +41,8 @@ const UpdatePassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const token = localStorage.getItem("token")
+console.log("first--->", token);
  const handleSubmit = async (e) => {
   e.preventDefault();
   setError("");
@@ -52,19 +54,26 @@ const UpdatePassword = () => {
 
   setLoading(true);
   try {
-    const response = await axios.post("auth/change-password-forgot", {
-      newPassword,
-      confirmPassword,
-    });
+    const response = await axios.post(
+  "https://api.buzzhubapp.com/auth/change-password-forgot", 
+  {
+    newPassword,
+    confirmPassword,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`, // Get token from localStorage
+    },
+  }
+);
 
     // Check if a token is returned in the response
-    if (response?.data?.token) {
-      // Save token to localStorage
-      localStorage.setItem("token", response.data.token);
+    console.log("resp-- >", response);
+    if (response.data.token) {
+         setIsUpdated(true);
+    navigate("/login")
     }
 
-    setIsUpdated(true);
-    setTimeout(() => navigate("/login"), 2000); // Redirect to login after success
   } catch (err) {
     setError(err.response?.data?.message || "Something went wrong");
   } finally {

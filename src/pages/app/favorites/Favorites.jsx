@@ -148,7 +148,7 @@ const Favorites = () => {
                     <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
                       <FiHeart
                         className="text-gray-400 hover:text-red-500 cursor-pointer"
-                        onClick={() => handleAddToWishlistProduct(item._id)}
+                        onClick={() => handleAddToWishlistProduct(item?.ProductDetails?._id)}
                       />
                     </div>
 
