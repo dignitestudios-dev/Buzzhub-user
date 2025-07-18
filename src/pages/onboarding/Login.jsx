@@ -138,6 +138,8 @@ const Login = () => {
             <button
               type="button"
               className="text-xs font-medium text-green-600"
+                            onClick={() => navigate("/auth/forgot-password")}
+
             >
               Forgot Password?
             </button>

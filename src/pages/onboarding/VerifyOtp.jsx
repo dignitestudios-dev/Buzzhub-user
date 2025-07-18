@@ -10,7 +10,7 @@ const AuthSubmitBtn = ({ text, loading, disabled }) => {
       type="submit"
       disabled={disabled}
       className={`w-full h-[50px] rounded-[12px] text-white font-medium flex justify-center items-center text-[14px] ${
-        disabled ? "bg-gray-400 opacity-50 cursor-not-allowed" : "bg-primary"
+        disabled ? "bg-green-400 opacity-50 cursor-not-allowed" : "bg-green-600 hover:bg-green-700 transition-colors"
       }`}
     >
       <div className="flex items-center">

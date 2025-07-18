@@ -67,8 +67,6 @@ console.log("first--->", token);
   }
 );
 
-    // Check if a token is returned in the response
-    console.log("resp-- >", response);
     if (response.data.token) {
          setIsUpdated(true);
     navigate("/login")
