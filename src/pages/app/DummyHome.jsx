@@ -133,11 +133,16 @@ const ProductCard = ({ item, addToWishlist }) => {
 };
 
 // Section Component to display a title and cards
+// Section Component to display a title and cards
 const Section = ({ title, data, type, addToWishlist, loading }) => {
   const navigate = useNavigate();
 
   const handleSeeAll = () => {
-    navigate("/app/dispensaries");
+    if (title === "Popular Products") {
+      navigate("/app/products"); // Navigate to the products page
+    } else if (title === "Nearby Dispensaries") {
+      navigate("/app/dispensaries"); // Navigate to the dispensaries page
+    }
   };
 
   if (loading) {
@@ -146,7 +151,6 @@ const Section = ({ title, data, type, addToWishlist, loading }) => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
         </div>
-        {/* <p className="text-center text-gray-600">Loading...</p> */}
         <Loader /> {/* Assuming you have a Loader component */}
       </div>
     );
@@ -187,6 +191,7 @@ const Section = ({ title, data, type, addToWishlist, loading }) => {
     </div>
   );
 };
+
 
 // Main Home Component
 const DummyHome = () => {

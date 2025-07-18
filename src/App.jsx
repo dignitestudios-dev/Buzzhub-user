@@ -82,7 +82,7 @@ function App() {
       </Route>
 
       <Route path="app" element={<DashboardLayout />}>
-        <Route path="order-details" element={<OrderDetails />} />
+        <Route path="order-details/:id" element={<OrderDetails />} />
       </Route>
 
       <Route path="app" element={<DashboardLayout />}>
@@ -90,7 +90,7 @@ function App() {
       </Route>
 
       <Route path="app" element={<DashboardLayout />}>
-        <Route path="order-tracking" element={<OrderTracking />} />
+        <Route path="order-tracking/:id" element={<OrderTracking />} />
       </Route>
 
 
