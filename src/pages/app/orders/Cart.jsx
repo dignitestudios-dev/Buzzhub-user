@@ -88,7 +88,7 @@ const Cart = () => {
     0
   );
   const platformFee = subtotal > 0 ? 10 : 0; // Only charge fee if subtotal > 0
-  const total = subtotal > 0 ? subtotal - platformFee : 0; // Avoid negative total
+  const total = subtotal > 0 ? subtotal + platformFee : 0; // Avoid negative total
 
   // Function to handle "Proceed to Checkout" button click
   const handleProceedToCheckout = () => {
@@ -133,9 +133,9 @@ const Cart = () => {
               {/* Right side: Delete and Gram Controls */}
               <div className="flex flex-col items-end justify-between h-full">
                 <div className="flex items-center gap-2">
-                  <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
+                  {/* <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     {item.fullfillmentMethod}
-                  </span>
+                  </span> */}
                   <button
                     onClick={() => handleRemove(item)} // Pass the full item object dynamically
                     className="text-red-500"
@@ -177,15 +177,15 @@ const Cart = () => {
       <div className="mb-6 bg-gray-50 p-4 rounded-xl text-sm">
         <div className="flex justify-between mb-2">
           <span>Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
+          <span>${subtotal?.toFixed(2)}</span>
         </div>
         <div className="flex justify-between mb-2">
-          <span>1% platform fees</span>
-          <span>${platformFee.toFixed(2)}</span>
+          <span>2% platform fees</span>
+          <span>${platformFee?.toFixed(2)}</span>
         </div>
         <div className="flex justify-between font-semibold text-green-700 text-base">
           <span>Total</span>
-          <span>${total.toFixed(2)}</span>
+          <span>${total?.toFixed(2)}</span>
         </div>
       </div>
 
