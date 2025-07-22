@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react"; 
-import { useNavigate, useParams } from "react-router"; 
-import axios from "../../../axios"; 
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router";
+import axios from "../../../axios";
 import Loader from "../../../components/global/Loader";
+import { MdArrowBack } from "react-icons/md";
 
 const OrderDetails = () => {
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { id } = useParams(); 
+  const { id } = useParams();
+  const location = useLocation();
+  const { order } = location?.state || {};
 
-  // Log to check the order ID coming from the URL
-  console.log("Extracted Order ID from URL:", id);
-
+  console.log(order, "orderData");
   // Fetch order details from the API
   const fetchOrderDetails = async () => {
     setLoading(true);
@@ -24,10 +25,8 @@ const OrderDetails = () => {
       console.log("Sending orderId in the request body:", { orderId: id });
 
       const response = await axios.post("user/view-order-by-id", {
-        orderId: id
+        orderId: id,
       });
-
-      console.log("API Response:", response.data);
 
       // Assuming response.data directly contains the order data
       if (response.data && response.data._id) {
@@ -62,35 +61,121 @@ const OrderDetails = () => {
     fulfillmentMethod,
     orderStatus,
     dispensaryName,
-    orderUvid
+    orderUvid,
+    createdAt,
+    
+    phoneNumber,
+    
   } = orderDetails || {};
 
+  const handleTrackOrderClick = () => {
+    navigate(`/app/order-tracking/${id}`, {
+      state: { order: orderDetails }, // ✅ pass the full orderDetails
+    });
+  };
+  console.log(products, "vproducts");
   return (
     <div className="w-full mx-auto bg-white border border-gray-200 p-4 pb-20 lg:pb-0 rounded-2xl">
       {/* Header */}
-      <div className="text-left">
-        <h2 className="text-lg font-semibold">Order Details</h2>
+      <div className="flex items-center  py-3">
+        <div className="cursor-pointer" onClick={() => navigate(-1)}>
+          <MdArrowBack className="text-2xl" />
+        </div>
+
+        <div className="w-6" />
+        <div className="text-left">
+          <h2 className="text-lg font-semibold">Order Details</h2>
+        </div>
       </div>
 
       {/* Order Details */}
-      <div className="bg-[#F9FAFA] mb-2 p-4 rounded-xl text-sm space-y-3">
-        <div className="flex justify-between border-b border-gray-300 pb-3">
-          <span>Order ID</span>
-          <span className="text-gray-700 font-medium">{orderUvid}</span> {/* Use orderUvid from the API */}
+      <div className="bg-white shadow-sm rounded-2xl p-5 text-sm space-y-4">
+        {/* Title */}
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">
+          Order Summary
+        </h2>
+
+        {/* Order ID */}
+        <div className="flex justify-between border-b pb-3 text-gray-600">
+          <span className="font-medium">Order ID</span>
+          <span className="text-gray-900">{orderUvid}</span>
         </div>
-        <div className="flex justify-between border-b border-gray-300 pb-3">
-          <span>Fulfillment Method</span>
-          <span className="text-gray-700 font-medium">{fulfillmentMethod}</span>
+
+        {/* Order Created */}
+        <div className="flex justify-between border-b pb-3 text-gray-600">
+          <span className="font-medium">Order Created</span>
+          <span className="text-gray-900">
+            {new Date(createdAt).toLocaleString("en-US", {
+              dateStyle: "medium",
+              timeStyle: "short",
+            })}
+          </span>
         </div>
-        <div className="flex justify-between border-b border-gray-300 pb-3">
-          <span>Status</span>
-          <span className={`text-sm font-medium ${orderStatus === "Approved" ? "text-green-600" : "text-yellow-500"}`}>{orderStatus}</span>
+
+        {/* Fulfillment Method */}
+        <div className="flex justify-between border-b pb-3 text-gray-600">
+          <span className="font-medium">Fulfillment Method</span>
+          <span className="text-gray-900 capitalize">{fulfillmentMethod}</span>
+        </div>
+
+        {/* No. of Products */}
+        <div className="flex justify-between border-b pb-3 text-gray-600">
+          <span className="font-medium">No. of Products</span>
+          <span className="text-gray-900">{products?.length}</span>
+        </div>
+
+        {/* Phone Number */}
+        <div className="flex justify-between border-b pb-3 text-gray-600">
+          <span className="font-medium">Tel. No.</span>
+          <span className="text-gray-900">{phoneNumber}</span>
+        </div>
+
+        {/* Status */}
+        <div className="flex justify-between text-gray-600">
+          <span className="font-medium">Status</span>
+          <span
+            className={`font-semibold ${
+              orderStatus === "Approved"
+                ? "text-green-600"
+                : orderStatus === "Completed"
+                ? "text-blue-600"
+                : "text-yellow-500"
+            }`}
+          >
+            {orderStatus}
+          </span>
         </div>
       </div>
 
+      {fulfillmentMethod?.toLowerCase() === "pickup" ? (
+      <div className="bg-white my-5 rounded-xl p-4 shadow-sm border border-gray-200">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+        
+          Pick Up Address
+        </h2>
+
+        <p className="text-sm text-gray-600 leading-relaxed break-words">
+          {order?.state?.order?.dispensarystreetAddress}
+        </p>
+      </div>
+
+      ):(
+
+      <div className="bg-white my-5 rounded-xl p-4 shadow-sm border border-gray-200">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+        
+          Shipping Address
+        </h2>
+
+        <p className="text-sm text-gray-600 leading-relaxed break-words">
+          {shippingAddress}
+        </p>
+      </div>
+      )}
+
       {/* Product Details */}
       <div className="rounded-2xl p-3 shadow-sm bg-[#F9FAFA] border border-[#E5E5E5] mt-3">
-        {products?.map((product) => (
+        {order?.state?.order?.products?.map((product) => (
           <div key={product._id} className="flex gap-3 items-center mb-3">
             <img
               src={product.image}
@@ -99,8 +184,14 @@ const OrderDetails = () => {
             />
             <div className="flex flex-col gap-0.5 flex-1 mt-3">
               <p className="text-[15px] font-medium">{product.name}</p>
-              <p className="text-xs text-gray-500">{product.gram}g</p>
-              <p className="text-sm font-bold">${product.price}</p>
+              <p className="text-xs text-gray-500">{product.weight}</p>
+              <p className="text-sm font-bold">
+                $
+                {(
+                  parseFloat(product.price.replace("$", "")) *
+                  parseFloat(product.weight)
+                ).toFixed(2)}
+              </p>
             </div>
           </div>
         ))}
@@ -112,11 +203,25 @@ const OrderDetails = () => {
         <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
           <div className="flex justify-between">
             <span>Subtotal</span>
-            <span>${totalAmount}</span>
+            <span>${parseFloat(totalAmount).toFixed(2)}</span>
           </div>
+
+          <div className="flex justify-between">
+            <span>Platform Fee (2%)</span>
+            <span className="text-red-500">
+              ${(parseFloat(totalAmount) * 0.02).toFixed(2)}
+            </span>
+          </div>
+
           <div className="flex justify-between font-semibold text-green-700 text-base pt-2 border-t border-gray-200">
-            <span>Total</span>
-            <span>${totalAmount}</span>
+            <span>Total After Fee</span>
+            <span>
+              $
+              {(
+                parseFloat(totalAmount) +
+                parseFloat(totalAmount) * 0.02
+              ).toFixed(2)}
+            </span>
           </div>
         </div>
       </div>
@@ -124,7 +229,7 @@ const OrderDetails = () => {
       {/* CTA Button */}
       <button
         className="w-full mt-4 bg-green-700 text-white py-3 rounded-xl font-semibold text-sm"
-        onClick={() => navigate(`/app/order-tracking/${id}`)} // Navigate to the tracking page with the correct order ID
+        onClick={handleTrackOrderClick}
       >
         Track Order
       </button>
