@@ -3,8 +3,8 @@ import { FiArrowLeft, FiHeart, FiSearch } from "react-icons/fi";
 import { CiFilter } from "react-icons/ci";
 import { useNavigate } from "react-router";
 import FilterModal from "../../../components/app/dashboard/FilterModal"; // Adjust the import path as necessary
-import axios from "../../../axios"; // Assuming you have a custom axios instance for API calls  
-
+import axios from "../../../axios"; // Assuming you have a custom axios instance for API calls
+import { ErrorToast, SuccessToast } from "../../../components/global/Toaster";
 
 const Dispensaries = () => {
   const [dispensaries, setDispensaries] = useState([]); // State for storing dispensaries data
@@ -33,7 +33,32 @@ const Dispensaries = () => {
   const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
+  const handleWishlistClick = async (type, id) => {
+    try {
+      let endpoint = "/user/add-to-wishlist"; // Default endpoint for products
+      let requestBody = {
+        [`${type}Id`]: id, // Dynamic key for dispensaryId or productId based on type
+      };
 
+      if (type === "dispensary") {
+        endpoint = "/user/add-to-wishlist-dispensary"; // Dispensary-specific endpoint
+        requestBody = {
+          dispensaryId: id, // Sending dispensaryId directly for dispensary items
+        };
+      }
+
+      const response = await axios.post(endpoint, requestBody);
+
+      if (response.data.success) {
+        SuccessToast(response.data.message); // Display message from API directly
+      } else {
+        ErrorToast(response.data.message); // Display error message from API directly
+      }
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+      ErrorToast("Error adding to wishlist");
+    }
+  };
   return (
     <div className="w-full mx-auto bg-white min-h-screen">
       <div className="flex items-center justify-between mb-8">
@@ -77,14 +102,23 @@ const Dispensaries = () => {
           <div
             key={dispensary._id}
             className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[212px] w-full h-full"
-            onClick={() => navigate("/app/product-details")}
+            onClick={() =>
+              navigate(`/app/dispensary-profile/${dispensary?._id}`)
+            }
           >
             <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
               {dispensary.deliveryRadius} Miles Away
             </div>
-            <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
-              <FiHeart className="text-gray-400 hover:text-red-500 cursor-pointer" />
-            </div>
+           <div
+  onClick={(e) => {
+    e.stopPropagation(); // Prevent navigating to profile
+    handleWishlistClick("dispensary", dispensary._id);
+  }}
+  className="absolute top-2 right-2 bg-white p-1 rounded-full shadow cursor-pointer"
+>
+  <FiHeart className="text-gray-400 hover:text-red-500" />
+</div>
+
             <img
               src={dispensary.profilePicture}
               alt={dispensary.dispensaryName}
@@ -92,9 +126,13 @@ const Dispensaries = () => {
             />
             <div className="p-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-[13px] font-semibold text-gray-900">{dispensary.dispensaryName}</h3>
+                <h3 className="text-[13px] font-semibold text-gray-900">
+                  {dispensary.dispensaryName}
+                </h3>
               </div>
-              <div className="text-sm text-gray-500 mt-1">{dispensary.fulfillmentMethod}</div>
+              <div className="text-sm text-gray-500 mt-1">
+                {dispensary.fulfillmentMethod}
+              </div>
               {/* <div className="flex items-center mt-1">
                 <img
                   src="https://randomuser.me/api/portraits/men/1.jpg" // Sample dispensary image
@@ -110,7 +148,10 @@ const Dispensaries = () => {
       </div>
 
       {/* Filter Modal */}
-      <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
+      <FilterModal
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+      />
     </div>
   );
 };

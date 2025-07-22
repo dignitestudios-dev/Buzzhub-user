@@ -64,7 +64,7 @@ const DispensaryCard = ({ item, addToWishlist }) => {
 // Product Card Component
 const ProductCard = ({ item, addToWishlist }) => {
   const navigate = useNavigate();
-
+console.log(item,"addToWishlist==>")
   const handleCardClick = () => {
     navigate(`/app/product-details/${item._id}`); // Product Details page
   };
