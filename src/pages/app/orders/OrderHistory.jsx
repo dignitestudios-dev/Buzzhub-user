@@ -4,15 +4,16 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { useNavigate } from "react-router";
 import axios from "../../../axios"; // Assuming you have a custom axios instance for API calls
 import Loader from "../../../components/global/Loader";
+import { CiLocationOn } from "react-icons/ci";
 
 const statusColors = {
   Pending: "text-yellow-500",
   Approved: "text-green-600",
   Rejected: "text-red-500",
-  InProcess: "text-orange-500",  // New status color
+  InProcess: "text-orange-500", // New status color
   OutForDelivery: "text-blue-500", // New status color
-  Ready: "text-purple-500",  // New status color
-  Completed: "text-green-600",  // New status color
+  Ready: "text-purple-500", // New status color
+  Completed: "text-green-600", // New status color
 };
 
 const OrderHistory = () => {
@@ -32,13 +33,13 @@ const OrderHistory = () => {
 
         // Map orders to simplified format for UI
         const mappedOrders = All.map((order) => ({
-          id: order._id,  // Correct MongoDB _id
+          id: order._id, // Correct MongoDB _id
           status: order.orderStatus,
-          orderUvid: order.orderUvid,  // Map the orderUvid
+          orderUvid: order.orderUvid, // Map the orderUvid
           products: order.products.map((product) => ({
             name: product.productName || "Item name",
             weight: `${product.gram} gram`,
-            price: `$${product.productPrice}`,  // Use the correct price here
+            price: `$${product.productPrice}`, // Use the correct price here
             image: product.productImage?.[0],
           })),
           totalPrice: `$${order.totalAmount}`,
@@ -48,6 +49,11 @@ const OrderHistory = () => {
             order.products[0]?.isPickup === "true"
               ? "Pickup"
               : "Delivery",
+          dispensaryName: order?.dispensaryDetails?.dispensaryName,
+          dispensaryProfile: order?.dispensaryDetails?.profilePicture,
+          dispensarycity: order?.dispensaryDetails?.city,
+          dispensarystate: order?.dispensaryDetails?.state,
+          dispensarystreetAddress: order?.dispensaryDetails?.streetAddress,
         }));
 
         setOrders(mappedOrders);
@@ -79,22 +85,25 @@ const OrderHistory = () => {
       : order.status === filter; // For "Order Tracking", use the status filter
   });
 
-  const handleOrderDetailsClick = (orderId) => {
-    navigate(`/app/order-details/${orderId}`);  // Here, `orderId` is the MongoDB _id
+  const handleOrderDetailsClick = (orderId, order) => {
+    navigate(`/app/order-details/${orderId}`, {
+      state: { order },
+    }); // Here, `orderId` is the MongoDB _id
   };
-const handleTrackOrderClick = (orderId) => {
-  // Find the order by orderId
-  const selectedOrder = orders.find((order) => order.id === orderId);
+  const handleTrackOrderClick = (orderId) => {
+    // Find the order by orderId
+    const selectedOrder = orders.find((order) => order.id === orderId);
 
-  // Pass selected order to the OrderTracking page
-  navigate(`/app/order-tracking/${orderId}`, {
-    state: { order: selectedOrder }
-  });
-};
-
+    // Pass selected order to the OrderTracking page
+    navigate(`/app/order-tracking/${orderId}`, {
+      state: { order: selectedOrder },
+    });
+  };
+  console.log(orders);
   return (
     <div className="w-full lg:mb-0 md:mb-0 mb-24 bg-white min-h-screen">
       {/* Header */}
+
       <div className="flex items-center gap-2 mb-4">
         <button className="p-1" onClick={() => navigate(-1)}>
           <IoMdArrowBack size={24} />
@@ -138,13 +147,16 @@ const handleTrackOrderClick = (orderId) => {
       </div>
 
       {/* Orders List */}
+
       <div className="space-y-4">
         {loading ? (
-          <div className="text-center text-gray-500"><Loader /></div>
+          <div className="text-center text-gray-500">
+            <Loader />
+          </div>
         ) : filteredOrders.length === 0 ? (
           <p className="text-center text-gray-500">No orders found.</p>
         ) : (
-          filteredOrders.map((order, i) => (
+          filteredOrders?.map((order, i) => (
             <div
               key={i}
               className="rounded-2xl p-3 shadow-sm bg-[#F9FAFA] border border-[#E5E5E5]"
@@ -153,66 +165,101 @@ const handleTrackOrderClick = (orderId) => {
               <div className="flex justify-between items-center mb-2 border-b pb-2">
                 <p className="text-sm text-[#1D7C42] font-medium">
                   Order Id:{" "}
-                  <span className="text-[#1D7C42] font-normal">{order.orderUvid}</span>
+                  <span className="text-[#1D7C42] font-normal">
+                    {order.orderUvid}
+                  </span>
                 </p>
-                <p className={`text-sm font-medium ${statusColors[order.status.replace(/\s+/g, '')]}`}>
+                <p
+                  className={`text-sm font-medium ${
+                    statusColors[order.status.replace(/\s+/g, "")]
+                  }`}
+                >
                   {order.status}
                 </p>
               </div>
 
               {/* Product Details */}
-              <div className="flex flex-col gap-3 mb-3">
-                {order.products.map((product, index) => (
-                  <div key={index} className="flex gap-3 items-center">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-20 h-20 rounded-lg object-cover"
-                    />
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm">{product.name}</p>
-                      <p className="text-xs text-[#1D7C42] font-medium">{product.weight}</p>
+              <div className="flex flex-col gap-4 mb-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <img
+                    src={order.dispensaryProfile}
+                    alt={order.dispensaryName}
+                    className="w-20 h-20 rounded-lg object-cover"
+                  />
+
+                  <div className="flex-1 w-full">
+                    {/* Dispensary Name */}
+                    <div className="flex items-start justify-between flex-wrap">
+                      <p className="font-semibold text-base text-black">
+                        {order.dispensaryName}
+                      </p>
+                      <p className="font-bold text-lg text-black">
+                        Total: $
+                        {(
+                          parseFloat(order.totalPrice.replace("$", "")) * 1.02
+                        ).toFixed(2)}
+                      </p>
+                    </div>
+
+                    {/* Location + Fee Note */}
+                    <div className="flex justify-between items-center mt-2 text-sm text-gray-500 flex-wrap">
+                      <div className="flex items-center gap-1">
+                        <CiLocationOn className="text-[#1D7C42]" />
+                        <span>
+                          {order.dispensarycity}, {order.dispensarystate}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-400 italic">
+                        Includes 2% platform fee
+                      </span>
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
 
               {/* Location & Total Price */}
-              <div className="text-xs text-gray-500 flex items-center mb-1">
-                <HiOutlineLocationMarker className="mr-1" />
-                {order.location}
-              </div>
-              <p className="text-[18px] font-bold text-black">Total: {order.totalPrice}</p>
 
               {/* Buttons */}
               <div className="flex justify-end items-center gap-2 mt-2">
-  {/* Track order button - Only shown if order status matches one of the specified statuses */}
-  {["Approved", "In Process", "Out For Delivery", "Ready", "Completed"].includes(order.status) && (
-    <button
-      onClick={() => handleTrackOrderClick(order.id)}
-      className="text-[12px] text-white bg-[#1D7C42] w-[83px] h-[38px] rounded-lg"
-    >
-      Track order
-    </button>
-  )}
-  
-  {/* Order Details button */}
-  <button
-    onClick={() => handleOrderDetailsClick(order.id)}  // Use the correct orderId (_id)
-    className="bg-[#1D7C42] p-2.5 w-[38px] h-[38px] rounded-lg text-white"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-    </svg>
-  </button>
-</div>
+                {/* Track order button - Only shown if order status matches one of the specified statuses */}
+                {[
+                  "Approved",
+                  "In Process",
+                  "Out For Delivery",
+                  "Ready",
+                  "Completed",
+                ].includes(order.status) && (
+                  <button
+                    onClick={() => handleTrackOrderClick(order.id)}
+                    className="text-[12px] text-white bg-[#1D7C42] w-[83px] h-[38px] rounded-lg"
+                  >
+                    Track order
+                  </button>
+                )}
 
+                {/* Order Details button */}
+                <button
+                  onClick={() =>
+                    handleOrderDetailsClick(order.id, { state: { order } })
+                  }
+                  className="bg-[#1D7C42] p-2.5 w-[38px] h-[38px] rounded-lg text-white"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
           ))
         )}

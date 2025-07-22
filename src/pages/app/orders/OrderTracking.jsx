@@ -1,18 +1,25 @@
-import { FaCheck } from "react-icons/fa"; 
+import { FaCheck } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { MdArrowBack } from "react-icons/md";
-import { useLocation } from "react-router-dom"; // Import useLocation
+import { useLocation, useNavigate } from "react-router-dom"; // Import useLocation
 
 const OrderTracking = () => {
-  const location = useLocation(); // Get the location object
-  const { order } = location.state; // Extract the order from the state
-
+  const navigate =useNavigate()
+  const location = useLocation();
+  const order = location?.state?.order;
+console.log(order,"order==>")
   // Define the order statuses for progression
-  const statuses = ["In Process", "Approved", "Out For Delivery", "Ready", "Completed"];
+  const statuses = [
+    "In Process",
+    "Approved",
+    "Out For Delivery",
+    "Ready",
+    "Completed",
+  ];
 
   // Get the index of the current status
-  const currentStatusIndex = statuses.indexOf(order.status);
+  const currentStatusIndex = statuses.indexOf(order.orderStatus);
 
   // Create the steps based on the order status
   const steps = [
@@ -24,13 +31,15 @@ const OrderTracking = () => {
   ];
 
   // Check if the order status is "Completed"
-  const isCompleted = order.status === "Completed";
+  const isCompleted = order.orderStatus === "Completed";
 
   return (
     <div className="w-full mx-auto bg-white min-h-screen font-sans text-[15px] pb-20 md:pb-0">
       {/* Header */}
       <div className="flex items-center justify-between py-3">
-        <MdArrowBack className="text-2xl" />
+        <div className="cursor-pointer" onClick={() => navigate(-1)}>
+          <MdArrowBack className="text-2xl" />
+        </div>
         <p className="font-semibold text-[15px]">Order Tracking</p>
         <div className="w-6" />
       </div>
@@ -41,43 +50,54 @@ const OrderTracking = () => {
         <div className="flex justify-between items-center mb-2 border-b pb-2">
           <p className="text-sm text-[#1D7C42] font-medium">
             Order Id:{" "}
-            <span className="text-[#1D7C42] font-normal">{order.orderUvid}</span>
+            <span className="text-[#1D7C42] font-normal">
+              {order.orderUvid}
+            </span>
           </p>
 
-          <div className="flex items-center ml-4">
-            <p className="text-xs md:text-sm mr-2">Dispensary</p>
-            <img
-              src={order.products[0]?.dispensaryDetails?.image} // Assuming dispensary image is part of the order data
-              alt="dispensary"
-              className="w-[20px] h-[20px] md:w-8 md:h-8 rounded-full object-cover mr-2"
-            />
-          </div>
+          {Array.isArray(order?.products) && order.products.length > 0 && (
+            <div className="flex items-center ml-4">
+              <p className="text-xs md:text-sm mr-2">Dispensary</p>
+              <img
+                src={
+                  order?.products[0]?.dispensaryDetails?.image ||
+                  "/default-dispensary.png"
+                }
+                alt="dispensary"
+                className="w-[20px] h-[20px] md:w-8 md:h-8 rounded-full object-cover mr-2"
+              />
+            </div>
+          )}
         </div>
 
         {/* Product Details */}
         <div className="flex flex-col gap-3 mb-3">
-          {order.products.map((product, index) => (
-            <div key={index} className="flex gap-3 items-center">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-[62px] h-[62px] mt-2 rounded-md object-cover"
-              />
-              <div className="flex flex-col gap-0.5 flex-1">
-                <p className="text-[15px] font-medium">{product.name}</p>
-                <p className="flex items-center text-xs text-gray-500">
-                  <HiOutlineLocationMarker className="mr-1 text-gray-500" />
-                  {order.location} {/* Assuming this field exists in the order */}
-                </p>
-                <p className="text-xs text-black">{product.weight}</p>
+          {Array.isArray(order?.products) &&
+            order.products.map((product, index) => (
+              <div key={index} className="flex gap-3 items-center">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-[62px] h-[62px] mt-2 rounded-md object-cover"
+                />
+                <div className="flex flex-col gap-0.5 flex-1">
+                  <p className="text-[15px] font-medium">{product.name}</p>
+                  <p className="flex items-center text-xs text-gray-500">
+                    <HiOutlineLocationMarker className="mr-1 text-gray-500" />
+                    {order?.location || "No location"}
+                  </p>
+                  <p className="text-xs text-black">{product.weight}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[18px] font-bold">
+                    $
+                    {typeof product.price === "number"
+                      ? product.price.toFixed(2)
+                      : product.price?.replace("$", "")}
+                  </p>
+                </div>
               </div>
-
-              {/* Right Section - Price */}
-              <div className="text-right">
-                <p className="text-[18px] font-bold">${product.price?.replace('$', '')}</p>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
 
@@ -97,7 +117,13 @@ const OrderTracking = () => {
                 </div>
               )}
             </div>
-            <p className={`text-[13px] ${step.completed ? "text-[#4C9A2A]" : "text-[#D9EBD0]"}`}>{step.label}</p>
+            <p
+              className={`text-[13px] ${
+                step.completed ? "text-[#4C9A2A]" : "text-[#D9EBD0]"
+              }`}
+            >
+              {step.label}
+            </p>
           </div>
         ))}
       </div>
@@ -107,7 +133,7 @@ const OrderTracking = () => {
         <div className="flex justify-between gap-4 mt-6">
           {/* Give Feedback Button */}
           <button
-            onClick={() => window.location.href = "/app/feedback"}
+            onClick={() => (window.location.href = "/app/feedback")}
             className="w-1/2 bg-[#1D7C42] text-white text-sm py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
           >
             Give Feedback
