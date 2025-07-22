@@ -20,6 +20,21 @@ const EditProfile = () => {
 
   const [formData, setFormData] = useState({});
 
+  const formatPhoneNumber = (phoneNumber) => {
+  // Remove non-numeric characters
+  const cleaned = phoneNumber.replace(/\D/g, "");
+
+  // Format the phone number in the desired pattern
+  const match = cleaned.match(/(\d{1})(\d{3})(\d{3})(\d{1})/);
+
+  if (match) {
+    return `+${match[1]}-${match[2]}${match[3]}-${match[4]}`;
+  }
+
+  return phoneNumber; // If it's not a valid phone number, return as is
+};
+
+
   // Fetch profile data to pre-fill the form
   const fetchProfile = async () => {
     try {
@@ -38,7 +53,7 @@ const EditProfile = () => {
           deliveryRadius: userData?.deliveryRadius,
           zipCode: userData?.zipCode,
           country: userData?.country,
-          streetAddress: "user",
+          streetAddress: userData?.streetAddress,
         });
       } else {
         ErrorToast("Failed to fetch profile data.");
@@ -91,10 +106,11 @@ const EditProfile = () => {
       const lat = place.geometry.location.lat();
       const lng = place.geometry.location.lng();
       setStartAddress(place.formatted_address || "");
+      console.log("lat:", lat, "lng:", lng);
       setFormData({ ...formData, ["streetAddress"]: place.formatted_address });
       setCoordinates({
         type: "Point",
-        coordinates: { lat, lng },
+        coordinates: [lat, lng],
       });
       setOriginCoords([lng, lat]);
       setCoordinatesMessage(null);
@@ -125,11 +141,13 @@ const EditProfile = () => {
       data.append("streetAddress", formData.streetAddress);
       data.append("zipCode", formData.zipCode);
 
-      // data.append("location[coordinates]", JSON.stringify(latLong));
-      data.append(
-        "location[coordinates]",
-        JSON.stringify(originCoords ? originCoords : latLong)
-      );
+      data.append("location[type]", coordinates.type); // Append the type field
+data.append("location[coordinates][]", coordinates.coordinates[0]); // Append latitude
+data.append("location[coordinates][]", coordinates.coordinates[1]);
+      // data.append(
+      //   "location[coordinates]",
+      //   JSON.stringify(coordinates ? coordinates : latLong)
+      // );
       data.append("fullName", name);
 
       data.append("phoneNumber", phone);
@@ -230,14 +248,15 @@ const EditProfile = () => {
 
         {/* Phone Field */}
         <div>
-          <input
-            type="tel"
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600"
-            placeholder="Phone number"
-            value={phone}
-            maxLength={11} // This limits the input field to 11 characters
-            onChange={(e) => setPhone(e.target.value)}
-          />
+         <input
+  type="tel"
+  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600"
+  placeholder="Phone number"
+  value={formatPhoneNumber(phone)}  // Use formatted phone number
+  maxLength={11}  // Limit the input to 11 characters
+  onChange={(e) => setPhone(e.target.value)}  // Keep the original unformatted number
+/>
+
         </div>
 
         {/* Address Field */}

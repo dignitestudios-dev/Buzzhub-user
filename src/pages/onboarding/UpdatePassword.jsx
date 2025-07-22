@@ -1,21 +1,31 @@
 import React, { useState } from "react";
-import { BiArrowBack } from "react-icons/bi";
+import { BiShow, BiHide } from "react-icons/bi";  // Importing the eye icons
 import { Logo } from "../../assets/export";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const AuthInput = ({ text, placeholder, type, state, setState }) => {
+const AuthInput = ({ text, placeholder, type, state, setState, showPassword, togglePasswordVisibility }) => {
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       <label className="text-sm text-gray-700">{text}</label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        value={state}
-        onChange={(e) => setState(e.target.value)}
-        className="w-full p-3 mt-2 border border-gray-300 rounded-md"
-        required
-      />
+      <div className="relative">
+        <input
+          type={type}
+          placeholder={placeholder}
+          value={state}
+          onChange={(e) => setState(e.target.value)}
+          className="w-full p-3 mt-2 border border-gray-300 rounded-md pr-10" // Added pr-10 for space for the eye icon
+          required
+        />
+        {showPassword && (
+          <div
+            className="absolute top-1/2 transform -translate-y-1/2 right-3 cursor-pointer"
+            onClick={togglePasswordVisibility}
+          >
+            {type === "password" ? <BiShow size={24} /> : <BiHide size={24} />}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -40,53 +50,52 @@ const UpdatePassword = () => {
   const [isUpdated, setIsUpdated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);  // State to toggle visibility of the new password
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);  // State to toggle visibility of the confirm password
 
-  const token = localStorage.getItem("token")
-console.log("first--->", token);
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  
-  if (newPassword !== confirmPassword) {
-    setError("Passwords do not match");
-    return;
-  }
+  const token = localStorage.getItem("token");
 
-  setLoading(true);
-  try {
-    const response = await axios.post(
-  "https://api.buzzhubapp.com/auth/change-password-forgot", 
-  {
-    newPassword,
-    confirmPassword,
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`, // Get token from localStorage
-    },
-  }
-);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    if (response.data.token) {
-         setIsUpdated(true);
-    navigate("/login")
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
     }
 
-  } catch (err) {
-    setError(err.response?.data?.message || "Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "https://api.buzzhubapp.com/auth/change-password-forgot",
+        {
+          newPassword,
+          confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      if (response.data.token) {
+        setIsUpdated(true);
+        navigate("/login");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleNewPasswordVisibility = () => setShowNewPassword(!showNewPassword);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   return (
     <div className="w-screen h-screen flex items-start justify-start bg-gray-50">
       <form onSubmit={handleSubmit} className="w-full lg:w-1/2 h-full bg-white px-4 py-4 lg:p-20 flex flex-col overflow-y-auto justify-start items-center gap-8">
-        {/* <button type="button" onClick={() => navigate(-1)} className="w-full flex justify-start items-start flex-col">
-          <BiArrowBack className="text-3xl text-black" />
-        </button> */}
-
         <div className="w-full flex justify-start -mt-6 items-start flex-col mt-8">
           <h1 className="text-[36px] font-bold text-black leading-[64.8px] tracking-[-1.2px]">
             Update Password
@@ -97,16 +106,20 @@ console.log("first--->", token);
           <AuthInput
             text="New Password"
             placeholder="Enter Password"
-            type="password"
+            type={showNewPassword ? "text" : "password"}  // Toggle between text and password
             state={newPassword}
             setState={setNewPassword}
+            showPassword={true}  // Enable the eye icon for password visibility toggle
+            togglePasswordVisibility={toggleNewPasswordVisibility}
           />
           <AuthInput
             text="Confirm Password"
             placeholder="Enter Password"
-            type="password"
+            type={showConfirmPassword ? "text" : "password"}  // Toggle between text and password
             state={confirmPassword}
             setState={setConfirmPassword}
+            showPassword={true}  // Enable the eye icon for password visibility toggle
+            togglePasswordVisibility={toggleConfirmPasswordVisibility}
           />
         </div>
 

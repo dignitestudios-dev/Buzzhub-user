@@ -1,24 +1,40 @@
 import React, { useState } from "react";
 import AddressForm from "../../components/app/onboarding/AddressForm";
 import UploadDocuments from "../../components/app/onboarding/UploadDocuments";
-import PaymentMethod from "../../components/app/onboarding/PaymentMethod";
-import ReviewForm from "../../components/app/onboarding/ReviewForm";
+import ReviewForm from "../../components/app/onboarding/ReviewForm"; // ReviewForm remains
 
 export default function App() {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    address: {},
+    images: {},
+  });
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
-  const updateData = (data) => setFormData({ ...formData, ...data });
+  const updateData = (data) => {
+    setFormData((prevData) => ({ ...prevData, ...data }));
+  };
 
-  const steps = ["Address", "Profile", "Payment", "Review"];
+  // Combine address and image data into a single object
+ const combinedFormData = {
+  ...formData.address, // Address data
+  profileImage: formData.images.profile,  // Ensure profile image is passed correctly
+  medicalCardFront: formData.images.medicalFront,  // Pass medical card front
+  medicalCardBack: formData.images.medicalBack,  // Pass medical card back
+  licenseFront: formData.images.licenseFront,  // Pass license front
+  licenseBack: formData.images.licenseBack,  // Pass license back
+};
+console.log(formData); // Log to inspect the object
+
+  // Step names
+  const steps = ["Address", "Documents", "Review"];
 
   return (
-    <div className="w-full ">
+    <div className="w-full">
       {/* Stepper */}
-      <div className="flex justify-center bg-green-600 p-4 items-center  mx-auto mb-6">
+      <div className="flex justify-center bg-green-600 p-4 items-center mx-auto mb-6">
         {steps.map((label, index) => {
           const isCompleted = index + 1 < step;
           const isCurrent = index + 1 === step;
@@ -57,10 +73,7 @@ export default function App() {
         {step === 2 && (
           <UploadDocuments onNext={nextStep} onBack={prevStep} updateData={updateData} />
         )}
-        {step === 3 && (
-          <PaymentMethod onNext={nextStep} onBack={prevStep} updateData={updateData} />
-        )}
-        {step === 4 && <ReviewForm formData={formData} onBack={prevStep} />}
+        {step === 3 && <ReviewForm formData={combinedFormData} onBack={prevStep} />}
       </div>
     </div>
   );
