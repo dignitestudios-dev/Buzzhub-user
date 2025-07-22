@@ -1,31 +1,31 @@
 import React, { useState } from "react";
-import { BiShow, BiHide } from "react-icons/bi";  // Importing the eye icons
+import { BiArrowBack } from "react-icons/bi";
 import { Logo } from "../../assets/export";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { BiHide, BiShow } from "react-icons/bi"; // Eye icons
+import axios from "../../axios.js";
+import { SuccessToast } from "../../components/global/Toaster.jsx";
 
-const AuthInput = ({ text, placeholder, type, state, setState, showPassword, togglePasswordVisibility }) => {
+const AuthInput = ({ text, placeholder, type, state, setState, toggleVisibility }) => {
   return (
     <div className="w-full relative">
       <label className="text-sm text-gray-700">{text}</label>
-      <div className="relative">
-        <input
-          type={type}
-          placeholder={placeholder}
-          value={state}
-          onChange={(e) => setState(e.target.value)}
-          className="w-full p-3 mt-2 border border-gray-300 rounded-md pr-10" // Added pr-10 for space for the eye icon
-          required
-        />
-        {showPassword && (
-          <div
-            className="absolute top-1/2 transform -translate-y-1/2 right-3 cursor-pointer"
-            onClick={togglePasswordVisibility}
-          >
-            {type === "password" ? <BiShow size={24} /> : <BiHide size={24} />}
-          </div>
-        )}
-      </div>
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={state}
+        onChange={(e) => setState(e.target.value)}
+        className="w-full p-3 mt-2 border border-gray-300 rounded-md pr-10" // Add padding to the right for space for the icon
+        required
+      />
+      {toggleVisibility && (
+        <div
+          onClick={toggleVisibility}
+          className="absolute right-3 pb-12 transform -translate-y-1/2 cursor-pointer"
+        >
+          {type === "password" ? <BiShow size={24} /> : <BiHide size={24} />}
+        </div>
+      )}
     </div>
   );
 };
@@ -50,8 +50,8 @@ const UpdatePassword = () => {
   const [isUpdated, setIsUpdated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showNewPassword, setShowNewPassword] = useState(false);  // State to toggle visibility of the new password
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);  // State to toggle visibility of the confirm password
+  const [showNewPassword, setShowNewPassword] = useState(false);  // State for toggling new password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);  // State for toggling confirm password visibility
 
   const token = localStorage.getItem("token");
 
@@ -67,7 +67,7 @@ const UpdatePassword = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://api.buzzhubapp.com/auth/change-password-forgot",
+        "https://api.buzzhubapp.com/auth/change-password-forgot", 
         {
           newPassword,
           confirmPassword,
@@ -78,10 +78,11 @@ const UpdatePassword = () => {
           },
         }
       );
-
-      if (response.data.token) {
+console.log(response.data,"testtt")
+      if (response.data.success) {
         setIsUpdated(true);
-        navigate("/login");
+        SuccessToast("Password updated successfully!");
+        navigate("/auth/login");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
@@ -89,9 +90,6 @@ const UpdatePassword = () => {
       setLoading(false);
     }
   };
-
-  const toggleNewPasswordVisibility = () => setShowNewPassword(!showNewPassword);
-  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
   return (
     <div className="w-screen h-screen flex items-start justify-start bg-gray-50">
@@ -106,20 +104,18 @@ const UpdatePassword = () => {
           <AuthInput
             text="New Password"
             placeholder="Enter Password"
-            type={showNewPassword ? "text" : "password"}  // Toggle between text and password
+            type={showNewPassword ? "text" : "password"}
             state={newPassword}
             setState={setNewPassword}
-            showPassword={true}  // Enable the eye icon for password visibility toggle
-            togglePasswordVisibility={toggleNewPasswordVisibility}
+            toggleVisibility={() => setShowNewPassword(!showNewPassword)}  // Toggle visibility for new password
           />
           <AuthInput
             text="Confirm Password"
             placeholder="Enter Password"
-            type={showConfirmPassword ? "text" : "password"}  // Toggle between text and password
+            type={showConfirmPassword ? "text" : "password"}
             state={confirmPassword}
             setState={setConfirmPassword}
-            showPassword={true}  // Enable the eye icon for password visibility toggle
-            togglePasswordVisibility={toggleConfirmPasswordVisibility}
+            toggleVisibility={() => setShowConfirmPassword(!showConfirmPassword)}  // Toggle visibility for confirm password
           />
         </div>
 
