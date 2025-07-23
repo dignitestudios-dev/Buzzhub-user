@@ -108,7 +108,7 @@ const Products = () => {
               <div className="flex justify-between items-center">
                 <h3 className="text-[13px] font-semibold text-gray-900">{item.productName}</h3>
                 <div className="flex items-center text-sm text-yellow-500 font-semibold">
-                  <span className="mr-1">⭐</span> {item.averageRating || "N/A"}
+                  <span className="mr-1">⭐</span> {item.averageRating || "0.0"}
                 </div>
               </div>
               <div className="text-sm text-gray-500 mt-1">{item.productType}</div>
