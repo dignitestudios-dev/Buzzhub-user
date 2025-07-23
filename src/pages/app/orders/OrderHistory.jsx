@@ -32,7 +32,7 @@ const OrderHistory = () => {
         const { All } = response.data.data;
 
         // Map orders to simplified format for UI
-        const mappedOrders = All.map((order) => ({
+        const mappedOrders = All?.map((order) => ({
           id: order._id, // Correct MongoDB _id
           status: order.orderStatus,
           orderUvid: order.orderUvid, // Map the orderUvid
