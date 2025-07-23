@@ -3,6 +3,7 @@ import { FiHeart } from "react-icons/fi";
 import axios from "../../../axios"; // Assuming you have a custom axios instance for API calls
 import Loader from "../../../components/global/Loader";
 import { SuccessToast } from "../../../components/global/Toaster";
+import { FaHeart } from "react-icons/fa";
 
 const Favorites = () => {
   const [activeTab, setActiveTab] = useState("Dispensary");
@@ -123,9 +124,9 @@ const Favorites = () => {
                     </div>
                     <button
                       onClick={() => handleAddToWishlistDispensary(item._id)}
-                      className="text-green-600 absolute top-3 right-3 hover:text-green-800"
+                      className="text-red-600 absolute top-3 right-3 hover:text-green-800"
                     >
-                      <FiHeart size={20} />
+                      <FaHeart size={20} />
                     </button>
                   </div>
                 ))
@@ -146,15 +147,15 @@ const Favorites = () => {
                     </div>
 
                     <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
-                      <FiHeart
-                        className="text-gray-400 hover:text-red-500 cursor-pointer"
+                      <FaHeart
+                        className="text-red-600 hover:text-red-500 cursor-pointer"
                         onClick={() => handleAddToWishlistProduct(item?.ProductDetails?._id)}
                       />
                     </div>
 
                     {/* Product Image */}
                     <img
-                      src={item.ProductDetails.productImage}
+                      src={item.ProductDetails.productImage[0]}
                       alt={item.ProductDetails.productName}
                       className="w-full h-[130px] object-cover rounded-t-xl"
                     />

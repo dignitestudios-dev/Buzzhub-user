@@ -7,6 +7,8 @@ import axios from "../../axios"; // Adjust according to your path
 import Cookies from "js-cookie"; // For setting token in cookies
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; // Eye icon imports
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster"; // Import toast components
+import SocialLogin from "./SocialLogin";
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -33,16 +35,16 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
-    setErrors({}); 
+    e.preventDefault();
+    setErrors({});
     const formErrors = validateForm();
 
     if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors); 
-      return; 
+      setErrors(formErrors);
+      return;
     }
 
-    setLoading(true); 
+    setLoading(true);
 
     const deviceIdentity = "123";
 
@@ -55,7 +57,7 @@ const Login = () => {
         deviceIdentity, // Directly using "123" as device identity
       });
 
-      if (response.data.success) { 
+      if (response.data.success) {
         // Show success toast
         SuccessToast("Login successful!");
 
@@ -84,8 +86,8 @@ const Login = () => {
   return (
     <div className="flex w-full h-screen overflow-hidden bg-gray-50">
       <form
-        onSubmit={(e)=>handleSubmit(e)}
-        className="w-full lg:w-1/2 h-full bg-white p-8 lg:p-20 flex flex-col justify-start items-start gap-8"
+        onSubmit={(e) => handleSubmit(e)}
+        className="w-full lg:w-1/2 h-full bg-white p-8 lg:p-20 flex flex-col  gap-8"
       >
         {/* Header */}
         <div className="flex flex-col items-start mt-16">
@@ -95,39 +97,58 @@ const Login = () => {
 
         {/* Error Message */}
         {errors.general && (
-          <div className="w-full text-red-500 text-sm text-center mt-4">{errors.general}</div>
+          <div className="w-full text-red-500 text-sm text-center mt-4">
+            {errors.general}
+          </div>
         )}
 
         {/* Input Fields */}
-        <div className="flex flex-col w-full justify-start items-start gap-4">
+        <div className="flex flex-col w-full justify-center items-center gap-4">
           {/* Email Input */}
           <div className="relative w-full">
-            <PiEnvelopeLight className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" size={20} />
+            <PiEnvelopeLight
+              className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
             <input
               type="email"
               placeholder="Email"
-              className={`w-full rounded-xl border ${errors.email ? 'border-red-500' : 'border-gray-300'} pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-green-500`}
+              className={`w-full rounded-xl border ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              } pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-green-500`}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            {errors.email && <div className="text-red-500 text-sm">{errors.email}</div>}
+            {errors.email && (
+              <div className="text-red-500 text-sm">{errors.email}</div>
+            )}
           </div>
 
           {/* Password Input */}
           <div className="relative w-full">
-            <CiLock className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" size={20} />
+            <CiLock
+              className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className={`w-full rounded-xl border ${errors.password ? 'border-red-500' : 'border-gray-300'} pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-green-500`}
+              className={`w-full rounded-xl border ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              } pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-green-500`}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               maxLength={12}
             />
-            {errors.password && <div className="text-red-500 text-sm">{errors.password}</div>}
+            {errors.password && (
+              <div className="text-red-500 text-sm">{errors.password}</div>
+            )}
             <div className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer">
               {showPassword ? (
-                <AiOutlineEyeInvisible onClick={() => setShowPassword(false)} size={20} />
+                <AiOutlineEyeInvisible
+                  onClick={() => setShowPassword(false)}
+                  size={20}
+                />
               ) : (
                 <AiOutlineEye onClick={() => setShowPassword(true)} size={20} />
               )}
@@ -138,8 +159,7 @@ const Login = () => {
             <button
               type="button"
               className="text-xs font-medium text-green-600"
-                            onClick={() => navigate("/auth/forgot-password")}
-
+              onClick={() => navigate("/auth/forgot-password")}
             >
               Forgot Password?
             </button>
@@ -151,9 +171,12 @@ const Login = () => {
           type="submit"
           className="w-full rounded-xl bg-green-600 text-white py-3 text-sm font-semibold hover:bg-green-700 transition duration-200"
         >
-          {loading ? "Logging In..." : "Log in"} {/* Show loading text if loading */}
+          {loading ? "Logging In..." : "Log in"}{" "}
+          {/* Show loading text if loading */}
         </button>
-
+        <div className="flex justify-center items-center mb-6">
+          <SocialLogin />
+        </div>
         {/* Signup Redirect */}
         <div className="w-full flex flex-col gap-1 justify-center items-center mt-4">
           <div className="w-full lg:w-[434px] flex gap-1 justify-center items-center">
