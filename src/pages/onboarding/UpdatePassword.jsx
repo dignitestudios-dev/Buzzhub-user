@@ -2,20 +2,30 @@ import React, { useState } from "react";
 import { BiArrowBack } from "react-icons/bi";
 import { Logo } from "../../assets/export";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { BiHide, BiShow } from "react-icons/bi"; // Eye icons
+import axios from "../../axios.js";
+import { SuccessToast } from "../../components/global/Toaster.jsx";
 
-const AuthInput = ({ text, placeholder, type, state, setState }) => {
+const AuthInput = ({ text, placeholder, type, state, setState, toggleVisibility }) => {
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       <label className="text-sm text-gray-700">{text}</label>
       <input
         type={type}
         placeholder={placeholder}
         value={state}
         onChange={(e) => setState(e.target.value)}
-        className="w-full p-3 mt-2 border border-gray-300 rounded-md"
+        className="w-full p-3 mt-2 border border-gray-300 rounded-md pr-10" // Add padding to the right for space for the icon
         required
       />
+      {toggleVisibility && (
+        <div
+          onClick={toggleVisibility}
+          className="absolute right-3 pb-12 transform -translate-y-1/2 cursor-pointer"
+        >
+          {type === "password" ? <BiShow size={24} /> : <BiHide size={24} />}
+        </div>
+      )}
     </div>
   );
 };
@@ -40,53 +50,50 @@ const UpdatePassword = () => {
   const [isUpdated, setIsUpdated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);  // State for toggling new password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);  // State for toggling confirm password visibility
 
-  const token = localStorage.getItem("token")
-console.log("first--->", token);
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  
-  if (newPassword !== confirmPassword) {
-    setError("Passwords do not match");
-    return;
-  }
+  const token = localStorage.getItem("token");
 
-  setLoading(true);
-  try {
-    const response = await axios.post(
-  "https://api.buzzhubapp.com/auth/change-password-forgot", 
-  {
-    newPassword,
-    confirmPassword,
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`, // Get token from localStorage
-    },
-  }
-);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    if (response.data.token) {
-         setIsUpdated(true);
-    navigate("/login")
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
     }
 
-  } catch (err) {
-    setError(err.response?.data?.message || "Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
-
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "https://api.buzzhubapp.com/auth/change-password-forgot", 
+        {
+          newPassword,
+          confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+console.log(response.data,"testtt")
+      if (response.data.success) {
+        setIsUpdated(true);
+        SuccessToast("Password updated successfully!");
+        navigate("/auth/login");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-screen h-screen flex items-start justify-start bg-gray-50">
       <form onSubmit={handleSubmit} className="w-full lg:w-1/2 h-full bg-white px-4 py-4 lg:p-20 flex flex-col overflow-y-auto justify-start items-center gap-8">
-        {/* <button type="button" onClick={() => navigate(-1)} className="w-full flex justify-start items-start flex-col">
-          <BiArrowBack className="text-3xl text-black" />
-        </button> */}
-
         <div className="w-full flex justify-start -mt-6 items-start flex-col mt-8">
           <h1 className="text-[36px] font-bold text-black leading-[64.8px] tracking-[-1.2px]">
             Update Password
@@ -97,16 +104,18 @@ console.log("first--->", token);
           <AuthInput
             text="New Password"
             placeholder="Enter Password"
-            type="password"
+            type={showNewPassword ? "text" : "password"}
             state={newPassword}
             setState={setNewPassword}
+            toggleVisibility={() => setShowNewPassword(!showNewPassword)}  // Toggle visibility for new password
           />
           <AuthInput
             text="Confirm Password"
             placeholder="Enter Password"
-            type="password"
+            type={showConfirmPassword ? "text" : "password"}
             state={confirmPassword}
             setState={setConfirmPassword}
+            toggleVisibility={() => setShowConfirmPassword(!showConfirmPassword)}  // Toggle visibility for confirm password
           />
         </div>
 

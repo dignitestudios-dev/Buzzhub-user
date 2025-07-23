@@ -16,8 +16,8 @@ export default function UploadDocuments({ onNext, onBack, updateData }) {
   };
 
   const handleSubmit = () => {
-    updateData(images);
-    onNext();
+    updateData({ images }); // Save images data in parent state
+    onNext(); // Go to next step
   };
 
   const renderUploadBox = (label, name) => (
@@ -40,24 +40,7 @@ export default function UploadDocuments({ onNext, onBack, updateData }) {
   );
 
   return (
-    <div className="w-full  max-w-full">
-      {/* Progress Steps */}
-      {/* <div className="flex items-center justify-between bg-green-600 text-white p-4">
-        {["Address", "Profile", "Payment", "Review"].map((step, index) => (
-          <div key={step} className="flex-1 text-center relative">
-            <div
-              className={`w-6 h-6 mx-auto mb-1 rounded-full border-2 flex items-center justify-center text-sm font-bold ${
-                index < 2 ? "bg-white text-green-600 border-white" : "border-white"
-              }`}
-            >
-              {index + 1}
-            </div>
-            <span className="text-xs">{step}</span>
-          </div>
-        ))}
-      </div> */}
-
-      {/* Upload Image Section */}
+    <div className="w-full max-w-full">
       <div className="bg-white rounded-b-xl py-6 shadow-md ">
         <h2 className="text-center text-green-600 font-bold text-lg mb-4">Upload Image</h2>
 
