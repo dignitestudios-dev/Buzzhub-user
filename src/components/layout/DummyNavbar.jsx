@@ -1,9 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Logo, notification, buy } from "../../assets/export";  // Import notification and buy images
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
+import axios from "../../axios"; // Assuming axios is already set up
 
 const DummyNavbar = () => {
   const navigate = useNavigate();
+  const [cartItemCount, setCartItemCount] = useState(0); // State to store the cart item count
+
+  // Fetch the cart items when the component mounts
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const response = await axios.get("/user/get-cart-items"); // Call the get cart API
+        if (response?.data?.success) {
+          setCartItemCount(response?.data?.data?.items.length); // Set the cart item count
+        }
+      } catch (error) {
+        console.error("Error fetching cart items:", error);
+        setCartItemCount(0); // Fallback to 0 if there is an error
+      }
+    };
+
+    fetchCartItems();
+  }, []); // Empty dependency array ensures it runs once when the component mounts
 
   return (
     <header className="w-full h-16 flex items-center bg-[#1D7C42] justify-between px-4 bg-gray/50 shadow-sm border-b border-gray-200">
@@ -27,7 +46,7 @@ const DummyNavbar = () => {
             className="w-auto h-auto rounded-full object-contain" // Ensuring the icon is fully rounded and retains its aspect ratio
           />
           <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold shadow-md">
-            3
+            {cartItemCount > 0 ? cartItemCount : ""}
           </span>
         </button>
 

@@ -3,12 +3,14 @@ import { FaStar } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../../../axios"; 
 import { ErrorToast, SuccessToast } from "../../../components/global/Toaster";
-import { FiArrowLeft } from "react-icons/fi";
+import { FiArrowLeft, FiLoader } from "react-icons/fi";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null); 
   const [grams, setGrams] = useState();
   const [fulfillment, setFulfillment] = useState("self");
+  const [loading, setLoading] = useState(false); // State to manage loading state for Add to Cart button
+
 
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -41,7 +43,9 @@ const ProductDetails = () => {
   }, [productId]);
 
   // Handle Add to Cart Button Click
-  const handleAddToCart = async () => {
+ const handleAddToCart = async () => {
+  setLoading(true); // Set loading to true when the button is clicked
+
   try {
     const response = await axios.post("/user/add-to-cart", {
       productId: productId,
@@ -50,18 +54,20 @@ const ProductDetails = () => {
       fullfillmentMethod: fulfillment === "self" ? "Pickup" : "Delivery",
     });
 
-    console.log(response);  
-
     if (response.data.success) {
       SuccessToast("Item added to cart!");
+      window.location.reload(); // Reload the page to see the updated cart
     } else {
       ErrorToast(response.data.message);
     }
   } catch (error) {
     console.error("Error adding to cart:", error);
-    ErrorToast("Grams cant be empty or an error occurred. Please try again.");
+    ErrorToast("Grams can't be empty or an error occurred. Please try again.");
+  } finally {
+    setLoading(false); // Reset loading to false after the request is finished
   }
 };
+
 
 
   if (!product) return <div>Loading...</div>; 
@@ -185,12 +191,18 @@ const ProductDetails = () => {
           </div>
 
           {/* Add to Cart Button */}
-          <button
-            onClick={handleAddToCart}
-            className="w-full bg-green-600 hover:bg-green-700 transition text-white font-semibold py-3 mt-4 rounded-xl"
-          >
-            Add to Cart
-          </button>
+         <button
+  onClick={handleAddToCart}
+  className="w-full bg-green-600 hover:bg-green-700 transition text-white font-semibold py-3 mt-4 rounded-xl flex items-center justify-center"
+  disabled={loading} // Disable the button while loading
+>
+  {loading ? (
+    <FiLoader className="animate-spin text-white text-2xl" />
+  ) : (
+    "Add to Cart"
+  )}
+</button>
+
         </div>
       </div>
     </>

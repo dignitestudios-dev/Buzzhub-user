@@ -110,12 +110,12 @@ const Profile = () => {
           <span className="text-[#B7B8B8]">&gt;</span>
         </button>
 
-        <button
+        {/* <button
           className="flex items-center justify-between gap-1 bg-[#F9FAFA] text-black px-4 py-3 rounded-xl text-sm font-normal transition hover:bg-gray-100"
         >
           Notification Settings
           <span className="text-[#B7B8B8]">&gt;</span>
-        </button>
+        </button> */}
 
         <button 
           onClick={() => navigate("/app/delete-account")}

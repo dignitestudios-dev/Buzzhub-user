@@ -29,6 +29,7 @@ import Feedback from "./pages/app/orders/Feedback";
 import Products from "./pages/app/products/Products";
 import ForgotPassword from "./pages/onboarding/ForgotPassword";
 import UpdatePassword from "./pages/onboarding/UpdatePassword";
+import VerifySignup from "./pages/onboarding/VerifySignup";
 
 function App() {
   return (
@@ -151,6 +152,10 @@ function App() {
 
         <Route path="auth">
         <Route path="update-password" element={<UpdatePassword />} />
+      </Route>
+
+       <Route path="auth">
+        <Route path="verifyisgnup" element={<VerifySignup />} />
       </Route>
 
       
