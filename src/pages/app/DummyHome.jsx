@@ -9,7 +9,7 @@ import { ErrorToast, SuccessToast } from "../../components/global/Toaster"; // I
 import Loader from "../../components/global/Loader";
 
 // Dispensary Card Component
-const DispensaryCard = ({ item, addToWishlist }) => {
+const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
@@ -32,10 +32,13 @@ const DispensaryCard = ({ item, addToWishlist }) => {
         {item.distance ? `${item.distance.toFixed(1)} miles` : "0.0"}
       </div>
 
-      <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
+    <div className="absolute top-2 right-2 z-20 bg-white p-1 rounded-full shadow-lg">
+
         <FaHeart
-          className="text-gray-400 hover:text-red-500 cursor-pointer"
-          onClick={handleWishlistClick} // Trigger wishlist action on heart click
+          className={`cursor-pointer ${
+            isLiked ? "text-red-500" : "text-gray-400 hover:text-red-500"
+          }`}
+          onClick={handleWishlistClick} // Trigger    wishlist action on heart click
         />
       </div>
 
@@ -68,7 +71,7 @@ const DispensaryCard = ({ item, addToWishlist }) => {
         <div className="flex mt-3 items-center font-[600] gap-2 text-[12px] text-gray-600">
           <CiClock2 className="text-lg" />
           <span>{item?.createdAt?.split("T")[1]?.slice(0, 5)}</span>
-          {'-'}
+          {"-"}
           <span>
             {" "}
             {(() => {
@@ -87,9 +90,9 @@ const DispensaryCard = ({ item, addToWishlist }) => {
 };
 
 // Product Card Component
-const ProductCard = ({ item, addToWishlist }) => {
+const ProductCard = ({ item, addToWishlist, isLiked }) => {
   const navigate = useNavigate();
-  console.log(item, "addToWishlist==>");
+
   const handleCardClick = () => {
     navigate(`/app/product-details/${item._id}`); // Product Details page
   };
@@ -113,7 +116,9 @@ const ProductCard = ({ item, addToWishlist }) => {
       {/* Wishlist Icon */}
       <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
         <FaHeart
-          className="text-gray-400 hover:text-red-500 cursor-pointer"
+          className={`cursor-pointer ${
+            isLiked ? "text-red-500" : "text-gray-400 hover:text-red-500"
+          }`}
           onClick={handleWishlistClick} // Trigger wishlist action on heart click
         />
       </div>
@@ -165,7 +170,15 @@ const ProductCard = ({ item, addToWishlist }) => {
 
 // Section Component to display a title and cards
 // Section Component to display a title and cards
-const Section = ({ title, data, type, addToWishlist, loading }) => {
+const Section = ({
+  title,
+  data,
+  type,
+  addToWishlist,
+  loading,
+  likedProducts = [],
+  likedDispensaries = [],
+}) => {
   const navigate = useNavigate();
 
   const handleSeeAll = () => {
@@ -221,12 +234,14 @@ const Section = ({ title, data, type, addToWishlist, loading }) => {
               key={item._id}
               item={item}
               addToWishlist={addToWishlist}
+              isLiked={likedDispensaries.includes(item._id)} // ✅ pass liked status
             />
           ) : (
             <ProductCard
               key={item._id}
               item={item}
               addToWishlist={addToWishlist}
+              isLiked={likedProducts.includes(item._id)} // ✅ pass liked status
             />
           )
         )}
@@ -245,6 +260,37 @@ const DummyHome = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
   const [products, setProducts] = useState([]); // Loading state
+  // DummyHome component ke upar top mein:
+  const [likedDispensaries, setLikedDispensaries] = useState([]);
+  const [likedProducts, setLikedProducts] = useState([]);
+
+  const fetchWishlist = async () => {
+    try {
+      const [dispensaryRes, productRes] = await Promise.all([
+        axios.get("/user/get-my-wishlist-dispensary"),
+        axios.get("/user/get-my-wishlist"),
+      ]);
+
+      if (dispensaryRes.status === 200) {
+        const dispensaryIds = dispensaryRes.data.data?.dispensaryId?.map((item)=>item?._id);
+        setLikedDispensaries(dispensaryIds);
+      }
+
+      if (productRes.status === 200) {
+        const productIds = productRes?.data?.data?.map((item) => item?.ProductDetails?._id);
+        setLikedProducts(productIds);
+      }
+    } catch (err) {
+      console.error(
+        "Error fetching wishlist:",
+        err?.response?.data || err.message
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchWishlist();
+  }, []);
 
   useEffect(() => {
     const fetchNearbyDispensaries = async () => {
@@ -335,28 +381,25 @@ const DummyHome = () => {
   // Function to handle adding/removing from wishlist
   const addToWishlist = async (type, id) => {
     try {
-      let endpoint = "/user/add-to-wishlist"; // Default endpoint for products
-      let requestBody = {
-        [`${type}Id`]: id, // Dynamic key for dispensaryId or productId based on type
-      };
+      const endpoint =
+        type === "dispensary"
+          ? "/user/add-to-wishlist-dispensary"
+          : "/user/add-to-wishlist";
 
-      if (type === "dispensary") {
-        endpoint = "/user/add-to-wishlist-dispensary"; // Dispensary-specific endpoint
-        requestBody = {
-          dispensaryId: id, // Sending dispensaryId directly for dispensary items
-        };
-      }
+      const payload =
+        type === "dispensary" ? { dispensaryId: id } : { productId: id };
 
-      const response = await axios.post(endpoint, requestBody);
+      const response = await axios.post(endpoint, payload);
 
       if (response.data.success) {
-        SuccessToast(response.data.message); // Display message from API directly
+        SuccessToast(response.data.message);
+        fetchWishlist(); // Refresh wishlist after like/dislike
       } else {
-        ErrorToast(response.data.message); // Display error message from API directly
+        ErrorToast(response.data.message);
       }
-    } catch (error) {
-      console.error("Error adding to wishlist:", error);
-      ErrorToast("Error adding to wishlist");
+    } catch (err) {
+      console.error("Wishlist error:", err);
+      ErrorToast("Something went wrong");
     }
   };
 
@@ -393,20 +436,25 @@ const DummyHome = () => {
         type="dispensary"
         addToWishlist={addToWishlist}
         loading={loading}
+        likedDispensaries={likedDispensaries}
       />
+
       <Section
         title="Popular Products"
         data={filteredProducts}
         type="product"
         addToWishlist={addToWishlist}
         loading={loading}
+        likedProducts={likedProducts}
       />
+
       <Section
         title="New Products"
         data={products}
         type="product"
         addToWishlist={addToWishlist}
         loading={loading}
+        likedProducts={likedProducts}
       />
 
       {/* Filter Modal */}
