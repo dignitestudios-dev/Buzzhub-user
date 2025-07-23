@@ -119,7 +119,7 @@ const Favorites = () => {
                         {item.city}, {item.state}
                       </p>
                       <p className="text-xs text-yellow-600 mt-1 font-medium">
-                        ⭐ {item.rating || "N/A"}
+                        ⭐ {item.rating || "0.0"}
                       </p>
                     </div>
                     <button
@@ -167,7 +167,7 @@ const Favorites = () => {
                           {item.ProductDetails.productName}
                         </h3>
                         <div className="flex items-center text-sm text-yellow-500 font-semibold">
-                          <span className="mr-1">⭐</span> {item.ProductDetails.rating || "N/A"}
+                          <span className="mr-1">⭐</span> {item.ProductDetails.rating || "0.0"}
                         </div>
                       </div>
 
