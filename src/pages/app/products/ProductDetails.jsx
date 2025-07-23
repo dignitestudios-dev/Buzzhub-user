@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FaStar } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "../../../axios";
 import { ErrorToast, SuccessToast } from "../../../components/global/Toaster";
 import { FiArrowLeft, FiLoader } from "react-icons/fi";
 import { ProductDetailsloader } from "../../../components/global/Loader";
+import { AppContext } from "../../../context/AppContext";
 
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
@@ -43,8 +44,9 @@ const ProductDetails = () => {
   }, [productId]);
 
   // Handle Add to Cart Button Click
+  const { setAddToCart, addtoCart } = useContext(AppContext);
   const handleAddToCart = async () => {
-    setLoading(true); // Set loading to true when the button is clicked
+    setLoading(true);
 
     try {
       const response = await axios.post("/user/add-to-cart", {
@@ -56,7 +58,7 @@ const ProductDetails = () => {
 
       if (response.data.success) {
         SuccessToast("Item added to cart!");
-        window.location.reload(); // Reload the page to see the updated cart
+        setAddToCart(addtoCart + 1);
       } else {
         ErrorToast(response.data.message);
       }
@@ -66,7 +68,7 @@ const ProductDetails = () => {
         "Grams can't be empty or an error occurred. Please try again."
       );
     } finally {
-      setLoading(false); // Reset loading to false after the request is finished
+      setLoading(false);
     }
   };
 
@@ -74,7 +76,6 @@ const ProductDetails = () => {
     return (
       <div>
         <ProductDetailsloader />
-       
       </div>
     );
 

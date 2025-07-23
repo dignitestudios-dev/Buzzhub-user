@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FiHeart } from "react-icons/fi";
 import axios from "../../../axios"; // Assuming you have a custom axios instance for API calls
-import Loader from "../../../components/global/Loader";
 import { SuccessToast } from "../../../components/global/Toaster";
 import { FaHeart } from "react-icons/fa";
+import { Loader } from "../../../components/global/Loader";
 
 const Favorites = () => {
   const [activeTab, setActiveTab] = useState("Dispensary");

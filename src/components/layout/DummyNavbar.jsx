@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Logo, notification, buy } from "../../assets/export";  // Import notification and buy images
 import { useNavigate } from "react-router-dom";
 import axios from "../../axios"; // Assuming axios is already set up
+import { AppContext } from "../../context/AppContext";
 
 const DummyNavbar = () => {
   const navigate = useNavigate();
   const [cartItemCount, setCartItemCount] = useState(0); // State to store the cart item count
-
+ const {addtoCart} =useContext(AppContext)
   // Fetch the cart items when the component mounts
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -46,7 +47,7 @@ const DummyNavbar = () => {
             className="w-auto h-auto rounded-full object-contain" // Ensuring the icon is fully rounded and retains its aspect ratio
           />
           <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold shadow-md">
-            {cartItemCount > 0 ? cartItemCount : ""}
+            {addtoCart > 0 ? addtoCart : ""}
           </span>
         </button>
 

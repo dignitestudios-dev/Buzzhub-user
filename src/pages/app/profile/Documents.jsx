@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"; // To handle cookies
 import axios from "../../../axios"; // Adjust the import path as necessary
 import { ErrorToast, SuccessToast } from "../../../components/global/Toaster"; // Import toaster functions
-import Loader from "../../../components/global/Loader";
+import { Loader } from "../../../components/global/Loader";
 
 const Documents = () => {
   const navigate = useNavigate();

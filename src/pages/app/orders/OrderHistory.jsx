@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
-import { HiOutlineLocationMarker } from "react-icons/hi";
 import { useNavigate } from "react-router";
-import axios from "../../../axios"; // Assuming you have a custom axios instance for API calls
-import Loader from "../../../components/global/Loader";
+import axios from "../../../axios"; 
 import { CiLocationOn } from "react-icons/ci";
+import { Loader } from "../../../components/global/Loader";
 
 const statusColors = {
   Pending: "text-yellow-500",

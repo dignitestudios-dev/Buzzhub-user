@@ -8,7 +8,11 @@ import axios from "../axios";
 
 export const AppContext = createContext();
 
+
 export const AppContextProvider = ({ children }) => {
+
+
+  const [addtoCart, setAddToCart] = useState(0);
   // Send fcm to backend:
   // const fetchToken = async () => {
   //   const token = await getFCMToken();
@@ -52,6 +56,8 @@ export const AppContextProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         dummyVar,
+        addtoCart,
+        setAddToCart,
       }}
     >
       {children}

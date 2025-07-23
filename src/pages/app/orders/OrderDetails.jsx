@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router";
 import axios from "../../../axios";
-import Loader from "../../../components/global/Loader";
 import { MdArrowBack } from "react-icons/md";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+import { Loader } from "../../../components/global/Loader";
 
 
 const OrderDetails = () => {
