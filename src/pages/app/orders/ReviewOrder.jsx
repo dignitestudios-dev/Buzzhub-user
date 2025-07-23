@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FiArrowLeft } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const ReviewOrder = () => {
@@ -17,6 +18,10 @@ const ReviewOrder = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const navigate = useNavigate();
+
+   const handleBackClick = () => {
+    navigate(-1); // Navigate one step back in history
+  };
   
   // Calculate totals
   const subtotal = cartData?.items?.reduce((sum, item) => sum + item.productPrice * item.grams, 0);
@@ -57,8 +62,17 @@ const ReviewOrder = () => {
 
   return (
     <div className="w-full mx-auto bg-white lg:border lg:border-gray-200 lg:p-4 pb-20 lg:pb-4 rounded-2xl">
-      <h2 className="text-lg font-semibold mb-4">Review Order</h2>
-
+<div className="flex items-center justify-between mb-8">
+        <button
+          className="text-gray-800 pr-3"
+          onClick={handleBackClick}
+        >
+          <FiArrowLeft size={20} />
+        </button>
+        <h3 className="text-[16px] lg:text-xl font-semibold text-gray-800 mx-auto sm:mx-0 sm:flex-1 sm:text-left">
+          Review Order
+        </h3>
+      </div>
       {/* Fulfillment Method */}
       <div className="mb-4">
         <span className="font-medium block mb-2">Fulfillment Method</span>
@@ -117,6 +131,7 @@ const ReviewOrder = () => {
         <input
           type="text"
           value={phoneNumber}
+          maxLength={11}
           onChange={(e) => setPhoneNumber(e.target.value)}
           className="w-full text-gray-700 p-2 rounded-md border"
         />

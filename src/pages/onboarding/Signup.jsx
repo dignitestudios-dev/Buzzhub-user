@@ -100,8 +100,8 @@ const SignUp = () => {
       // Send data to the API
       const response = await axios.post("/auth/sign-up", payload);
       if (response.status === 200 || response.status === 201) {
-        navigate("/auth/user-info");
-      } else {
+  navigate(`/auth/verifyisgnup?email=${encodeURIComponent(formData.email)}`);
+} else {
         console.error("API Error:", response?.message);
       }
     } catch (error) {

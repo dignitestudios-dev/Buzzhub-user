@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { FiTrash2 } from "react-icons/fi";
+import { FiLoader, FiTrash2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from "../../../axios"; // Custom axios instance (make sure this is set up correctly)
 import { ErrorToast, SuccessToast } from "../../../components/global/Toaster"; // Assuming you have a toaster component
@@ -11,6 +11,8 @@ const Cart = () => {
   const [cartData, setCartData] = useState(null); // For storing the cart data
   const [loading, setLoading] = useState(true); // Loading state
   const navigate = useNavigate(); // Initialize navigate function
+  const [deletingItem, setDeletingItem] = useState(null); // Track the item being deleted
+
 
   useEffect(() => {
     const fetchCartItems = async () => {
@@ -37,31 +39,35 @@ const Cart = () => {
       </div>
     );
   }
-  const handleRemove = async (item) => {
-    const productId = item.productId._id; // Extract the product ID dynamically from the item
+ const handleRemove = async (item) => {
+  const productId = item.productId._id; // Extract the product ID dynamically from the item
 
-    try {
-      // Send DELETE request to the API to remove the item from the cart
-      const response = await axios.post("user/delete-cart-item", {
-        productId: productId, // Send the productId as a string
-      });
+  setDeletingItem(item._id); // Set loading state for the item being deleted
 
-      if (response.data.success) {
-        // Update local state by removing the item
-        setCartData((prev) => ({
-          ...prev,
-          items: prev.items.filter((cartItem) => cartItem._id !== productId),
-        }));
-        SuccessToast("Item removed from cart!");
-        window.location.reload(); // Reload the page to reflect changes
-      } else {
-        ErrorToast("Failed to remove item. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error deleting item from cart:", error);
-      ErrorToast("An error occurred. Please try again.");
+  try {
+    // Send DELETE request to the API to remove the item from the cart
+    const response = await axios.post("user/delete-cart-item", {
+      productId: productId, // Send the productId as a string
+    });
+
+    if (response.data.success) {
+      // Update local state by removing the item
+      setCartData((prev) => ({
+        ...prev,
+        items: prev.items.filter((cartItem) => cartItem._id !== productId),
+      }));
+      SuccessToast("Item removed from cart!");
+      window.location.reload(); // Reload the page to see the updated cart
+    } else {
+      ErrorToast("Failed to remove item. Please try again.");
     }
-  };
+  } catch (error) {
+    console.error("Error deleting item from cart:", error);
+    ErrorToast("An error occurred. Please try again.");
+  } finally {
+    setDeletingItem(null); // Reset deleting state after operation is complete
+  }
+};
 
   const handleAddGrams = (id) => {
     setCartData((prev) => ({
@@ -136,12 +142,18 @@ const Cart = () => {
                   {/* <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     {item.fullfillmentMethod}
                   </span> */}
-                  <button
-                    onClick={() => handleRemove(item)} // Pass the full item object dynamically
-                    className="text-red-500"
-                  >
-                    <FiTrash2 size={18} />
-                  </button>
+                 <button
+  onClick={() => handleRemove(item)} // Pass the full item object dynamically
+  className="text-red-500 flex items-center"
+  disabled={deletingItem === item._id} // Disable button while deleting
+>
+  {deletingItem === item._id ? (
+    <FiLoader className="animate-spin text-red-500 text-xl" /> // Loader icon
+  ) : (
+    <FiTrash2 size={18} /> // Regular trash icon
+  )}
+</button>
+
                 </div>
 
                 {/* Gram Control Buttons BELOW Delete */}

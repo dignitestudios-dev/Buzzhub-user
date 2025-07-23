@@ -3,6 +3,8 @@ import { useLocation, useNavigate, useParams } from "react-router";
 import axios from "../../../axios";
 import Loader from "../../../components/global/Loader";
 import { MdArrowBack } from "react-icons/md";
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+
 
 const OrderDetails = () => {
   const [orderDetails, setOrderDetails] = useState(null);
@@ -227,12 +229,23 @@ const OrderDetails = () => {
       </div>
 
       {/* CTA Button */}
-      <button
-        className="w-full mt-4 bg-green-700 text-white py-3 rounded-xl font-semibold text-sm"
-        onClick={handleTrackOrderClick}
-      >
-        Track Order
-      </button>
+      <div className="flex gap-4 mt-4 mb-2">
+  <button
+    className="w-1/2 bg-green-700 text-white py-3 rounded-xl font-semibold text-sm"
+    onClick={handleTrackOrderClick}
+  >
+    Track Order
+  </button>
+  <button
+    className="w-1/2 bg-white text-green-500 border border-green-500 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2" // Flex for icon and text alignment
+    // onClick={handleChatClick}
+  >
+    <IoChatbubbleEllipsesOutline size={20} /> {/* Adjust the icon size as needed */}
+    Chat
+  </button>
+</div>
+
+
     </div>
   );
 };
