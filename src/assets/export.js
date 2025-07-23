@@ -12,10 +12,25 @@ import profile from "./profile.png";
 import profileactive from "./profileactive.png";
 import chatactive from "./chatactive.png";
 import notification from "./notification.png";
-import buy from "./buy.png"
+import buy from "./buy.png";
+import Appleicon from "./appleicon.png";
+import Googleicon from "./googleicon.png";
 
 // export {
 //     FILENAME(PASCALCASE)
 // }
 
-export { Logo, NoInternetImage, chat, home, profile, profileactive, homeinactive, chatactive,notification, buy };
+export {
+  Logo,
+  Appleicon,
+  Googleicon,
+  NoInternetImage,
+  chat,
+  home,
+  profile,
+  profileactive,
+  homeinactive,
+  chatactive,
+  notification,
+  buy,
+};
