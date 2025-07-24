@@ -119,7 +119,7 @@ const Favorites = () => {
                         {item.city}, {item.state}
                       </p> */}
                                             <h3 className="font-semibold text-sm text-gray-800 ">{item.disType}</h3>
-                                            {/* <h3 className=" text-sm text-gray-800 ">{item.fulfillmentMethod}</h3> */}
+                                  {/* <h3 className=" text-sm text-gray-800 ">{item.fulfillmentMethod}</h3> */}
 
                       <p className="text-xs text-yellow-600 mt-1 font-medium">
                         ⭐ {item.rating || "0.0"}

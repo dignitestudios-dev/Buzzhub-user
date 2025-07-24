@@ -75,10 +75,10 @@ const OrderDetails = () => {
 
   const handleTrackOrderClick = () => {
     navigate(`/app/order-tracking/${id}`, {
-      state: { order: order }, // ✅ pass the full orderDetails
+      state: { order: order, orderDetails:orderDetails }, 
     });
   };
-  console.log(products, "vproducts");
+  console.log(order, "order");
   return (
     <div className="w-full mx-auto bg-white border border-gray-200 p-4 pb-20 lg:pb-0 rounded-2xl">
       {/* Header */}

@@ -1,23 +1,50 @@
 import React, { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { FaStar } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import axios from '../../../axios';
+import { ErrorToast, SuccessToast } from "../../../components/global/Toaster";
 
 const Feedback = () => {
   const navigate = useNavigate();
+  const { id: dispensaryId } = useParams();
+  const location = useLocation();
+  const productId = location.state?.productId;
+  
   const [rating, setRating] = useState(4);
   const [review, setReview] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
 
   const handleStarClick = (value) => {
     setRating(value);
   };
 
-  const handleSave = () => {
-    // Save logic here
-    console.log("Rating:", rating);
-    console.log("Review:", review);
-    // Navigate back or show success toast
-  };
+
+
+  const handleReview = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post("user/add-reviews", {
+        dispensaryId ,
+        productId,
+        ratingNumber:rating.toString(),
+        review:review,
+      });
+      if (response.data.success) {
+        // Handle success, e.g., show a success message or navigate back
+        console.log("Feedback submitted successfully");
+        SuccessToast("Feedback submitted successfully");
+        navigate("/app/orders");
+      } 
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      ErrorToast("Error submitting feedback");
+    }finally{
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white px-4 py-6">
@@ -58,11 +85,10 @@ const Feedback = () => {
 
       {/* Save button */}
       <button
-        onClick={handleSave}
+      disabled={loading}
+        onClick={handleReview}
         className="w-full mt-6 py-3 bg-green-700 text-white font-semibold rounded-xl"
-      >
-        Save
-      </button>
+      >{loading ? "Submitting..." : "Submit Feedback"}</button>
     </div>
   );
 };
