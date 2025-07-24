@@ -24,7 +24,7 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
 
   return (
     <div
-      className="relative bg-white rounded-xl shadow hover:shadow-lg transition duration-300 
+      className="relative cursor-pointer bg-white rounded-xl shadow hover:shadow-lg transition duration-300 
         min-w-[168px] min-h-[212px] w-full h-full"
       onClick={handleCardClick}
     >
@@ -170,9 +170,11 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
 
 // Section Component to display a title and cards
 // Section Component to display a title and cards
+
+
 const Section = ({
   title,
-  data,
+  data = [],
   type,
   addToWishlist,
   loading,
@@ -182,38 +184,12 @@ const Section = ({
   const navigate = useNavigate();
 
   const handleSeeAll = () => {
-    if (title === "Popular Products") {
-      navigate("/app/products"); // Navigate to the products page
-    } else if (title === "Nearby Dispensaries") {
-      navigate("/app/dispensaries"); // Navigate to the dispensaries page
-    } else if (title === "New Products") {
+    if (title === "Popular Products" || title === "New Products") {
       navigate("/app/products");
+    } else if (title === "Nearby Dispensaries") {
+      navigate("/app/dispensaries");
     }
   };
-
-  if (loading) {
-    return (
-      <div className="mb-12 -mt-5 text-center">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-        </div>
-        <Loader /> {/* Assuming you have a Loader component */}
-      </div>
-    );
-  }
-
-  if (!Array.isArray(data) || data.length === 0) {
-    return (
-      <div className="mb-12 -mt-5">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-        </div>
-        <p className="text-center text-gray-600">
-          No {title.toLowerCase()} available
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="mb-12 -mt-5">
@@ -228,27 +204,37 @@ const Section = ({
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {data.map((item) =>
-          type === "dispensary" ? (
-            <DispensaryCard
-              key={item._id}
-              item={item}
-              addToWishlist={addToWishlist}
-              isLiked={likedDispensaries.includes(item._id)} // ✅ pass liked status
-            />
-          ) : (
-            <ProductCard
-              key={item._id}
-              item={item}
-              addToWishlist={addToWishlist}
-              isLiked={likedProducts.includes(item._id)} // ✅ pass liked status
-            />
-          )
-        )}
+        {loading
+          ? [...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="w-full h-[250px] bg-gray-100 animate-pulse rounded-xl"
+              ></div>
+            ))
+          : data?.map((item) =>
+              type === "dispensary" ? (
+                <DispensaryCard
+                  key={item._id}
+                  item={item}
+                  addToWishlist={addToWishlist}
+                  isLiked={likedDispensaries.includes(item._id)}
+                />
+              ) : (
+                <ProductCard
+                  key={item._id}
+                  item={item}
+                  addToWishlist={addToWishlist}
+                  isLiked={likedProducts.includes(item._id)}
+                />
+              )
+            )}
       </div>
     </div>
   );
 };
+
+
+
 
 // Main Home Component
 const DummyHome = () => {
@@ -260,7 +246,6 @@ const DummyHome = () => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
   const [products, setProducts] = useState([]); // Loading state
-  // DummyHome component ke upar top mein:
   const [likedDispensaries, setLikedDispensaries] = useState([]);
   const [likedProducts, setLikedProducts] = useState([]);
 
@@ -293,7 +278,10 @@ const DummyHome = () => {
   }, []);
 
   useEffect(() => {
+    
     const fetchNearbyDispensaries = async () => {
+    setLoading(true);
+
       try {
         const response = await axios.get("/user/get-nearby-dispensary");
         if (response.data.success) {
@@ -330,6 +318,7 @@ const DummyHome = () => {
       }
     };
     const fetchNewPopularProducts = async () => {
+
       try {
         const response = await axios.get("/user/get-all-products");
         if (response.data.success) {
@@ -342,18 +331,19 @@ const DummyHome = () => {
       } catch (error) {
         console.error("Error fetching popular products:", error);
         setProducts([]);
+      }finally{
+         setLoading(false);
       }
     };
 
     // Start loading
-    setLoading(true);
 
     fetchNearbyDispensaries();
     fetchPopularProducts();
     fetchNewPopularProducts();
 
     // Set loading to false when done
-    setLoading(false);
+   
   }, []);
 
   // Handle search input change and filter results

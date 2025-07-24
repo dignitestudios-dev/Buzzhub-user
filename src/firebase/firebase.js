@@ -1,8 +1,9 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, OAuthProvider,getIdToken } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getRemoteConfig } from "firebase/remote-config";
+import { getMessaging } from "firebase/messaging";
 
 
 const firebaseConfig = {
@@ -16,7 +17,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-console.log("app initialized:", app);
+
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 export const appleProvider = new OAuthProvider("apple.com");
@@ -24,6 +25,7 @@ export const db = getFirestore(app);
 export const firestore = getFirestore(app);
 export const storage = getStorage(app);
 export const remoteConfig = getRemoteConfig(app);
+export const messaging = getMessaging(app);
 
 
 export default app; // Export the app if needed

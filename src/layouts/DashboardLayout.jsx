@@ -38,13 +38,13 @@ const DashboardLayout = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
       {/* Desktop Sidebar */}
-     <aside
-  className={`${
-    isMobile ? "hidden" : "block"
-  } w-72 min-h-screen bg-white border-r border-gray-200 shadow-sm overflow-y-auto`}
->
-  <DummySidebaar isMobile={false} />
-</aside>
+      <aside
+        className={`${
+          isMobile ? "hidden" : "block"
+        } w-72 min-h-screen bg-white border-r border-gray-200 shadow-sm overflow-y-auto`}
+      >
+        <DummySidebaar isMobile={false} />
+      </aside>
 
       {/* Main layout (navbar + outlet) */}
       <div className="flex flex-col w-full min-h-screen">
@@ -71,7 +71,7 @@ const DashboardLayout = () => {
 
       {/* Preload image */}
       <img src={NoInternetImage} alt="" className="hidden" />
-      
+
       {/* Sidebar Overlay for Mobile */}
       {isSidebarOpen && (
         <div
@@ -79,15 +79,15 @@ const DashboardLayout = () => {
           onClick={toggleSidebar}
         ></div>
       )}
-      
+
       {/* Sidebar Drawer */}
       <div
-  className={`fixed inset-0 z-50 shadow-lg transform ${
-    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-  } transition-transform duration-300 ease-in-out md:hidden`}
->
-  <DummySidebaar isMobile={true} toggleSidebar={toggleSidebar} />
-</div>
+        className={`fixed inset-0 z-50 shadow-lg transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform duration-300 ease-in-out md:hidden`}
+      >
+        <DummySidebaar isMobile={true} toggleSidebar={toggleSidebar} />
+      </div>
     </div>
   );
 };

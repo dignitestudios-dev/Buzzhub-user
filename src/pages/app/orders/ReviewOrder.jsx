@@ -219,7 +219,7 @@ const ReviewOrder = () => {
             <span>${subtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between">
-            <span>1% platform fees</span>
+            <span>2% platform fees</span>
             <span>${platformFee.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-semibold text-green-700 text-base pt-2">

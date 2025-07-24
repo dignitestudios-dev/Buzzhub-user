@@ -5,7 +5,9 @@ import { FiLoader, FiTrash2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from "../../../axios"; // Custom axios instance (make sure this is set up correctly)
 import { ErrorToast, SuccessToast } from "../../../components/global/Toaster"; // Assuming you have a toaster component
-import Loader from "../../../components/global/Loader";
+import { Loader } from "../../../components/global/Loader";
+
+
 
 const Cart = () => {
   const [cartData, setCartData] = useState(null); // For storing the cart data
