@@ -8,7 +8,7 @@ const OrderTracking = () => {
   const navigate =useNavigate()
   const location = useLocation();
   const order = location?.state?.order?.state?.order;
-console.log(order,"order==>")
+
   // Define the order statuses for progression
   const statuses = [
     "In Process",
@@ -41,7 +41,7 @@ console.log(order,"order==>")
   ];
 
   // Check if the order status is "Completed"
-  const isCompleted = order.orderStatus === "Completed";
+  const isCompleted = order?.status === "Completed";
 
   return (
     <div className="w-full mx-auto bg-white min-h-screen font-sans text-[15px] pb-20 md:pb-0">
@@ -61,7 +61,7 @@ console.log(order,"order==>")
           <p className="text-sm text-[#1D7C42] font-medium">
             Order Id:{" "}
             <span className="text-[#1D7C42] font-normal">
-              {order.orderUvid}
+              {order?.orderUvid}
             </span>
           </p>
 

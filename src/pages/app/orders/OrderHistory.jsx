@@ -221,21 +221,7 @@ const OrderHistory = () => {
               {/* Buttons */}
               <div className="flex justify-end items-center gap-2 mt-2">
                 {/* Track order button - Only shown if order status matches one of the specified statuses */}
-                {[
-                  "Approved",
-                  "In Process",
-                  "Out For Delivery",
-                  "Ready",
-                  "Completed",
-                ].includes(order.status) && (
-                  <button
-                    onClick={() => handleTrackOrderClick(order.id)}
-                    className="text-[12px] text-white bg-[#1D7C42] w-[83px] h-[38px] rounded-lg"
-                  >
-                    Track order
-                  </button>
-                )}
-
+               
                 {/* Order Details button */}
                 <button
                   onClick={() =>

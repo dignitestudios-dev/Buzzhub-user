@@ -13,7 +13,6 @@ const OrderDetails = () => {
   const location = useLocation();
   const { order } = location?.state || {};
 
-  console.log(order, "orderData");
   // Fetch order details from the API
   const fetchOrderDetails = async () => {
     setLoading(true);
