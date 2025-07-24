@@ -132,7 +132,7 @@ const SignUp = () => {
                   onChange={handleChange}
                   placeholder="Full Name"
                   className="w-full pl-12 text-sm bg-[#F3F3F3] text-[#1D7C42] placeholder:text-black px-4 py-3 rounded-xl outline-none bg-light"
-                />
+                /> 
               </div>
               {errors.fullName && <p className="text-red-500">{errors.fullName}</p>}
             </div>

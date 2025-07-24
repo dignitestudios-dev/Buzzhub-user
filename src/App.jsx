@@ -121,7 +121,7 @@ function App() {
       </Route>
 
        <Route path="app" element={<DashboardLayout />}>
-        <Route path="feedback" element={<Feedback />} />
+        <Route path="feedback/:id" element={<Feedback />} />
       </Route>
 
 

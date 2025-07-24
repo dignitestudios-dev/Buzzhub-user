@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function AddressForm({ onNext, updateData }) {
   const [address, setAddress] = useState({
@@ -15,9 +15,14 @@ export default function AddressForm({ onNext, updateData }) {
     setAddress((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Check if all fields are filled
+  const isFormComplete = Object.values(address).every((field) => field.trim() !== "");
+
   const handleSubmit = () => {
-    updateData({ address }); // Save address data in parent state
-    onNext(); // Go to next step
+    if (isFormComplete) {
+      updateData({ address }); // Save address data in parent state
+      onNext(); // Go to next step
+    }
   };
 
   return (
@@ -79,9 +84,11 @@ export default function AddressForm({ onNext, updateData }) {
             className="w-full p-3 bg-gray-100 rounded-md placeholder-gray-500 focus:outline-none"
           />
 
+          {/* Disable Next button if form is incomplete */}
           <button
             onClick={handleSubmit}
-            className="w-full py-3 bg-green-700 text-white rounded-md font-semibold hover:bg-green-800"
+            disabled={!isFormComplete}
+            className={`w-full py-3 rounded-md font-semibold ${isFormComplete ? 'bg-green-700 text-white hover:bg-green-800' : 'bg-gray-400 text-gray-200 cursor-not-allowed'}`}
           >
             Next
           </button>

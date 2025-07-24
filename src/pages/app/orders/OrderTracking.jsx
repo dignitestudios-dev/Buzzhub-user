@@ -2,7 +2,7 @@ import { FaCheck } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { MdArrowBack } from "react-icons/md";
-import { useLocation, useNavigate } from "react-router-dom"; // Import useLocation
+import { useLocation, useNavigate, useParams } from "react-router-dom"; // Import useParams
 
 const OrderTracking = () => {
   const navigate =useNavigate()
@@ -18,8 +18,18 @@ console.log(order,"order==>")
     "Completed",
   ];
 
+    const { orderId } = useParams();  // Get orderId directly from URL params
+
   // Get the index of the current status
   const currentStatusIndex = statuses.indexOf(order?.status);
+
+
+  const handleGiveFeedbackClick = () => {
+    // Navigate to the feedback page, passing the orderId in the URL
+    navigate(`/app/feedback/${orderId}`);
+  };
+
+
 
   // Create the steps based on the order status
   const steps = [
@@ -132,8 +142,8 @@ console.log(order,"order==>")
       {isCompleted && (
         <div className="flex justify-between gap-4 mt-6">
           {/* Give Feedback Button */}
-          <button
-            onClick={() => (window.location.href = "/app/feedback")}
+         <button
+            onClick={handleGiveFeedbackClick}
             className="w-1/2 bg-[#1D7C42] text-white text-sm py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
           >
             Give Feedback

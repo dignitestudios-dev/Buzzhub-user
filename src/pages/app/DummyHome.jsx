@@ -211,6 +211,12 @@ const Section = ({
                 className="w-full h-[250px] bg-gray-100 animate-pulse rounded-xl"
               ></div>
             ))
+
+              : data.length === 0 ? (
+              <div className="col-span-full text-center text-gray-500">
+                No nearby dispensaries available.
+              </div>
+            ) 
           : data?.map((item) =>
               type === "dispensary" ? (
                 <DispensaryCard

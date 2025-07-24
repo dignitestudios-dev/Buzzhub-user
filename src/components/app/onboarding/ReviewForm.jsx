@@ -55,7 +55,7 @@ export default function ReviewForm({ formData = {}, onBack }) {
     };
 
     try {
-      const response = await axios.post('/api/auth/set-profile', requestBody, {
+      const response = await axios.post('auth/set-profile', requestBody, {
         headers: {
           'Content-Type': 'application/json',
         }
@@ -95,7 +95,7 @@ export default function ReviewForm({ formData = {}, onBack }) {
           { label: "State", value: state },
           { label: "Country", value: country },
           { label: "Zip Code", value: zip },
-          { label: "Payment Method", value: paymentMethod },
+          // { label: "Payment Method", value: paymentMethod },
         ].map(({ label, value }, idx) => (
           <div key={idx} className="mb-3">
             <input
