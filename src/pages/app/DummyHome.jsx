@@ -32,8 +32,7 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
         {item.distance ? `${item.distance.toFixed(1)} miles` : "0.0"}
       </div>
 
-    <div className="absolute top-2 right-2 z-20 bg-white p-1 rounded-full shadow-lg">
-
+      <div className="absolute top-2 right-2 z-20 bg-white p-1 rounded-full shadow-lg">
         <FaHeart
           className={`cursor-pointer ${
             isLiked ? "text-red-500" : "text-gray-400 hover:text-red-500"
@@ -94,7 +93,9 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate(`/app/product-details/${item._id}`); // Product Details page
+    navigate(`/app/product-details/${item._id}`, {
+      state: { dispensary: item },
+    }); // Product Details page
   };
 
   const handleWishlistClick = (e) => {
@@ -171,7 +172,6 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
 // Section Component to display a title and cards
 // Section Component to display a title and cards
 
-
 const Section = ({
   title,
   data = [],
@@ -204,43 +204,40 @@ const Section = ({
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {loading
-          ? [...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="w-full h-[250px] bg-gray-100 animate-pulse rounded-xl"
-              ></div>
-            ))
-
-              : data.length === 0 ? (
-              <div className="col-span-full text-center text-gray-500">
-                No nearby dispensaries available.
-              </div>
-            ) 
-          : data?.map((item) =>
-              type === "dispensary" ? (
-                <DispensaryCard
-                  key={item._id}
-                  item={item}
-                  addToWishlist={addToWishlist}
-                  isLiked={likedDispensaries.includes(item._id)}
-                />
-              ) : (
-                <ProductCard
-                  key={item._id}
-                  item={item}
-                  addToWishlist={addToWishlist}
-                  isLiked={likedProducts.includes(item._id)}
-                />
-              )
-            )}
+        {loading ? (
+          [...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="w-full h-[250px] bg-gray-100 animate-pulse rounded-xl"
+            ></div>
+          ))
+        ) : data.length === 0 ? (
+          <div className="col-span-full text-center text-gray-500">
+            No nearby dispensaries available.
+          </div>
+        ) : (
+          data?.map((item) =>
+            type === "dispensary" ? (
+              <DispensaryCard
+                key={item._id}
+                item={item}
+                addToWishlist={addToWishlist}
+                isLiked={likedDispensaries.includes(item._id)}
+              />
+            ) : (
+              <ProductCard
+                key={item._id}
+                item={item}
+                addToWishlist={addToWishlist}
+                isLiked={likedProducts.includes(item._id)}
+              />
+            )
+          )
+        )}
       </div>
     </div>
   );
 };
-
-
-
 
 // Main Home Component
 const DummyHome = () => {
@@ -263,12 +260,16 @@ const DummyHome = () => {
       ]);
 
       if (dispensaryRes.status === 200) {
-        const dispensaryIds = dispensaryRes.data.data?.dispensaryId?.map((item)=>item?._id);
+        const dispensaryIds = dispensaryRes.data.data?.dispensaryId?.map(
+          (item) => item?._id
+        );
         setLikedDispensaries(dispensaryIds);
       }
 
       if (productRes.status === 200) {
-        const productIds = productRes?.data?.data?.map((item) => item?.ProductDetails?._id);
+        const productIds = productRes?.data?.data?.map(
+          (item) => item?.ProductDetails?._id
+        );
         setLikedProducts(productIds);
       }
     } catch (err) {
@@ -284,9 +285,8 @@ const DummyHome = () => {
   }, []);
 
   useEffect(() => {
-    
     const fetchNearbyDispensaries = async () => {
-    setLoading(true);
+      setLoading(true);
 
       try {
         const response = await axios.get("/user/get-nearby-dispensary");
@@ -324,7 +324,6 @@ const DummyHome = () => {
       }
     };
     const fetchNewPopularProducts = async () => {
-
       try {
         const response = await axios.get("/user/get-all-products");
         if (response.data.success) {
@@ -337,8 +336,8 @@ const DummyHome = () => {
       } catch (error) {
         console.error("Error fetching popular products:", error);
         setProducts([]);
-      }finally{
-         setLoading(false);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -349,7 +348,6 @@ const DummyHome = () => {
     fetchNewPopularProducts();
 
     // Set loading to false when done
-   
   }, []);
 
   // Handle search input change and filter results
