@@ -5,7 +5,6 @@ import { MdArrowBack } from "react-icons/md";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { Loader } from "../../../components/global/Loader";
 
-
 const OrderDetails = () => {
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -58,21 +57,26 @@ const OrderDetails = () => {
   // Only destructure if `orderDetails` is not null
   const {
     products,
-    shippingAddress,
-    totalAmount,
+    shippingAddress,  
+
     fulfillmentMethod,
     orderStatus,
     dispensaryName,
     orderUvid,
     createdAt,
-    
     phoneNumber,
-    
   } = orderDetails || {};
+  const totalAmount = order?.state?.order?.products
+    ? order.state.order.products.reduce((sum, product) => {
+        const price = parseFloat(product.price.replace("$", ""));
+        const weight = parseFloat(product.weight);
+        return sum + price * weight;
+      }, 0)
+    : 0;
 
   const handleTrackOrderClick = () => {
     navigate(`/app/order-tracking/${id}`, {
-      state: { order: orderDetails }, // ✅ pass the full orderDetails
+      state: { order: order }, // ✅ pass the full orderDetails
     });
   };
   console.log(products, "vproducts");
@@ -123,7 +127,9 @@ const OrderDetails = () => {
         {/* No. of Products */}
         <div className="flex justify-between border-b pb-3 text-gray-600">
           <span className="font-medium">No. of Products</span>
-          <span className="text-gray-900">{products?.length}</span>
+          <span className="text-gray-900">
+            {order?.state?.order?.products?.length}
+          </span>
         </div>
 
         {/* Phone Number */}
@@ -150,29 +156,25 @@ const OrderDetails = () => {
       </div>
 
       {fulfillmentMethod?.toLowerCase() === "pickup" ? (
-      <div className="bg-white my-5 rounded-xl p-4 shadow-sm border border-gray-200">
-        <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
-        
-          Pick Up Address
-        </h2>
+        <div className="bg-white my-5 rounded-xl p-4 shadow-sm border border-gray-200">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+            Pick Up Address
+          </h2>
 
-        <p className="text-sm text-gray-600 leading-relaxed break-words">
-          {order?.state?.order?.dispensarystreetAddress}
-        </p>
-      </div>
+          <p className="text-sm text-gray-600 leading-relaxed break-words">
+            {order?.state?.order?.dispensarystreetAddress}
+          </p>
+        </div>
+      ) : (
+        <div className="bg-white my-5 rounded-xl p-4 shadow-sm border border-gray-200">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
+            Shipping Address
+          </h2>
 
-      ):(
-
-      <div className="bg-white my-5 rounded-xl p-4 shadow-sm border border-gray-200">
-        <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
-        
-          Shipping Address
-        </h2>
-
-        <p className="text-sm text-gray-600 leading-relaxed break-words">
-          {shippingAddress}
-        </p>
-      </div>
+          <p className="text-sm text-gray-600 leading-relaxed break-words">
+            {shippingAddress}
+          </p>
+        </div>
       )}
 
       {/* Product Details */}
@@ -200,52 +202,44 @@ const OrderDetails = () => {
       </div>
 
       {/* Billing Summary */}
-      <div>
-        <h3 className="text-sm font-semibold mb-2 mt-2">Billing</h3>
-        <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
-          <div className="flex justify-between">
-            <span>Subtotal</span>
-            <span>${parseFloat(totalAmount).toFixed(2)}</span>
-          </div>
+    <div>
+  <h3 className="text-sm font-semibold mb-2 mt-2">Billing</h3>
+  <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
+    <div className="flex justify-between">
+      <span>Subtotal</span>
+      <span>${totalAmount.toFixed(2)}</span>
+    </div>
 
-          <div className="flex justify-between">
-            <span>Platform Fee (2%)</span>
-            <span className="text-red-500">
-              ${(parseFloat(totalAmount) * 0.02).toFixed(2)}
-            </span>
-          </div>
+    <div className="flex justify-between">
+      <span>Platform Fee (2%)</span>
+      <span className="text-red-500">${(totalAmount * 0.02).toFixed(2)}</span>
+    </div>
 
-          <div className="flex justify-between font-semibold text-green-700 text-base pt-2 border-t border-gray-200">
-            <span>Total After Fee</span>
-            <span>
-              $
-              {(
-                parseFloat(totalAmount) +
-                parseFloat(totalAmount) * 0.02
-              ).toFixed(2)}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Button */}
-      <div className="flex gap-4 mt-4 mb-2">
-  <button
-    className="w-1/2 bg-green-700 text-white py-3 rounded-xl font-semibold text-sm"
-    onClick={handleTrackOrderClick}
-  >
-    Track Order
-  </button>
-  <button
-    className="w-1/2 bg-white text-green-500 border border-green-500 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2" // Flex for icon and text alignment
-    // onClick={handleChatClick}
-  >
-    <IoChatbubbleEllipsesOutline size={20} /> {/* Adjust the icon size as needed */}
-    Chat
-  </button>
+    <div className="flex justify-between font-semibold text-green-700 text-base pt-2 border-t border-gray-200">
+      <span>Total After Fee</span>
+      <span>${(totalAmount * 1.02).toFixed(2)}</span>
+    </div>
+  </div>
 </div>
 
 
+      {/* CTA Button */}
+      <div className="flex gap-4 mt-4 mb-2">
+        <button
+          className="w-1/2 bg-green-700 text-white py-3 rounded-xl font-semibold text-sm"
+          onClick={handleTrackOrderClick}
+        >
+          Track Order
+        </button>
+        <button
+          className="w-1/2 bg-white text-green-500 border border-green-500 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2" // Flex for icon and text alignment
+          // onClick={handleChatClick}
+        >
+          <IoChatbubbleEllipsesOutline size={20} />{" "}
+          {/* Adjust the icon size as needed */}
+          Chat
+        </button>
+      </div>
     </div>
   );
 };

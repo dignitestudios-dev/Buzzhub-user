@@ -4,13 +4,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 const ReviewOrder = () => {
   const { state } = useLocation(); // Get the cartData passed from the Cart component
-  const [cartData, setCartData] = useState(state?.cartData || []); // Initialize cartData from the state
+  const [cartData, setCartData] = useState(state?.addtoCart || []); // Initialize cartData from the state
   const [fulfillmentMethod, setFulfillmentMethod] = useState("Delivery");
   const [shippingAddress, setShippingAddress] = useState("");
   const [medicalCards, setMedicalCards] = useState({
     front: "",
     back: "",
   });
+  console.log(cartData, "cartData");
   const [drivingLicense, setDrivingLicense] = useState({
     front: "",
     back: "",
@@ -19,19 +20,23 @@ const ReviewOrder = () => {
 
   const navigate = useNavigate();
 
-   const handleBackClick = () => {
+  const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
-  
+
   // Calculate totals
-  const subtotal = cartData?.items?.reduce((sum, item) => sum + item.productPrice * item.grams, 0);
+  const subtotal = cartData?.reduce(
+    (sum, item) => sum + item.productPrice * item.grams,
+    0
+  );
   const platformFee = 10;
-  const total = subtotal + platformFee;  // Adding platform fee to the total
+  const total = subtotal + platformFee; // Adding platform fee to the total
 
   // Function to handle "Place Order" button click
   const handlePlaceOrder = () => {
     navigate("/app/order-details"); // Navigate to order-details page
   };
+  const userData = JSON.parse(localStorage.getItem("userData"));
 
   useEffect(() => {
     if (fulfillmentMethod === "Self Pickup") {
@@ -41,14 +46,13 @@ const ReviewOrder = () => {
     }
 
     // Retrieve user data from localStorage
-    const userData = JSON.parse(localStorage.getItem("userData"));
     if (userData) {
       // Set medical card images from localStorage
       setMedicalCards({
         front: userData.medicalCardFront,
         back: userData.medicalCardBack,
       });
-      
+
       // Set driving license images from localStorage
       setDrivingLicense({
         front: userData.drivingLicenseFront,
@@ -58,15 +62,15 @@ const ReviewOrder = () => {
       // Set phone number from localStorage
       setPhoneNumber(userData.phoneNumber);
     }
+    console.log(userData, "userData");
   }, [fulfillmentMethod]);
+  const cartDataFullMethod = cartData?.map((item) => item?.fullfillmentMethod);
 
+  console.log(cartDataFullMethod, "cartData==>");
   return (
     <div className="w-full mx-auto bg-white lg:border lg:border-gray-200 lg:p-4 pb-20 lg:pb-4 rounded-2xl">
-<div className="flex items-center justify-between mb-8">
-        <button
-          className="text-gray-800 pr-3"
-          onClick={handleBackClick}
-        >
+      <div className="flex items-center justify-between mb-8">
+        <button className="text-gray-800 pr-3" onClick={handleBackClick}>
           <FiArrowLeft size={20} />
         </button>
         <h3 className="text-[16px] lg:text-xl font-semibold text-gray-800 mx-auto sm:mx-0 sm:flex-1 sm:text-left">
@@ -75,35 +79,59 @@ const ReviewOrder = () => {
       </div>
       {/* Fulfillment Method */}
       <div className="mb-4">
-        <span className="font-medium block mb-2">Fulfillment Method</span>
-        <div className="flex gap-4">
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="fulfillment"
-              value="Delivery"
-              checked={fulfillmentMethod === "Delivery"}
-              onChange={() => setFulfillmentMethod("Delivery")}
-              className="mr-2"
-            />
-            Delivery
-          </label>
-          <label className="flex items-center">
-            <input
-              type="radio"
-              name="fulfillment"
-              value="Self Pickup"
-              checked={fulfillmentMethod === "Self Pickup"}
-              onChange={() => setFulfillmentMethod("Self Pickup")}
-              className="mr-2"
-            />
-            Self Pickup
-          </label>
-        </div>
+        {cartDataFullMethod[0] === "Both" && (
+          <div className="flex gap-4">
+            <span className="font-medium block mb-2">Fulfillment Method</span>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="fulfillment"
+                value="Delivery"
+                checked={fulfillmentMethod === "Delivery"}
+                onChange={() => setFulfillmentMethod("Delivery")}
+                className="mr-2"
+              />
+              Delivery
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="fulfillment"
+                value="Pickup"
+                checked={fulfillmentMethod === "Pickup"}
+                onChange={() => setFulfillmentMethod("Pickup")}
+                className="mr-2"
+              />
+              Self Pickup
+            </label>
+            {fulfillmentMethod === "Delivery" && (
+              <>
+                <span className="font-medium block mb-1 mt-2">Shipping Address</span>
+                <div className="p-1 rounded-xl text-sm space-y-2">
+                  <input
+                    type="text"
+                    value={shippingAddress}
+                    onChange={(e) => setShippingAddress(e.target.value)}
+                    className="w-full text-gray-700 p-2 rounded-md border"
+                    placeholder="Enter your delivery address"
+                  />
+                </div>
+              </>
+            )}
+      
+            {fulfillmentMethod === "Pickup" && (
+              <>
+                <span className="font-medium block mb-1 mt-2">Pickup Address</span>
+                <div className="p-1 rounded-xl text-sm space-y-2">
+                  <p className="text-gray-700 leading-6">{userData?.streetAddress}</p>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
-
       {/* Conditionally render Shipping Address */}
-      {fulfillmentMethod === "Delivery" ? (
+      {cartDataFullMethod[0] === "Deliver at home" && (
         <>
           <span className="font-medium block mb-1 mt-2">Shipping Address</span>
           <div className="p-1 rounded-xl text-sm space-y-2">
@@ -116,15 +144,16 @@ const ReviewOrder = () => {
             />
           </div>
         </>
-      ) : (
+      )}
+
+      {cartDataFullMethod[0] === "Self Pickup" && (
         <>
           <span className="font-medium block mb-1 mt-2">Pickup Address</span>
           <div className="p-1 rounded-xl text-sm space-y-2">
-            <p className="text-gray-700 leading-6">{shippingAddress}</p>
+            <p className="text-gray-700 leading-6">{userData?.streetAddress}</p>
           </div>
         </>
       )}
-
       {/* Phone Number */}
       <span className="font-medium block mt-2 pr-2 pt-2">Phone Number</span>
       <div className=" p-1 rounded-xl text-sm space-y-1">
@@ -191,7 +220,7 @@ const ReviewOrder = () => {
       <div>
         <h3 className="text-sm font-semibold mb-2">Purchased Items</h3>
         <div className="bg-gray-50 p-4 rounded-xl space-y-2">
-          {cartData?.items?.map((item) => (
+          {cartData?.map((item) => (
             <div key={item._id} className="flex items-start gap-3">
               <img
                 src={item.productImage}
@@ -201,9 +230,11 @@ const ReviewOrder = () => {
               <div className="flex-1">
                 <p className="font-medium text-sm">{item.productName}</p>
                 <p className="text-green-600 font-semibold text-sm">
-                  ${item.productPrice.toFixed(2)}
+                  <span>${subtotal?.toFixed(2)}</span>
                 </p>
-                <span className="text-xs text-gray-600">{item.grams} grams</span>
+                <span className="text-xs text-gray-600">
+                  {item.grams} grams
+                </span>
               </div>
             </div>
           ))}
@@ -213,18 +244,19 @@ const ReviewOrder = () => {
       {/* Billing Summary */}
       <div>
         <h3 className="text-sm font-semibold mb-2 mt-4">Billing</h3>
-        <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
-          <div className="flex justify-between">
+        <div className="mb-6 bg-gray-50 p-4 rounded-xl text-sm">
+          <div className="flex justify-between mb-2">
             <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>${subtotal?.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between mb-2">
             <span>2% platform fees</span>
-            <span>${platformFee.toFixed(2)}</span>
+            <span>${(subtotal * 0.02)?.toFixed(2)}</span> {/* 2% fee amount */}
           </div>
-          <div className="flex justify-between font-semibold text-green-700 text-base pt-2">
+          <div className="flex justify-between font-semibold text-green-700 text-base">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>${(subtotal * 1.02)?.toFixed(2)}</span>{" "}
+            {/* Total me 2% add ho gaya */}
           </div>
         </div>
       </div>

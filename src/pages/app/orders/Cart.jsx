@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { FiLoader, FiTrash2 } from "react-icons/fi";
@@ -6,93 +6,63 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from "../../../axios"; // Custom axios instance (make sure this is set up correctly)
 import { ErrorToast, SuccessToast } from "../../../components/global/Toaster"; // Assuming you have a toaster component
 import { Loader } from "../../../components/global/Loader";
-
-
+import { AppContext } from "../../../context/AppContext";
 
 const Cart = () => {
-  const [cartData, setCartData] = useState(null); // For storing the cart data
+  // For storing the cart data
   const [loading, setLoading] = useState(true); // Loading state
   const navigate = useNavigate(); // Initialize navigate function
   const [deletingItem, setDeletingItem] = useState(null); // Track the item being deleted
+  const { setAddToCart, addtoCart, setUpdate } = useContext(AppContext);
 
+  const handleRemove = async (item) => {
+    const productId = item.productId._id;
 
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get("user/get-cart-items");
-        if (response.data.success) {
-          setCartData(response.data.data); // Set cart data to state
-        }
-      } catch (error) {
-        console.error("Error fetching cart items:", error);
-      } finally {
-        setLoading(false);
+    setDeletingItem(item._id);
+
+    try {
+      const response = await axios.post("user/delete-cart-item", {
+        productId: productId,
+      });
+
+      if (response.data.success) {
+        setAddToCart((prev) =>
+          prev.filter((cartItem) => cartItem._id !== item._id)
+        );
+
+        SuccessToast("Item removed from cart!");
+        setUpdate((prev) => !prev);
+      } else {
+        ErrorToast("Failed to remove item. Please try again.");
       }
-    };
-
-    fetchCartItems(); // Fetch cart items on component mount
-  }, []); // Only run on mount
-
-  if (loading) {
-    return (
-      <div className="w-full h-screen flex ">
-        <Loader />
-      </div>
-    );
-  }
- const handleRemove = async (item) => {
-  const productId = item.productId._id; // Extract the product ID dynamically from the item
-
-  setDeletingItem(item._id); // Set loading state for the item being deleted
-
-  try {
-    // Send DELETE request to the API to remove the item from the cart
-    const response = await axios.post("user/delete-cart-item", {
-      productId: productId, // Send the productId as a string
-    });
-
-    if (response.data.success) {
-      // Update local state by removing the item
-      setCartData((prev) => ({
-        ...prev,
-        items: prev.items.filter((cartItem) => cartItem._id !== productId),
-      }));
-      SuccessToast("Item removed from cart!");
-      window.location.reload(); // Reload the page to see the updated cart
-    } else {
-      ErrorToast("Failed to remove item. Please try again.");
+    } catch (error) {
+      console.error("Error deleting item from cart:", error);
+      ErrorToast("An error occurred. Please try again.");
+    } finally {
+      setDeletingItem(null);
     }
-  } catch (error) {
-    console.error("Error deleting item from cart:", error);
-    ErrorToast("An error occurred. Please try again.");
-  } finally {
-    setDeletingItem(null); // Reset deleting state after operation is complete
-  }
-};
+  };
 
   const handleAddGrams = (id) => {
-    setCartData((prev) => ({
-      ...prev,
-      items: prev.items.map((item) =>
+    setAddToCart((prev) =>
+      prev.map((item) =>
         item._id === id ? { ...item, grams: (item.grams || 1) + 1 } : item
-      ),
-    }));
+      )
+    );
   };
 
   const handleReduceGrams = (id) => {
-    setCartData((prev) => ({
-      ...prev,
-      items: prev.items.map((item) =>
+    setAddToCart((prev) =>
+      prev.map((item) =>
         item._id === id && item.grams > 1
           ? { ...item, grams: item.grams - 1 }
           : item
-      ),
-    }));
+      )
+    );
   };
-
-  const subtotal = cartData?.items.reduce(
-    (sum, item) => sum + item.productPrice * item.grams,
+  console.log(addtoCart, "addtoCart////");
+  const subtotal = addtoCart?.reduce(
+    (sum, item) => sum + item?.productPrice * item?.grams,
     0
   );
   const platformFee = subtotal > 0 ? 10 : 0; // Only charge fee if subtotal > 0
@@ -101,7 +71,7 @@ const Cart = () => {
   // Function to handle "Proceed to Checkout" button click
   const handleProceedToCheckout = () => {
     // Pass the cartData as state when navigating to the review order page
-    navigate("/app/review-order", { state: { cartData } });
+    navigate("/app/review-order", { state: { addtoCart } });
   };
 
   return (
@@ -113,10 +83,12 @@ const Cart = () => {
 
       {/* Cart Items */}
       <div className="space-y-4 mb-6">
-        {cartData?.items.length === 0 ? (
-          <p className="text-center text-gray-400 ">No items in your cart yet.</p>
+        {addtoCart?.length === 0 ? (
+          <p className="text-center text-gray-400 ">
+            No items in your cart yet.
+          </p>
         ) : (
-          cartData?.items?.map((item) => (
+          addtoCart?.map((item) => (
             <div
               key={item._id}
               className="flex gap-3 items-start p-1.5 bg-[#F9FAFA] border border-gray-200 rounded-xl shadow-sm relative"
@@ -144,18 +116,17 @@ const Cart = () => {
                   {/* <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
                     {item.fullfillmentMethod}
                   </span> */}
-                 <button
-  onClick={() => handleRemove(item)} // Pass the full item object dynamically
-  className="text-red-500 flex items-center"
-  disabled={deletingItem === item._id} // Disable button while deleting
->
-  {deletingItem === item._id ? (
-    <FiLoader className="animate-spin text-red-500 text-xl" /> // Loader icon
-  ) : (
-    <FiTrash2 size={18} /> // Regular trash icon
-  )}
-</button>
-
+                  <button
+                    onClick={() => handleRemove(item)} // Pass the full item object dynamically
+                    className="text-red-500 flex items-center"
+                    disabled={deletingItem === item._id} // Disable button while deleting
+                  >
+                    {deletingItem === item._id ? (
+                      <FiLoader className="animate-spin text-red-500 text-xl" /> // Loader icon
+                    ) : (
+                      <FiTrash2 size={18} /> // Regular trash icon
+                    )}
+                  </button>
                 </div>
 
                 {/* Gram Control Buttons BELOW Delete */}
@@ -188,20 +159,21 @@ const Cart = () => {
 
       {/* Billing Summary */}
       <h1 className="mb-2 font-semibold text-[13px]">Billing</h1>
-      <div className="mb-6 bg-gray-50 p-4 rounded-xl text-sm">
-        <div className="flex justify-between mb-2">
-          <span>Subtotal</span>
-          <span>${subtotal?.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between mb-2">
-          <span>2% platform fees</span>
-          <span>${platformFee?.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between font-semibold text-green-700 text-base">
-          <span>Total</span>
-          <span>${total?.toFixed(2)}</span>
-        </div>
-      </div>
+    <div className="mb-6 bg-gray-50 p-4 rounded-xl text-sm">
+  <div className="flex justify-between mb-2">
+    <span>Subtotal</span>
+    <span>${subtotal?.toFixed(2)}</span>
+  </div>
+  <div className="flex justify-between mb-2">
+    <span>2% platform fees</span>
+     <span>${(subtotal * 0.02)?.toFixed(2)}</span> {/* 2% fee amount */}
+  </div>
+  <div className="flex justify-between font-semibold text-green-700 text-base">
+    <span>Total</span>
+    <span>${(subtotal * 1.02)?.toFixed(2)}</span> {/* Total me 2% add ho gaya */}
+  </div>
+</div>
+
 
       {/* Checkout Button */}
       <button

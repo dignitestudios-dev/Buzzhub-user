@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router";
-import axios from "../../../axios"; 
+import axios from "../../../axios";
 import { CiLocationOn } from "react-icons/ci";
 import { Loader } from "../../../components/global/Loader";
 
@@ -98,7 +98,7 @@ const OrderHistory = () => {
       state: { order: selectedOrder },
     });
   };
-  console.log(orders);
+  console.log(filteredOrders);
   return (
     <div className="w-full lg:mb-0 md:mb-0 mb-24 bg-white min-h-screen">
       {/* Header */}

@@ -135,7 +135,11 @@ const DispensaryProfile = () => {
           products.map((product, idx) => (
             <div
               key={idx}
-              onClick={()=>navigate(`/app/product-details/${product?._id}`)}
+              onClick={() =>
+                navigate(`/app/product-details/${product?._id}`, {
+                  state: { dispensary },
+                })
+              }
               className="border cursor-pointer rounded-xl overflow-hidden shadow-sm"
             >
               <div className="relative">

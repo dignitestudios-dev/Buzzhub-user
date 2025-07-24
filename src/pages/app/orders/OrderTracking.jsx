@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom"; // Import useLocati
 const OrderTracking = () => {
   const navigate =useNavigate()
   const location = useLocation();
-  const order = location?.state?.order;
+  const order = location?.state?.order?.state?.order;
 console.log(order,"order==>")
   // Define the order statuses for progression
   const statuses = [
@@ -19,7 +19,7 @@ console.log(order,"order==>")
   ];
 
   // Get the index of the current status
-  const currentStatusIndex = statuses.indexOf(order.orderStatus);
+  const currentStatusIndex = statuses.indexOf(order?.status);
 
   // Create the steps based on the order status
   const steps = [
@@ -57,10 +57,10 @@ console.log(order,"order==>")
 
           {Array.isArray(order?.products) && order.products.length > 0 && (
             <div className="flex items-center ml-4">
-              <p className="text-xs md:text-sm mr-2">Dispensary</p>
+              <p className="text-xs md:text-sm mr-2">{order?.dispensaryName}</p>
               <img
                 src={
-                  order?.products[0]?.dispensaryDetails?.image ||
+                  order?.dispensaryProfile ||
                   "/default-dispensary.png"
                 }
                 alt="dispensary"
@@ -73,7 +73,7 @@ console.log(order,"order==>")
         {/* Product Details */}
         <div className="flex flex-col gap-3 mb-3">
           {Array.isArray(order?.products) &&
-            order.products.map((product, index) => (
+            order?.products?.map((product, index) => (
               <div key={index} className="flex gap-3 items-center">
                 <img
                   src={product.image}
@@ -90,10 +90,10 @@ console.log(order,"order==>")
                 </div>
                 <div className="text-right">
                   <p className="text-[18px] font-bold">
-                    $
-                    {typeof product.price === "number"
-                      ? product.price.toFixed(2)
-                      : product.price?.replace("$", "")}
+                  $ {(
+                  parseFloat(product.price.replace("$", "")) *
+                  parseFloat(product.weight)
+                ).toFixed(2)}
                   </p>
                 </div>
               </div>

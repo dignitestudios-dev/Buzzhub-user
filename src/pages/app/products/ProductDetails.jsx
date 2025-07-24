@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { FaStar } from "react-icons/fa";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "../../../axios";
 import { ErrorToast, SuccessToast } from "../../../components/global/Toaster";
 import { FiArrowLeft, FiLoader } from "react-icons/fi";
@@ -12,10 +12,12 @@ const ProductDetails = () => {
   const [grams, setGrams] = useState();
   const [fulfillment, setFulfillment] = useState("self");
   const [loading, setLoading] = useState(false); // State to manage loading state for Add to Cart button
-
+  const [cartData, setCartData] = useState(null);
   const { productId } = useParams();
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const dispensaryFullFillMent = location?.state;
+  console.log(dispensaryFullFillMent, "dispensary");
   const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
@@ -42,9 +44,31 @@ const ProductDetails = () => {
       fetchProductDetails();
     }
   }, [productId]);
+  const fetchCartItems = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get("user/get-cart-items");
+      if (response.data.success) {
+        setCartData(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching cart items:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchCartItems();
+  }, []);
 
-  // Handle Add to Cart Button Click
-  const { setAddToCart, addtoCart } = useContext(AppContext);
+  const cartItemID = cartData?.items?.map(
+    (item, index) => item?.productId?._id
+  );
+  console.log(product, "product==>");
+  const ProductId = product?._id;
+
+  console.log(fulfillment, "fulfillment==>");
+  const { setAddToCart, addtoCart, setUpdate } = useContext(AppContext);
   const handleAddToCart = async () => {
     setLoading(true);
 
@@ -53,12 +77,13 @@ const ProductDetails = () => {
         productId: productId,
         dispensaryId: product.dispensaryId._id,
         grams: grams,
-        fullfillmentMethod: fulfillment === "self" ? "Pickup" : "Delivery",
+        fullfillmentMethod: dispensaryFullFillMent?.dispensary?.fulfillmentMethod,
       });
 
-      if (response.data.success) {
+      if (response.status === 200) {
         SuccessToast("Item added to cart!");
-        setAddToCart(addtoCart + 1);
+        setUpdate((prev) => !prev);
+        fetchCartItems();
       } else {
         ErrorToast(response.data.message);
       }
@@ -92,7 +117,7 @@ const ProductDetails = () => {
     }
     setGrams(value);
   };
-
+  console.log(product, "product==>");
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
@@ -157,10 +182,8 @@ const ProductDetails = () => {
                   {product.dispensaryId.dispensaryName}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {product.dispensaryId.city}, {product.dispensaryId.state} •{" "}
-                  {product.dispensaryId.distance
-                    ? `${product.dispensaryId.distance.toFixed(1)} miles away`
-                    : "N/A"}
+                  {product.dispensaryId.city}, {product?.dispensaryId?.state}
+                  {/* {product.dispensaryId.distance} */}
                 </p>
               </div>
             </div>
@@ -198,7 +221,7 @@ const ProductDetails = () => {
               </p>
             </div>
 
-            <div>
+            {/* <div>
               <p className="text-sm font-medium text-gray-700">
                 Fulfillment Method
               </p>
@@ -219,7 +242,7 @@ const ProductDetails = () => {
                   </label>
                 ))}
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Description */}
@@ -243,17 +266,26 @@ const ProductDetails = () => {
           </div>
 
           {/* Add to Cart Button */}
-          <button
-            onClick={handleAddToCart}
-            className="w-full bg-green-600 hover:bg-green-700 transition text-white font-semibold py-3 mt-4 rounded-xl flex items-center justify-center"
-            disabled={loading} // Disable the button while loading
-          >
-            {loading ? (
-              <FiLoader className="animate-spin text-white text-2xl" />
-            ) : (
-              "Add to Cart"
-            )}
-          </button>
+          {cartItemID?.includes(ProductId) ? (
+            <button
+              onClick={() => navigate("/app/cart")}
+              className="w-full bg-green-600 hover:bg-green-700 transition text-white font-semibold py-3 mt-4 rounded-xl flex items-center justify-center"
+            >
+              View Cart
+            </button>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              className="w-full bg-green-600 hover:bg-green-700 transition text-white font-semibold py-3 mt-4 rounded-xl flex items-center justify-center"
+              disabled={loading} // Disable the button while loading
+            >
+              {loading ? (
+                <FiLoader className="animate-spin text-white text-2xl" />
+              ) : (
+                "Add to Cart"
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>
