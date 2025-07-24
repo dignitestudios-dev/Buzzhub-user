@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; 
 import { FaStar } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { useNavigate, useParams } from "react-router-dom"; // For dynamic routing
+import { useNavigate, useParams } from "react-router-dom"; 
 import axios from "../../../axios";
 import { CiClock2 } from "react-icons/ci";
 import { FiClock } from "react-icons/fi";
@@ -9,9 +9,10 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 
 const DispensaryProfile = () => {
   const navigate = useNavigate();
-  const { dispensaryId } = useParams(); // Get dispensaryId from the route
+  const { dispensaryId } = useParams(); 
   const [dispensary, setDispensary] = useState(null);
   const [products, setProducts] = useState([]);
+  const [reviews, setReviews] = useState([]); // New state for reviews
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -24,12 +25,12 @@ const DispensaryProfile = () => {
         // Log the response to check the structure
         console.log("API Response:", response.data);
 
-        // Check if the response contains the expected data structure
         if (response.data && response.data.success) {
           const data = response.data.data;
 
           setDispensary(data.dispensary);
           setProducts(data.products);
+          setReviews(data.reviews); // Set reviews data
         } else {
           setError("Dispensary data is missing.");
         }
@@ -71,16 +72,17 @@ const DispensaryProfile = () => {
   }
 
   return (
-    <div className="w-full mx-auto bg-white  overflow-hidden mb-8 pb-12">
+    <div className="w-full mx-auto bg-white overflow-hidden mb-8 pb-12">
       {/* Header */}
       <div
-        className="hidden lg:flex  items-center cursor-pointer mb-10 px-6"
+        className="hidden lg:flex items-center cursor-pointer mb-10 px-6"
         onClick={() => navigate(-1)}
       >
         <IoIosArrowRoundBack size={20} />
-
         <p className="text-[14px] font-[500]">Back</p>
       </div>
+
+      {/* Dispensary Info */}
       <div className="flex flex-col md:flex-row md:items-start md:gap-4 items-center mb-4 px-4">
         <img
           src={dispensary.profilePicture}
@@ -111,20 +113,8 @@ const DispensaryProfile = () => {
               {dispensary.disType}{" "}
             </span>
           </p>
-
-          <p className="text-red-500 text-sm font-medium mt-1">
-            {dispensary.fulfillmentMethod}
-          </p>
-          <span className="text-[#1D7C42] text-xs mt-1 block bg-[#1D7C421F] rounded-full p-2">
-            {dispensary.deliveryRadius} Delivery Radius
-          </span>
         </div>
       </div>
-
-      {/* Dispensary Bio */}
-      {/* <div className="px-4 mb-6">
-        <p className="text-sm text-gray-700">{dispensary.bio}</p>
-      </div> */}
 
       {/* Products */}
       <div>
@@ -144,9 +134,6 @@ const DispensaryProfile = () => {
                   alt={product.productName}
                   className="w-full h-28 object-cover"
                 />
-                <span className="absolute top-2 left-2 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
-                  Available for {product.fullfillmentMethod}
-                </span>
               </div>
               <div className="p-2">
                 <h3 className="text-sm font-medium">{product.productName}</h3>
@@ -176,31 +163,31 @@ const DispensaryProfile = () => {
           <button className="text-green-500 text-xs underline">See all</button>
         </div>
 
-        {dispensary.reviews && dispensary.reviews.length > 0 ? (
-          dispensary.reviews.map((review, idx) => (
+        {reviews && reviews.length > 0 ? (
+          reviews.map((review, idx) => (
             <div key={idx} className="bg-gray-50 p-4 rounded-xl shadow-sm mb-3">
               <div className="flex items-center mb-2">
                 <img
-                  src="https://source.unsplash.com/30x30/?person"
+                  src={review.userId.profilePicture}
                   className="w-8 h-8 rounded-full object-cover mr-2"
-                  alt="Reviewer"
+                  alt={review.userId.fullName}
                 />
                 <div>
                   <h4 className="text-sm font-semibold">
-                    {review.productName}
+                    {review.productId.productName}
                   </h4>
-                  <p className="text-xs text-gray-400">{review.location}</p>
+                  <p className="text-xs text-gray-400">{review.userId.city}, {review.userId.state}</p>
                 </div>
                 <span className="ml-auto font-bold text-green-600">
-                  ${review.price}
+                  ${review.productId.productPrice}
                 </span>
               </div>
               <div className="flex mb-2">
                 {[...Array(5)].map((_, i) => (
-                  <FaStar key={i} className="text-yellow-500 text-xs" />
+                  <FaStar key={i} className={`text-yellow-500 text-xs ${i < review.ratingNumber ? 'filled' : ''}`} />
                 ))}
               </div>
-              <p className="text-xs text-gray-700">{review.text}</p>
+              <p className="text-xs text-gray-700">{review.review}</p>
             </div>
           ))
         ) : (

@@ -8,6 +8,7 @@ import { FiArrowLeft, FiLoader } from "react-icons/fi";
 const ProductDetails = () => {
   const [product, setProduct] = useState(null); 
   const [grams, setGrams] = useState();
+  const [reviews, setReviews] = useState([]); // New state for reviews
   const [fulfillment, setFulfillment] = useState("self");
   const [loading, setLoading] = useState(false); // State to manage loading state for Add to Cart button
 
@@ -29,6 +30,8 @@ const ProductDetails = () => {
 
         if (response.data.success) {
           setProduct(response.data.data.products); 
+          setReviews(response.data.data.reviews || []); // Initialize reviews state
+
         } else {
           console.error("Failed to fetch product details");
         }
@@ -72,8 +75,6 @@ const ProductDetails = () => {
 
   if (!product) return <div>Loading...</div>; 
 
-  // Destructure the reviews safely to avoid errors
-  const reviews = Array.isArray(product.reviews) ? product.reviews : [];
   
   const availableMaxGrams = product.weightQuantity <= 300 ? product.weightQuantity : 300;
 
@@ -189,6 +190,50 @@ const ProductDetails = () => {
             <h3 className="text-base font-semibold text-gray-800 mb-1">Warnings</h3>
             <p className="text-sm text-gray-600">{product.warningDescription}</p>
           </div>
+
+
+          {/* Product Reviews */}
+{reviews.length > 0 ? (
+  <div className="mt-6 border-t pt-4">
+    <h3 className="text-base font-semibold text-gray-800 mb-4">Reviews</h3>
+    {reviews.map((review, idx) => (
+      <div key={idx} className="bg-gray-50 p-4 rounded-xl shadow-sm mb-4">
+        <div className="flex items-center mb-2">
+          <img
+            src={review.userId.profilePicture}
+            alt={review.userId.fullName}
+            className="w-8 h-8 rounded-full object-cover mr-2"
+          />
+          <div>
+            <h4 className="text-sm font-semibold">{review.userId.fullName}</h4>
+            <p className="text-xs text-gray-500">
+              {review.userId.city}, {review.userId.state}
+            </p>
+          </div>
+          <span className="ml-auto text-green-600 font-bold">
+            ${review.productId.productPrice}
+          </span>
+        </div>
+        <div className="flex mb-1">
+          {[...Array(5)].map((_, i) => (
+            <FaStar
+              key={i}
+              className={`text-yellow-500 text-xs ${
+                i < Math.round(review.ratingNumber) ? "filled" : ""
+              }`}
+            />
+          ))}
+        </div>
+        <p className="text-sm text-gray-700">{review.review}</p>
+      </div>
+    ))}
+  </div>
+) : (
+  <div className="mt-6 border-t pt-4 text-sm text-gray-500 italic">
+    No reviews available for this product.
+  </div>
+)}
+
 
           {/* Add to Cart Button */}
          <button
