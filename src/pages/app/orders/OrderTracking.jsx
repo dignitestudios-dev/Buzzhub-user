@@ -5,9 +5,12 @@ import { MdArrowBack } from "react-icons/md";
 import { useLocation, useNavigate, useParams } from "react-router-dom"; // Import useParams
 
 const OrderTracking = () => {
-  const navigate =useNavigate()
+  const navigate = useNavigate();
   const location = useLocation();
   const order = location?.state?.order?.state?.order;
+  const orderDetails = location?.state?.orderDetails;
+  const { dispensaryId, products } = location.state || {};
+  console.log("orderDetails -- > ", orderDetails, "order -- > ", order);
 
   // Define the order statuses for progression
   const statuses = [
@@ -18,18 +21,25 @@ const OrderTracking = () => {
     "Completed",
   ];
 
-    const { orderId } = useParams();  // Get orderId directly from URL params
+  const { id } = useParams();  // Get orderId directly from URL params
 
   // Get the index of the current status
   const currentStatusIndex = statuses.indexOf(order?.status);
 
-
   const handleGiveFeedbackClick = () => {
     // Navigate to the feedback page, passing the orderId in the URL
-    navigate(`/app/feedback/${orderId}`);
+    navigate(`/app/feedback/${id}`);
   };
 
-
+  const handleProductReviewClick = (index) => {
+    console.log(index, "productId");
+    // Navigate to the feedback page for the specific product
+    navigate(`/app/feedback/${orderDetails?.dispensaryId?._id}`, {
+  state: {
+    productId: orderDetails?.products[index]?._id,
+  },
+});
+  };
 
   // Create the steps based on the order status
   const steps = [
@@ -69,10 +79,7 @@ const OrderTracking = () => {
             <div className="flex items-center ml-4">
               <p className="text-xs md:text-sm mr-2">{order?.dispensaryName}</p>
               <img
-                src={
-                  order?.dispensaryProfile ||
-                  "/default-dispensary.png"
-                }
+                src={order?.dispensaryProfile || "/default-dispensary.png"}
                 alt="dispensary"
                 className="w-[20px] h-[20px] md:w-8 md:h-8 rounded-full object-cover mr-2"
               />
@@ -100,11 +107,21 @@ const OrderTracking = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-[18px] font-bold">
-                  $ {(
-                  parseFloat(product.price.replace("$", "")) *
-                  parseFloat(product.weight)
-                ).toFixed(2)}
+                    $ {(
+                      parseFloat(product.price.replace("$", "")) *
+                      parseFloat(product.weight)
+                    ).toFixed(2)}
                   </p>
+
+                  {/* Write Review Button */}
+                  {isCompleted && (
+                    <button
+                      onClick={() => handleProductReviewClick(index)}
+                      className="bg-green-600 text-white p-2 rounded-full text-xs font-semibold mt-2"
+                    >
+                      Write Review
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -142,7 +159,7 @@ const OrderTracking = () => {
       {isCompleted && (
         <div className="flex justify-between gap-4 mt-6">
           {/* Give Feedback Button */}
-         <button
+          <button
             onClick={handleGiveFeedbackClick}
             className="w-1/2 bg-[#1D7C42] text-white text-sm py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
           >
