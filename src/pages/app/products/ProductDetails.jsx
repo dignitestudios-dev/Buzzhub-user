@@ -217,6 +217,25 @@ const ProductDetails = () => {
             </div>
           </div>
 
+          {/* Category and Sub Category Display */}
+<div className="border-t mt-6 pt-4">
+  <div className="flex divide-x">
+    <div className="flex-1 pr-4">
+      <h4 className="text-[15px] font-semibold text-black mb-1">Category</h4>
+      <p className="text-[15px] text-black">{product.productType}</p>
+    </div>
+    <div className="flex-1 pl-4">
+      <h4 className="text-[15px] font-semibold text-black mb-1">Sub Category</h4>
+      <p className="text-[15px] text-black">
+        {product.subTypes && product.subTypes.length > 0
+          ? product.subTypes.join(", ")
+          : "N/A"}
+      </p>
+    </div>
+  </div>
+</div>
+
+
           {/* Description */}
           <div className="mt-6">
             <h3 className="text-base font-semibold text-gray-800 mb-2 border-t pt-4">
@@ -246,12 +265,12 @@ const ProductDetails = () => {
       <div key={idx} className="bg-gray-50 p-4 rounded-xl shadow-sm mb-4">
         <div className="flex items-center mb-2">
           <img
-            src={review.userId.profilePicture}
-            alt={review.userId.fullName}
-            className="w-8 h-8 rounded-full object-cover mr-2"
+            src={product.productImage[0]}  // Replacing user image with the first product image
+            alt={product.productName}
+            className="w-8 h-8 rounded-full object-cover mr-2"  // Style it to match the user profile image
           />
           <div>
-            <h4 className="text-sm font-semibold">{review.userId.fullName}</h4>
+            <h4 className="text-sm font-semibold">{review.productId.productName}</h4>
             <p className="text-xs text-gray-500">
               {review.userId.city}, {review.userId.state}
             </p>
@@ -271,6 +290,24 @@ const ProductDetails = () => {
           ))}
         </div>
         <p className="text-sm text-gray-700">{review.review}</p>
+
+        {/* User's profile and name below the review */}
+        <div className="mt-4 flex items-center gap-2">
+          <img
+            src={review.userId.profilePicture}  // Show user profile picture here
+            alt={review.userId.fullName}
+            className="w-8 h-8 rounded-full object-cover"
+          />
+          <div>
+            <h5 className="text-sm font-semibold text-gray-800">{review.userId.fullName}</h5>
+            {/* <a 
+              href={`/app/user-profile/${review.userId._id}`}  // Link to the user's profile
+              className="text-xs text-blue-500 hover:underline"
+            >
+              View Profile
+            </a> */}
+          </div>
+        </div>
       </div>
     ))}
   </div>
@@ -279,6 +316,7 @@ const ProductDetails = () => {
     No reviews available for this product.
   </div>
 )}
+
 
 
           {/* Add to Cart Button */}

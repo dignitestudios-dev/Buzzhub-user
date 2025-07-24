@@ -6,6 +6,7 @@ import axios from "../../../axios";
 import { CiClock2 } from "react-icons/ci";
 import { FiClock } from "react-icons/fi";
 import { IoIosArrowRoundBack } from "react-icons/io";
+import { MdHomeWork } from "react-icons/md";
 
 const DispensaryProfile = () => {
   const navigate = useNavigate();
@@ -106,12 +107,24 @@ const DispensaryProfile = () => {
             {new Date(dispensary.openingHourTime).toLocaleTimeString()} -{" "}
             {new Date(dispensary.closingHourTime).toLocaleTimeString()}
           </p>
+          <p className="text-xs text-gray-500 flex items-center justify-center md:justify-start gap-1">
+            <MdHomeWork  className="text-green-500" />
+              {" "}
+              {dispensary.streetAddress}{" "}
+          </p>
           <p className="text-gray-500 text-sm mt-1">
             Dispensary Type :{" "}
             <span className="text-gray-500 text-sm font-medium mt-1">
               {" "}
               {dispensary.disType}{" "}
             </span>
+          </p>
+          
+
+          
+          <p className="text-red-500 text-sm mt-1">
+              {" "}
+              {dispensary.fulfillmentMethod}{" "}
           </p>
         </div>
       </div>
@@ -168,7 +181,7 @@ const DispensaryProfile = () => {
             <div key={idx} className="bg-gray-50 p-4 rounded-xl shadow-sm mb-3">
               <div className="flex items-center mb-2">
                 <img
-                  src={review.userId.profilePicture}
+                  src={review.productId.productImage[0]}
                   className="w-8 h-8 rounded-full object-cover mr-2"
                   alt={review.userId.fullName}
                 />
@@ -182,12 +195,30 @@ const DispensaryProfile = () => {
                   ${review.productId.productPrice}
                 </span>
               </div>
+              
               <div className="flex mb-2">
                 {[...Array(5)].map((_, i) => (
                   <FaStar key={i} className={`text-yellow-500 text-xs ${i < review.ratingNumber ? 'filled' : ''}`} />
                 ))}
               </div>
               <p className="text-xs text-gray-700">{review.review}</p>
+              {/* User's profile and name below the review */}
+        <div className="mt-4 flex items-center gap-2">
+          <img
+            src={review.userId.profilePicture}  // Show user profile picture here
+            alt={review.userId.fullName}
+            className="w-8 h-8 rounded-full object-cover"
+          />
+          <div>
+            <h5 className="text-sm font-semibold text-gray-800">{review.userId.fullName}</h5>
+            {/* <a 
+              href={`/app/user-profile/${review.userId._id}`}  // Link to the user's profile
+              className="text-xs text-blue-500 hover:underline"
+            >
+              View Profile
+            </a> */}
+          </div>
+        </div>
             </div>
           ))
         ) : (

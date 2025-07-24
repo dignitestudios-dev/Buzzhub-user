@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
 
 export default function UploadDocuments({ onNext, onBack, updateData }) {
@@ -15,9 +15,14 @@ export default function UploadDocuments({ onNext, onBack, updateData }) {
     if (file) setImages((prev) => ({ ...prev, [name]: URL.createObjectURL(file) }));
   };
 
+  // Check if all images are uploaded
+  const isFormComplete = Object.values(images).every((image) => image !== null);
+
   const handleSubmit = () => {
-    updateData({ images }); // Save images data in parent state
-    onNext(); // Go to next step
+    if (isFormComplete) {
+      updateData({ images }); // Save images data in parent state
+      onNext(); // Go to next step
+    }
   };
 
   const renderUploadBox = (label, name) => (
@@ -94,9 +99,15 @@ export default function UploadDocuments({ onNext, onBack, updateData }) {
 
         {/* Navigation Buttons */}
         <div className="mt-6 px-4">
+          {/* Disable "Next" if form is incomplete */}
           <button
             onClick={handleSubmit}
-            className="w-full bg-green-600 text-white font-semibold py-2 rounded-md mb-2"
+            disabled={!isFormComplete}
+            className={`w-full py-2 rounded-md font-semibold ${
+              isFormComplete
+                ? "bg-green-600 text-white hover:bg-green-700"
+                : "bg-gray-400 text-gray-200 cursor-not-allowed"
+            }`}
           >
             Next
           </button>

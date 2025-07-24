@@ -115,9 +115,12 @@ const Favorites = () => {
                     />
                     <div className="flex-1 pt-2">
                       <h3 className="font-semibold text-sm text-gray-800 ">{item.dispensaryName}</h3>
-                      <p className="text-sm text-gray-600">
+                      {/* <p className="text-sm text-gray-600">
                         {item.city}, {item.state}
-                      </p>
+                      </p> */}
+                                            <h3 className="font-semibold text-sm text-gray-800 ">{item.disType}</h3>
+                                            {/* <h3 className=" text-sm text-gray-800 ">{item.fulfillmentMethod}</h3> */}
+
                       <p className="text-xs text-yellow-600 mt-1 font-medium">
                         ⭐ {item.rating || "0.0"}
                       </p>
