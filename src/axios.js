@@ -5,25 +5,24 @@ import FingerprintJS from "@fingerprintjs/fingerprintjs";
 
 export const baseUrl = "https://api.buzzhubapp.com/";
 
-
 async function getDeviceFingerprint() {
-  // const fp = await FingerprintJS.load();
-  // const result = await fp.get();
-  // console.log(result.visitorId); // Unique device ID
-  // return result.visitorId;
+  const fp = await FingerprintJS.load();
+  const result = await fp.get();
+  console.log(result.visitorId); // Unique device ID
+  return result.visitorId;
 }
 
 const instance = axios.create({
   baseURL: baseUrl,
   headers: {
-    // devicemodel: await getDeviceFingerprint(),
-    // deviceuniqueid: await getDeviceFingerprint(),
+    devicemodel: await getDeviceFingerprint(),
+    deviceuniqueid: await getDeviceFingerprint(),
   },
   timeout: 10000, // 10 seconds timeout
 });
 
 instance.interceptors.request.use((request) => {
-      const token = Cookies.get("authToken");
+  const token = Cookies.get("authToken");
   if (!navigator.onLine) {
     // No internet connection
     ErrorToast(

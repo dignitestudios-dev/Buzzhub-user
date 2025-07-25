@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Logo } from "../../assets/export";
 import { CiLock } from "react-icons/ci";
@@ -8,7 +8,7 @@ import Cookies from "js-cookie"; // For setting token in cookies
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; // Eye icon imports
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster"; // Import toast components
 import SocialLogin from "./SocialLogin";
-
+import { AppContext } from "../../context/AppContext";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false); // To manage loading state
   const [errors, setErrors] = useState({}); // To store validation errors
 
+  const { fcmToken } = useContext(AppContext);
   const validateForm = () => {
     let formErrors = {};
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Email regex pattern
@@ -33,7 +34,7 @@ const Login = () => {
     }
     return formErrors;
   };
-
+console.log(fcmToken,"fcmToken")
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
@@ -53,8 +54,8 @@ const Login = () => {
       const response = await axios.post("/auth/login-user", {
         email,
         password,
-        fcmToken: "123", // Replace with your actual FCM token
-        deviceIdentity, // Directly using "123" as device identity
+        fcmToken: fcmToken,
+        deviceIdentity,
       });
 
       if (response.data.success) {

@@ -5,7 +5,6 @@ import { getStorage } from "firebase/storage";
 import { getRemoteConfig } from "firebase/remote-config";
 import { getMessaging } from "firebase/messaging";
 
-
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_APP_FIREBASE_KEY,
   authDomain: "buzzhub-a3c54.firebaseapp.com",
@@ -27,5 +26,4 @@ export const storage = getStorage(app);
 export const remoteConfig = getRemoteConfig(app);
 export const messaging = getMessaging(app);
 
-
-export default app; // Export the app if needed
+export default app;

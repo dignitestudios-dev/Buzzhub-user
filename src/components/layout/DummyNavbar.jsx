@@ -6,7 +6,7 @@ import { AppContext } from "../../context/AppContext";
 
 const DummyNavbar = () => {
   const navigate = useNavigate();
-  const { addtoCart } = useContext(AppContext);
+  const { addtoCart, notifications } = useContext(AppContext);
 
   return (
     <header className="w-full h-16 flex items-center bg-[#1D7C42] justify-between px-4 bg-gray/50 shadow-sm border-b border-gray-200">
@@ -43,9 +43,11 @@ const DummyNavbar = () => {
             alt="Notification"
             className="w-auto h-auto rounded-full object-contain"
           />
-          <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold shadow-md">
-            3
-          </span>
+          {notifications?.length > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-semibold shadow-md">
+              {notifications.length}
+            </span>
+          )}
         </button>
       </div>
     </header>
