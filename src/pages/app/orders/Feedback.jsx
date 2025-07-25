@@ -10,6 +10,7 @@ const Feedback = () => {
   const { id: dispensaryId } = useParams();
   const location = useLocation();
   const productId = location.state?.productId;
+  console.log("Product ID:", productId);
   
   const [rating, setRating] = useState(4);
   const [review, setReview] = useState("");

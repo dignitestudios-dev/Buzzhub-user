@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { FiLoader, FiTrash2 } from "react-icons/fi";
+import { FiArrowLeft, FiLoader, FiTrash2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import axios from "../../../axios"; // Custom axios instance (make sure this is set up correctly)
 import { ErrorToast, SuccessToast } from "../../../components/global/Toaster"; // Assuming you have a toaster component
@@ -111,9 +111,14 @@ const Cart = () => {
   return (
     <div className="w-full mx-auto bg-white min-h-screen">
       {/* Header */}
-      <div className="flex items-center gap-2 mb-4">
-        <h2 className="text-2xl font-semibold">Cart</h2>
-      </div>
+      <div className="flex items-center justify-between mb-8">
+              <button className="text-gray-800 pr-3" onClick={handleBackClick}>
+                <FiArrowLeft size={20} />
+              </button>
+              <h3 className="text-[16px] lg:text-xl font-semibold text-gray-800 mx-auto sm:mx-0 sm:flex-1 sm:text-left">
+                Cart  
+              </h3>
+            </div>
 
       {/* Cart Items */}
       <div className="space-y-4 mb-6">

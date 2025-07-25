@@ -243,10 +243,14 @@ const Section = ({
 const DummyHome = () => {
   const [nearbyDispensaries, setNearbyDispensaries] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
+  const [newProducts, setNewProducts] = useState([]);
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(""); // Search query state
   const [filteredDispensaries, setFilteredDispensaries] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filteredNewProducts, setFilteredNewProducts] = useState([]);
+
   const [loading, setLoading] = useState(true); // Loading state
   const [products, setProducts] = useState([]); // Loading state
   const [likedDispensaries, setLikedDispensaries] = useState([]);
@@ -329,15 +333,19 @@ const DummyHome = () => {
         if (response.data.success) {
           const products = response.data.data.products || [];
           setProducts(products);
+          setFilteredNewProducts(products);
+
         } else {
           console.error("Failed to fetch popular products");
           setProducts([]);
+          setFilteredNewProducts([]);
         }
       } catch (error) {
         console.error("Error fetching popular products:", error);
         setProducts([]);
-      } finally {
-        setLoading(false);
+        setFilteredNewProducts([]);
+      }finally{
+         setLoading(false);
       }
     };
 
@@ -351,26 +359,35 @@ const DummyHome = () => {
   }, []);
 
   // Handle search input change and filter results
-  const handleSearchChange = (event) => {
-    const query = event.target.value.toLowerCase();
-    setSearchQuery(query);
+ const handleSearchChange = (event) => {
+  const query = event.target.value.toLowerCase();
+  setSearchQuery(query);
 
-    // Filter dispensaries
-    const filteredDispensaries = nearbyDispensaries.filter(
-      (dispensary) =>
-        dispensary.dispensaryName.toLowerCase().includes(query) ||
-        dispensary.city.toLowerCase().includes(query)
-    );
-    setFilteredDispensaries(filteredDispensaries);
+  // Filter dispensaries
+  const filteredDispensaries = nearbyDispensaries.filter(
+    (dispensary) =>
+      dispensary.dispensaryName.toLowerCase().includes(query) ||
+      dispensary.city.toLowerCase().includes(query)
+  );
+  setFilteredDispensaries(filteredDispensaries);
 
-    // Filter products
-    const filteredProducts = popularProducts.filter(
-      (product) =>
-        product.productName.toLowerCase().includes(query) ||
-        product.productType.toLowerCase().includes(query)
-    );
-    setFilteredProducts(filteredProducts);
-  };
+  // Filter products
+  const filteredProducts = popularProducts.filter(
+    (product) =>
+      product.productName.toLowerCase().includes(query) ||
+      product.productType.toLowerCase().includes(query)
+  );
+  setFilteredProducts(filteredProducts);
+
+  // Filter new products
+  const filteredNewProducts = products.filter(
+    (product) =>
+      product.productName.toLowerCase().includes(query) ||
+      product.productType.toLowerCase().includes(query)
+  );
+  setFilteredNewProducts(filteredNewProducts);
+};
+
 
   // Function to handle adding/removing from wishlist
   const addToWishlist = async (type, id) => {
@@ -444,7 +461,7 @@ const DummyHome = () => {
 
       <Section
         title="New Products"
-        data={products}
+        data={filteredNewProducts}
         type="product"
         addToWishlist={addToWishlist}
         loading={loading}

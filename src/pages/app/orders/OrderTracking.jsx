@@ -159,12 +159,12 @@ const OrderTracking = () => {
       {isCompleted && (
         <div className="flex justify-between gap-4 mt-6">
           {/* Give Feedback Button */}
-          <button
+          {/* <button 
             onClick={handleGiveFeedbackClick}
             className="w-1/2 bg-[#1D7C42] text-white text-sm py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
           >
             Give Feedback
-          </button>
+          </button> */}
 
           {/* Chat Button */}
           <button className="w-1/2 bg-[#F3F3F3] text-[#1D7C42] text-sm py-3 rounded-xl font-semibold flex items-center justify-center gap-2">
