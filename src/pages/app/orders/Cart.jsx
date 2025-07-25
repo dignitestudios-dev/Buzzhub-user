@@ -67,16 +67,40 @@ const Cart = () => {
   );
   const platformFee = subtotal > 0 ? 10 : 0; // Only charge fee if subtotal > 0
   const total = subtotal > 0 ? subtotal + platformFee : 0; // Avoid negative total
-
+  const dispencaryId = addtoCart?.map((item) => item?.dispensaryId?._id);
   // Function to handle "Proceed to Checkout" button click
-  const handleProceedToCheckout = () => {
-    // Pass the cartData as state when navigating to the review order page
-    navigate("/app/review-order", { state: { addtoCart } });
+  const handleProceedToCheckout = async () => {
+    setPaymentLoading(true);
+
+    try {
+      const amount = Number((subtotal * 1.02).toFixed(2)); // 2% platform fee added
+
+      const { data, status } = await axios.post("/user/create-payment-intent", {
+        dispencaryId, // make sure spelling matches your var
+        amount, // send as number, not string
+      });
+
+      if (status === 200) {
+        navigate("/app/review-order", {
+          state: {
+            addtoCart,
+            clientSecret: data?.clientSecret, // stripe style response (if any)
+          },
+        });
+      }
+    } catch (err) {
+      ErrorToast(
+        err?.response?.data?.message || err.message || "Something went wrong"
+      );
+    } finally {
+      setPaymentLoading(false);
+    }
   };
 
    const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   return (
     <div className="w-full mx-auto bg-white min-h-screen">
@@ -168,28 +192,32 @@ const Cart = () => {
 
       {/* Billing Summary */}
       <h1 className="mb-2 font-semibold text-[13px]">Billing</h1>
-    <div className="mb-6 bg-gray-50 p-4 rounded-xl text-sm">
-  <div className="flex justify-between mb-2">
-    <span>Subtotal</span>
-    <span>${subtotal?.toFixed(2)}</span>
-  </div>
-  <div className="flex justify-between mb-2">
-    <span>2% platform fees</span>
-     <span>${(subtotal * 0.02)?.toFixed(2)}</span> {/* 2% fee amount */}
-  </div>
-  <div className="flex justify-between font-semibold text-green-700 text-base">
-    <span>Total</span>
-    <span>${(subtotal * 1.02)?.toFixed(2)}</span> {/* Total me 2% add ho gaya */}
-  </div>
-</div>
-
+      <div className="mb-6 bg-gray-50 p-4 rounded-xl text-sm">
+        <div className="flex justify-between mb-2">
+          <span>Subtotal</span>
+          <span>${subtotal?.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between mb-2">
+          <span>2% platform fees</span>
+          <span>${(subtotal * 0.02)?.toFixed(2)}</span> {/* 2% fee amount */}
+        </div>
+        <div className="flex justify-between font-semibold text-green-700 text-base">
+          <span>Total</span>
+          <span>${(subtotal * 1.02)?.toFixed(2)}</span>{" "}
+          {/* Total me 2% add ho gaya */}
+        </div>
+      </div>
 
       {/* Checkout Button */}
       <button
-        className="w-full bg-green-700 text-white py-3 rounded-xl font-semibold"
+        className="w-full bg-green-700 flex justify-center text-white py-3 rounded-xl font-semibold"
         onClick={handleProceedToCheckout} // Navigate when button is clicked
       >
-        Proceed To Checkout
+        {paymentLoading ? (
+          <FiLoader className="animate-spin text-white text-2xl" />
+        ) : (
+          "Proceed To Checkout"
+        )}
       </button>
     </div>
   );

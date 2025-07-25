@@ -56,7 +56,7 @@ const OrderDetails = () => {
   // Only destructure if `orderDetails` is not null
   const {
     products,
-    shippingAddress,  
+    shippingAddress,
 
     fulfillmentMethod,
     orderStatus,
@@ -177,6 +177,7 @@ const OrderDetails = () => {
       )}
 
       {/* Product Details */}
+
       <div className="rounded-2xl p-3 shadow-sm bg-[#F9FAFA] border border-[#E5E5E5] mt-3">
         {order?.state?.order?.products?.map((product) => (
           <div key={product._id} className="flex gap-3 items-center mb-3">
@@ -201,26 +202,27 @@ const OrderDetails = () => {
       </div>
 
       {/* Billing Summary */}
-    <div>
-  <h3 className="text-sm font-semibold mb-2 mt-2">Billing</h3>
-  <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
-    <div className="flex justify-between">
-      <span>Subtotal</span>
-      <span>${totalAmount.toFixed(2)}</span>
-    </div>
+      <div>
+        <h3 className="text-sm font-semibold mb-2 mt-2">Billing</h3>
+        <div className="bg-gray-50 p-4 rounded-xl text-sm space-y-2">
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+            <span>${totalAmount.toFixed(2)}</span>
+          </div>
 
-    <div className="flex justify-between">
-      <span>Platform Fee (2%)</span>
-      <span className="text-red-500">${(totalAmount * 0.02).toFixed(2)}</span>
-    </div>
+          <div className="flex justify-between">
+            <span>Platform Fee (2%)</span>
+            <span className="text-red-500">
+              ${(totalAmount * 0.02).toFixed(2)}
+            </span>
+          </div>
 
-    <div className="flex justify-between font-semibold text-green-700 text-base pt-2 border-t border-gray-200">
-      <span>Total After Fee</span>
-      <span>${(totalAmount * 1.02).toFixed(2)}</span>
-    </div>
-  </div>
-</div>
-
+          <div className="flex justify-between font-semibold text-green-700 text-base pt-2 border-t border-gray-200">
+            <span>Total After Fee</span>
+            <span>${(totalAmount * 1.02).toFixed(2)}</span>
+          </div>
+        </div>
+      </div>
 
       {/* CTA Button */}
       <div className="flex gap-4 mt-4 mb-2">

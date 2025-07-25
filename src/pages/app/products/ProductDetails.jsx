@@ -15,6 +15,7 @@ const ProductDetails = () => {
   const [fulfillment, setFulfillment] = useState("self");
   const [loading, setLoading] = useState(false); // State to manage loading state for Add to Cart button
   const [cartData, setCartData] = useState(null);
+  const [dispencary, setDispencary] = useState([]);
   const { productId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,7 +24,27 @@ const ProductDetails = () => {
   const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
+  const fetchDispencaryDetails = async () => {
+    try {
+      const response = await axios.get("/user/get-nearby-dispensary");
 
+      if (response.status === 200) {
+        setDispencary(response?.data?.data);
+      } else {
+        console.error("Failed to fetch product details");
+      }
+    } catch (error) {
+      console.error("Error fetching product details:", error);
+    }
+  };
+  useEffect(() => {
+    fetchDispencaryDetails();
+  }, []);
+
+  const DispencaryFullFillMentMethod = dispencary?.map(
+    (item) => item?.fulfillmentMethod
+  );
+console.log(DispencaryFullFillMentMethod,"DispencaryFullFillMentMethod")
   // Fetch product details from API
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -33,9 +54,8 @@ const ProductDetails = () => {
         });
 
         if (response.data.success) {
-          setProduct(response.data.data.products); 
+          setProduct(response.data.data.products);
           setReviews(response.data.data.reviews || []); // Initialize reviews state
-
         } else {
           console.error("Failed to fetch product details");
         }
@@ -68,30 +88,35 @@ const ProductDetails = () => {
   const cartItemID = cartData?.items?.map(
     (item, index) => item?.productId?._id
   );
-  console.log(product, "product==>");
+
   const ProductId = product?._id;
 
-  console.log(fulfillment, "fulfillment==>");
   const { setAddToCart, addtoCart, setUpdate } = useContext(AppContext);
   const handleAddToCart = async () => {
   setLoading(true);
-
-  try {
-    const existingItem = addtoCart.find(
+const existingItem = addtoCart.find(
       (item) => item.dispensaryId._id !== product.dispensaryId._id
     );
+  
+    try {
+      const response = await axios.post("/user/add-to-cart", {
+        productId: productId,
+        dispensaryId: product.dispensaryId._id,
+        grams: grams,
+        fullfillmentMethod: DispencaryFullFillMentMethod[0],
+      });
 
     if (existingItem) {
       ErrorToast("You can't add products from different dispensaries to the cart.");
       return;
     }
 
-    const response = await axios.post("/user/add-to-cart", {
-      productId: productId,
-      dispensaryId: product.dispensaryId._id,
-      grams: grams,
-      fullfillmentMethod: dispensaryFullFillMent?.dispensary?.fulfillmentMethod,
-    });
+    // const response = await axios.post("/user/add-to-cart", {
+    //   productId: productId,
+    //   dispensaryId: product.dispensaryId._id,
+    //   grams: grams,
+    //   fullfillmentMethod: dispensaryFullFillMent?.dispensary?.fulfillmentMethod,
+    // });
 
     if (response.status === 200) {
       SuccessToast("Item added to cart!");
@@ -102,19 +127,18 @@ const ProductDetails = () => {
     } else {
       ErrorToast(response.data.message);
     }
+    
   } catch (error) {
     console.error("Error adding to cart:", error);
     ErrorToast("An error occurred while adding to the cart. Please try again.");
   } finally {
     setLoading(false);
-  }
-};
+  };}
 
+  if (!product) return <div>Loading...</div>;
 
-  if (!product) return <div>Loading...</div>; 
-
-  
-  const availableMaxGrams = product.weightQuantity <= 300 ? product.weightQuantity : 300;
+  const availableMaxGrams =
+    product.weightQuantity <= 300 ? product.weightQuantity : 300;
 
   const handleGramChange = (e) => {
     let value = Math.min(Number(e.target.value), availableMaxGrams); // Ensure grams don't exceed available stock or 300
@@ -195,7 +219,7 @@ const ProductDetails = () => {
             </div>
             <div className="text-right">
               <p className="text-red-500 text-sm font-semibold">
-                Delivery / Pickup
+                {product?.fullfillmentMethod}
               </p>
               <button
                 className="text-blue-600 text-xs underline"
@@ -252,23 +276,26 @@ const ProductDetails = () => {
           </div>
 
           {/* Category and Sub Category Display */}
-<div className="border-t mt-6 pt-4">
-  <div className="flex divide-x">
-    <div className="flex-1 pr-4">
-      <h4 className="text-[15px] font-semibold text-black mb-1">Category</h4>
-      <p className="text-[15px] text-black">{product.productType}</p>
-    </div>
-    <div className="flex-1 pl-4">
-      <h4 className="text-[15px] font-semibold text-black mb-1">Sub Category</h4>
-      <p className="text-[15px] text-black">
-        {product.subTypes && product.subTypes.length > 0
-          ? product.subTypes.join(", ")
-          : "N/A"}
-      </p>
-    </div>
-  </div>
-</div>
-
+          <div className="border-t mt-6 pt-4">
+            <div className="flex divide-x">
+              <div className="flex-1 pr-4">
+                <h4 className="text-[15px] font-semibold text-black mb-1">
+                  Category
+                </h4>
+                <p className="text-[15px] text-black">{product.productType}</p>
+              </div>
+              <div className="flex-1 pl-4">
+                <h4 className="text-[15px] font-semibold text-black mb-1">
+                  Sub Category
+                </h4>
+                <p className="text-[15px] text-black">
+                  {product.subTypes && product.subTypes.length > 0
+                    ? product.subTypes.join(", ")
+                    : "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Description */}
           <div className="mt-6">
@@ -290,68 +317,74 @@ const ProductDetails = () => {
             </p>
           </div>
 
-
           {/* Product Reviews */}
-{reviews.length > 0 ? (
-  <div className="mt-6 border-t pt-4">
-    <h3 className="text-base font-semibold text-gray-800 mb-4">Reviews</h3>
-    {reviews.map((review, idx) => (
-      <div key={idx} className="bg-gray-50 p-4 rounded-xl shadow-sm mb-4">
-        <div className="flex items-center mb-2">
-          <img
-            src={product.productImage[0]}  // Replacing user image with the first product image
-            alt={product.productName}
-            className="w-8 h-8 rounded-full object-cover mr-2"  // Style it to match the user profile image
-          />
-          <div>
-            <h4 className="text-sm font-semibold">{review.productId.productName}</h4>
-            <p className="text-xs text-gray-500">
-              {review.userId.city}, {review.userId.state}
-            </p>
-          </div>
-          <span className="ml-auto text-green-600 font-bold">
-            ${review.productId.productPrice}
-          </span>
-        </div>
-        <div className="flex mb-1">
-          {[...Array(5)].map((_, i) => (
-            <FaStar
-              key={i}
-              className={`text-yellow-500 text-xs ${
-                i < Math.round(review.ratingNumber) ? "filled" : ""
-              }`}
-            />
-          ))}
-        </div>
-        <p className="text-sm text-gray-700">{review.review}</p>
+          {reviews.length > 0 ? (
+            <div className="mt-6 border-t pt-4">
+              <h3 className="text-base font-semibold text-gray-800 mb-4">
+                Reviews
+              </h3>
+              {reviews.map((review, idx) => (
+                <div
+                  key={idx}
+                  className="bg-gray-50 p-4 rounded-xl shadow-sm mb-4"
+                >
+                  <div className="flex items-center mb-2">
+                    <img
+                      src={product.productImage[0]} // Replacing user image with the first product image
+                      alt={product.productName}
+                      className="w-8 h-8 rounded-full object-cover mr-2" // Style it to match the user profile image
+                    />
+                    <div>
+                      <h4 className="text-sm font-semibold">
+                        {review.productId.productName}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {review.userId.city}, {review.userId.state}
+                      </p>
+                    </div>
+                    <span className="ml-auto text-green-600 font-bold">
+                      ${review.productId.productPrice}
+                    </span>
+                  </div>
+                  <div className="flex mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar
+                        key={i}
+                        className={`text-yellow-500 text-xs ${
+                          i < Math.round(review.ratingNumber) ? "filled" : ""
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-sm text-gray-700">{review.review}</p>
 
-        {/* User's profile and name below the review */}
-        <div className="mt-4 flex items-center gap-2">
-          <img
-            src={review.userId.profilePicture}  // Show user profile picture here
-            alt={review.userId.fullName}
-            className="w-8 h-8 rounded-full object-cover"
-          />
-          <div>
-            <h5 className="text-sm font-semibold text-gray-800">{review.userId.fullName}</h5>
-            {/* <a 
+                  {/* User's profile and name below the review */}
+                  <div className="mt-4 flex items-center gap-2">
+                    <img
+                      src={review.userId.profilePicture} // Show user profile picture here
+                      alt={review.userId.fullName}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <div>
+                      <h5 className="text-sm font-semibold text-gray-800">
+                        {review.userId.fullName}
+                      </h5>
+                      {/* <a 
               href={`/app/user-profile/${review.userId._id}`}  // Link to the user's profile
               className="text-xs text-blue-500 hover:underline"
             >
               View Profile
             </a> */}
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-) : (
-  <div className="mt-6 border-t pt-4 text-sm text-gray-500 italic">
-    No reviews available for this product.
-  </div>
-)}
-
-
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-6 border-t pt-4 text-sm text-gray-500 italic">
+              No reviews available for this product.
+            </div>
+          )}
 
           {/* Add to Cart Button */}
           {cartItemID?.includes(ProductId) ? (
