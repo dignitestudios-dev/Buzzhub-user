@@ -22,6 +22,7 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     fetchCartItems();
   }, [update]);
+  
   console.log(addtoCart, "addtoCart==>");
   return (
     <AppContext.Provider

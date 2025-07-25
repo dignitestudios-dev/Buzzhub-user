@@ -7,6 +7,7 @@ import { FiArrowLeft, FiLoader } from "react-icons/fi";
 import { ProductDetailsloader } from "../../../components/global/Loader";
 import { AppContext } from "../../../context/AppContext";
 
+
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [grams, setGrams] = useState();
@@ -73,32 +74,42 @@ const ProductDetails = () => {
   console.log(fulfillment, "fulfillment==>");
   const { setAddToCart, addtoCart, setUpdate } = useContext(AppContext);
   const handleAddToCart = async () => {
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const response = await axios.post("/user/add-to-cart", {
-        productId: productId,
-        dispensaryId: product.dispensaryId._id,
-        grams: grams,
-        fullfillmentMethod: dispensaryFullFillMent?.dispensary?.fulfillmentMethod,
-      });
+  try {
+    const existingItem = addtoCart.find(
+      (item) => item.dispensaryId._id !== product.dispensaryId._id
+    );
 
-      if (response.status === 200) {
-        SuccessToast("Item added to cart!");
-        setUpdate((prev) => !prev);
-        fetchCartItems();
-      } else {
-        ErrorToast(response.data.message);
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      ErrorToast(
-        "Grams can't be empty or an error occurred. Please try again."
-      );
-    } finally {
-      setLoading(false);
+    if (existingItem) {
+      ErrorToast("You can't add products from different dispensaries to the cart.");
+      return;
     }
-  };
+
+    const response = await axios.post("/user/add-to-cart", {
+      productId: productId,
+      dispensaryId: product.dispensaryId._id,
+      grams: grams,
+      fullfillmentMethod: dispensaryFullFillMent?.dispensary?.fulfillmentMethod,
+    });
+
+    if (response.status === 200) {
+      SuccessToast("Item added to cart!");
+      setUpdate((prev) => !prev);  // Trigger a cart update.
+      fetchCartItems();
+            navigate("/app/cart");
+
+    } else {
+      ErrorToast(response.data.message);
+    }
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    ErrorToast("An error occurred while adding to the cart. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (!product) return <div>Loading...</div>; 
 

@@ -8,7 +8,10 @@ import { ErrorToast, SuccessToast } from "../../../components/global/Toaster";
 
 const Dispensaries = () => {
   const [dispensaries, setDispensaries] = useState([]); // State for storing dispensaries data
+  const [filteredDispensaries, setFilteredDispensaries] = useState([]); // State for filtered dispensaries
   const [isFilterOpen, setIsFilterOpen] = useState(false); // State for showing filter modal
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const [filters, setFilters] = useState({}); // State to store filters
   const navigate = useNavigate();
 
   // Fetch dispensaries data on component mount
@@ -18,8 +21,8 @@ const Dispensaries = () => {
         const response = await axios.get("user/get-all-dispensaries");
         if (response.data.success) {
           setDispensaries(response.data.data); // Store dispensary data
+          setFilteredDispensaries(response.data.data); // Initially show all dispensaries
         } else {
-          // Handle API error or empty data case
           console.log("No dispensaries found or failed to fetch");
         }
       } catch (error) {
@@ -30,9 +33,12 @@ const Dispensaries = () => {
     fetchDispensaries(); // Call the function to fetch data
   }, []);
 
+  // Handle back navigation
   const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
+
+  // Handle wishlist click for dispensaries
   const handleWishlistClick = async (type, id) => {
     try {
       let endpoint = "/user/add-to-wishlist"; // Default endpoint for products
@@ -59,6 +65,55 @@ const Dispensaries = () => {
       ErrorToast("Error adding to wishlist");
     }
   };
+
+  // Handle search query change
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // Filter dispensaries locally based on search query
+    if (query.trim() === "") {
+      setFilteredDispensaries(dispensaries);
+    } else {
+      const filtered = dispensaries.filter((dispensary) =>
+        dispensary.dispensaryName.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredDispensaries(filtered);
+    }
+  };
+
+  // Apply filters to the dispensaries
+  const handleApplyFilters = (appliedFilters) => {
+    setFilters(appliedFilters);
+
+    // Apply filters to dispensaries data
+    const filtered = dispensaries.filter((dispensary) => {
+      let isMatch = true;
+
+      // Check fulfillment method
+      if (appliedFilters.fulfillmentMethod && dispensary.fulfillmentMethod !== appliedFilters.fulfillmentMethod) {
+        isMatch = false;
+      }
+
+      // Check price range (assuming you have a price property in the dispensary object)
+      if (
+        appliedFilters.productPrice &&
+        (dispensary.price < 0 || dispensary.price > appliedFilters.productPrice)
+      ) {
+        isMatch = false;
+      }
+
+      // Check ratings (assuming dispensary has a `rating` property)
+      if (appliedFilters.productRating && dispensary.rating < appliedFilters.productRating) {
+        isMatch = false;
+      }
+
+      return isMatch;
+    });
+
+    setFilteredDispensaries(filtered);
+  };
+
   return (
     <div className="w-full mx-auto bg-white min-h-screen">
       <div className="flex items-center justify-between mb-8">
@@ -82,6 +137,8 @@ const Dispensaries = () => {
             <input
               type="text"
               placeholder="Search..."
+              value={searchQuery} // Bind input value to searchQuery state
+              onChange={handleSearchChange} // Update searchQuery on change and filter locally
               className="w-full bg-[#F3F3F3] border-none focus:ring-2 focus:ring-green-500 focus:outline-none rounded-full py-2 pl-10 pr-4 text-sm placeholder-gray-400"
             />
           </div>
@@ -98,59 +155,57 @@ const Dispensaries = () => {
 
       {/* Dispensary Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {dispensaries.map((dispensary) => (
-          <div
-            key={dispensary._id}
-            className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[212px] w-full h-full"
-            onClick={() =>
-              navigate(`/app/dispensary-profile/${dispensary?._id}`)
-            }
-          >
-            <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-              {dispensary.deliveryRadius} Miles Away
-            </div>
-           <div
-  onClick={(e) => {
-    e.stopPropagation(); // Prevent navigating to profile
-    handleWishlistClick("dispensary", dispensary._id);
-  }}
-  className="absolute top-2 right-2 bg-white p-1 rounded-full shadow cursor-pointer"
->
-  <FiHeart className="text-gray-400 hover:text-red-500" />
-</div>
+        {filteredDispensaries.length === 0 ? (
+          <p className="col-span-full text-center text-gray-500">No dispensaries available</p>
+        ) : (
+          filteredDispensaries.map((dispensary) => (
+            <div
+              key={dispensary._id}
+              className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[212px] w-full h-full"
+              onClick={() =>
+                navigate(`/app/dispensary-profile/${dispensary._id}`) // Navigate to dispensary profile with dispensaryId
+              }
+            >
+              <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
+                {dispensary.deliveryRadius} Miles Away
+              </div>
 
-            <img
-              src={dispensary.profilePicture}
-              alt={dispensary.dispensaryName}
-              className="w-full h-[130px] object-cover rounded-t-xl"
-            />
-            <div className="p-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-[13px] font-semibold text-gray-900">
-                  {dispensary.dispensaryName}
-                </h3>
+              <div
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent navigating to profile
+                  handleWishlistClick("dispensary", dispensary._id); // Handle wishlist click
+                }}
+                className="absolute top-2 right-2 bg-white p-1 rounded-full shadow cursor-pointer"
+              >
+                <FiHeart className="text-gray-400 hover:text-red-500" />
               </div>
-              <div className="text-sm text-gray-500 mt-1">
-                {dispensary.fulfillmentMethod}
+
+              <img
+                src={dispensary.profilePicture}
+                alt={dispensary.dispensaryName}
+                className="w-full h-[130px] object-cover rounded-t-xl"
+              />
+              <div className="p-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-[13px] font-semibold text-gray-900">
+                    {dispensary.dispensaryName}
+                  </h3>
+                </div>
+                <div className="text-sm text-gray-500 mt-1">
+                  {dispensary.fulfillmentMethod}
+                </div>
               </div>
-              {/* <div className="flex items-center mt-1">
-                <img
-                  src="https://randomuser.me/api/portraits/men/1.jpg" // Sample dispensary image
-                  alt="Dispensary Profile"
-                  className="w-[24px] h-[24px] rounded-full object-cover mr-2"
-                />
-                <div className="text-[12px] text-green-600">Dispensary</div>
-                <div className="text-gray-800 font-semibold text-[14px]">${dispensary.price || "N/A"}</div>
-              </div> */}
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Filter Modal */}
       <FilterModal
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
+        onApplyFilters={handleApplyFilters} // Pass the onApplyFilters function
+        filters={filters} // Pass current filters to the modal
       />
     </div>
   );
