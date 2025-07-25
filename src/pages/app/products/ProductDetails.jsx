@@ -7,7 +7,6 @@ import { FiArrowLeft, FiLoader } from "react-icons/fi";
 import { ProductDetailsloader } from "../../../components/global/Loader";
 import { AppContext } from "../../../context/AppContext";
 
-
 const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [grams, setGrams] = useState();
@@ -89,11 +88,21 @@ const ProductDetails = () => {
 
   const { setAddToCart, addtoCart, setUpdate } = useContext(AppContext);
   const handleAddToCart = async () => {
-  setLoading(true);
-const existingItem = addtoCart.find(
-      (item) => item.dispensaryId._id !== product.dispensaryId._id
-    );
-  
+    setLoading(true);
+    const hasDifferentDispensary =
+      addtoCart.length > 0 &&
+      addtoCart.some(
+        (item) => item.dispensaryId._id !== product.dispensaryId._id
+      );
+
+    if (hasDifferentDispensary) {
+      ErrorToast(
+        "You can't add products from different dispensaries to the cart."
+      );
+      setLoading(false);
+      return; // <- IMPORTANT: don't call API
+    }
+
     try {
       const response = await axios.post("/user/add-to-cart", {
         productId: productId,
@@ -102,34 +111,23 @@ const existingItem = addtoCart.find(
         fullfillmentMethod: DispencaryFullFillMentMethod[0],
       });
 
-    if (existingItem) {
-      ErrorToast("You can't add products from different dispensaries to the cart.");
-      return;
+      if (response.status === 200) {
+        SuccessToast("Item added to cart!");
+        setUpdate((prev) => !prev); // Trigger a cart update.
+        fetchCartItems();
+        navigate("/app/cart");
+      } else {
+        ErrorToast(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      ErrorToast(
+        "An error occurred while adding to the cart. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    // const response = await axios.post("/user/add-to-cart", {
-    //   productId: productId,
-    //   dispensaryId: product.dispensaryId._id,
-    //   grams: grams,
-    //   fullfillmentMethod: dispensaryFullFillMent?.dispensary?.fulfillmentMethod,
-    // });
-
-    if (response.status === 200) {
-      SuccessToast("Item added to cart!");
-      setUpdate((prev) => !prev);  // Trigger a cart update.
-      fetchCartItems();
-            navigate("/app/cart");
-
-    } else {
-      ErrorToast(response.data.message);
-    }
-    
-  } catch (error) {
-    console.error("Error adding to cart:", error);
-    ErrorToast("An error occurred while adding to the cart. Please try again.");
-  } finally {
-    setLoading(false);
-  };}
+  };
 
   if (!product) return <div>Loading...</div>;
 

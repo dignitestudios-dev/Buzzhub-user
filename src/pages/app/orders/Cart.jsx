@@ -106,7 +106,9 @@ const Cart = () => {
       setPaymentLoading(false);
     }
   };
-
+ const handleBackClick = () => {
+    navigate(-1); // Navigate one step back in history
+  };
   const isDisabled = addtoCart.length === 0 || paymentLoading;
   return (
     <div className="w-full mx-auto bg-white min-h-screen">
