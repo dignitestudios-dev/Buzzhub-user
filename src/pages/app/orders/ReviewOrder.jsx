@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
+import StripeCheckout from "../Stirpe/StripeCheckout";
+import ModalWrapper from "../Stirpe/ModalWrapper";
 
 const ReviewOrder = () => {
-  const { state } = useLocation(); // Get the cartData passed from the Cart component
-  const [cartData, setCartData] = useState(state?.addtoCart || []); // Initialize cartData from the state
+  const { state } = useLocation();
+  const [cartData, setCartData] = useState(state?.addtoCart || []);
   const [fulfillmentMethod, setFulfillmentMethod] = useState("Delivery");
+  const [isStripe, setIsStripe] = useState(false);
   const [shippingAddress, setShippingAddress] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const [medicalCards, setMedicalCards] = useState({
     front: "",
     back: "",
@@ -21,52 +25,43 @@ const ReviewOrder = () => {
   const navigate = useNavigate();
 
   const handleBackClick = () => {
-    navigate(-1); // Navigate one step back in history
+    navigate(-1);
   };
 
-  // Calculate totals
   const subtotal = cartData?.reduce(
     (sum, item) => sum + item.productPrice * item.grams,
     0
   );
-  const platformFee = 10;
-  const total = subtotal + platformFee; // Adding platform fee to the total
 
-  // Function to handle "Place Order" button click
   const handlePlaceOrder = () => {
-    navigate("/app/order-details"); // Navigate to order-details page
+    setIsStripe(true);
   };
   const userData = JSON.parse(localStorage.getItem("userData"));
 
   useEffect(() => {
     if (fulfillmentMethod === "Self Pickup") {
-      setShippingAddress("123 Pickup Ave, Toronto, ON M4B 1B3, Canada"); // Prefilled address for self pickup
+      setShippingAddress("123 Pickup Ave, Toronto, ON M4B 1B3, Canada");
     } else {
-      setShippingAddress(""); // Clear address when changing fulfillment method to delivery
+      setShippingAddress("");
     }
 
-    // Retrieve user data from localStorage
     if (userData) {
-      // Set medical card images from localStorage
       setMedicalCards({
         front: userData.medicalCardFront,
         back: userData.medicalCardBack,
       });
 
-      // Set driving license images from localStorage
       setDrivingLicense({
         front: userData.drivingLicenseFront,
         back: userData.drivingLicenseBack,
       });
 
-      // Set phone number from localStorage
       setPhoneNumber(userData.phoneNumber);
     }
-    console.log(userData, "userData");
   }, [fulfillmentMethod]);
+
   const cartDataFullMethod = cartData?.map((item) => item?.fullfillmentMethod);
 
-  console.log(cartDataFullMethod, "cartData==>");
   return (
     <div className="w-full mx-auto bg-white lg:border lg:border-gray-200 lg:p-4 pb-20 lg:pb-4 rounded-2xl">
       <div className="flex items-center justify-between mb-8">
@@ -106,7 +101,9 @@ const ReviewOrder = () => {
             </label>
             {fulfillmentMethod === "Delivery" && (
               <>
-                <span className="font-medium block mb-1 mt-2">Shipping Address</span>
+                <span className="font-medium block mb-1 mt-2">
+                  Shipping Address
+                </span>
                 <div className="p-1 rounded-xl text-sm space-y-2">
                   <input
                     type="text"
@@ -118,12 +115,16 @@ const ReviewOrder = () => {
                 </div>
               </>
             )}
-      
+
             {fulfillmentMethod === "Pickup" && (
               <>
-                <span className="font-medium block mb-1 mt-2">Pickup Address</span>
+                <span className="font-medium block mb-1 mt-2">
+                  Pickup Address
+                </span>
                 <div className="p-1 rounded-xl text-sm space-y-2">
-                  <p className="text-gray-700 leading-6">{userData?.streetAddress}</p>
+                  <p className="text-gray-700 leading-6">
+                    {userData?.streetAddress}
+                  </p>
                 </div>
               </>
             )}
@@ -268,6 +269,22 @@ const ReviewOrder = () => {
       >
         Place Order
       </button>
+
+      {isStripe && (
+        <ModalWrapper isOpen={isStripe} onClose={() => setIsStripe(false)}>
+          <StripeCheckout
+            stripeAccountId={state?.stripeAccountId}
+            clientSecret={state?.clientSecret}
+            dispensaryId={state?.dispensaryId}
+            products={state?.addtoCart}
+            paymentIntentId={state?.paymentIntentId}
+            shippingAddress={
+              shippingAddress ? shippingAddress : userData?.streetAddress
+            }
+            phoneNumber={phoneNumber}
+          />
+        </ModalWrapper>
+      )}
     </div>
   );
 };

@@ -98,7 +98,7 @@ const OrderHistory = () => {
       state: { order: selectedOrder },
     });
   };
-  console.log(filteredOrders);
+
   return (
     <div className="w-full lg:mb-0 md:mb-0 mb-24 bg-white min-h-screen">
       {/* Header */}

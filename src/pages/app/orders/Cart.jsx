@@ -13,8 +13,9 @@ const Cart = () => {
   const [loading, setLoading] = useState(true); // Loading state
   const navigate = useNavigate(); // Initialize navigate function
   const [deletingItem, setDeletingItem] = useState(null); // Track the item being deleted
-  const { setAddToCart, addtoCart, setUpdate } = useContext(AppContext);
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
+  const { setAddToCart, addtoCart, setUpdate } = useContext(AppContext);
   const handleRemove = async (item) => {
     const productId = item.productId._id;
 
@@ -60,7 +61,7 @@ const Cart = () => {
       )
     );
   };
-  console.log(addtoCart, "addtoCart////");
+
   const subtotal = addtoCart?.reduce(
     (sum, item) => sum + item?.productPrice * item?.grams,
     0
@@ -73,18 +74,27 @@ const Cart = () => {
     setPaymentLoading(true);
 
     try {
-      const amount = Number((subtotal * 1.02).toFixed(2)); // 2% platform fee added
+      const amount = Number((subtotal * 1.02).toFixed(2)); // 2% fee
+
+      const dispensaryId = [
+        ...new Set(
+          (addtoCart || []).map((i) => i?.dispensaryId?._id).filter(Boolean)
+        ),
+      ].join(","); // or pick [0] if only one allowed
 
       const { data, status } = await axios.post("/user/create-payment-intent", {
-        dispencaryId, // make sure spelling matches your var
-        amount, // send as number, not string
+        dispensaryId,
+        amount,
       });
 
       if (status === 200) {
         navigate("/app/review-order", {
           state: {
             addtoCart,
-            clientSecret: data?.clientSecret, // stripe style response (if any)
+            clientSecret: data?.data?.clientSecret,
+            dispensaryId: data?.data?.dispensaryId,
+            paymentIntentId: data?.data?.paymentIntentId,
+            stripeAccountId: data?.data?.stripeAccountId,
           },
         });
       }
@@ -97,8 +107,7 @@ const Cart = () => {
     }
   };
 
-  const [paymentLoading, setPaymentLoading] = useState(false);
-
+  const isDisabled = addtoCart.length === 0 || paymentLoading;
   return (
     <div className="w-full mx-auto bg-white min-h-screen">
       {/* Header */}
@@ -202,8 +211,12 @@ const Cart = () => {
 
       {/* Checkout Button */}
       <button
-        className="w-full bg-green-700 flex justify-center text-white py-3 rounded-xl font-semibold"
-        onClick={handleProceedToCheckout} // Navigate when button is clicked
+        type="button"
+        onClick={handleProceedToCheckout}
+        disabled={isDisabled}
+        aria-disabled={isDisabled}
+        className={`w-full bg-green-700 flex justify-center items-center text-white py-3 rounded-xl font-semibold transition
+        ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:bg-green-800"}`}
       >
         {paymentLoading ? (
           <FiLoader className="animate-spin text-white text-2xl" />

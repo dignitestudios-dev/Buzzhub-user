@@ -11,15 +11,12 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [grams, setGrams] = useState();
   const [reviews, setReviews] = useState([]); // New state for reviews
-  const [fulfillment, setFulfillment] = useState("self");
   const [loading, setLoading] = useState(false); // State to manage loading state for Add to Cart button
   const [cartData, setCartData] = useState(null);
   const [dispencary, setDispencary] = useState([]);
   const { productId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const dispensaryFullFillMent = location?.state;
-  console.log(dispensaryFullFillMent, "dispensary");
   const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
@@ -43,7 +40,6 @@ const ProductDetails = () => {
   const DispencaryFullFillMentMethod = dispencary?.map(
     (item) => item?.fulfillmentMethod
   );
-console.log(DispencaryFullFillMentMethod,"DispencaryFullFillMentMethod")
   // Fetch product details from API
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -127,11 +123,11 @@ console.log(DispencaryFullFillMentMethod,"DispencaryFullFillMentMethod")
   const handleGramChange = (e) => {
     let value = Math.min(Number(e.target.value), availableMaxGrams); // Ensure grams don't exceed available stock or 300
     if (isNaN(value) || value < 0) {
-      value = ""; // Reset to 0 if input is invalid
+      value = "";
     }
     setGrams(value);
   };
-  console.log(product, "product==>");
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
