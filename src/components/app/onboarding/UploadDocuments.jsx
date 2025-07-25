@@ -10,9 +10,18 @@ export default function UploadDocuments({ onNext, onBack, updateData }) {
     licenseBack: null,
   });
 
+  const [imageFiles, setImageFiles] = useState({
+    profile: null,
+    medicalFront: null,
+    medicalBack: null,
+    licenseFront: null,
+    licenseBack: null,
+  });
+
   const handleFile = (e, name) => {
     const file = e.target.files[0];
     if (file) setImages((prev) => ({ ...prev, [name]: URL.createObjectURL(file) }));
+    setImageFiles((prev) => ({ ...prev, [name]: file }));
   };
 
   // Check if all images are uploaded
@@ -20,7 +29,7 @@ export default function UploadDocuments({ onNext, onBack, updateData }) {
 
   const handleSubmit = () => {
     if (isFormComplete) {
-      updateData({ images }); // Save images data in parent state
+      updateData({ images: images, files: imageFiles }); // Save images data in parent state
       onNext(); // Go to next step
     }
   };

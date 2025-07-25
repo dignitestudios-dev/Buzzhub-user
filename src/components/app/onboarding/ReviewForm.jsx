@@ -19,6 +19,9 @@ export default function ReviewForm({ formData = {}, onBack }) {
     licenseFront = "",
     licenseBack = "",
     paymentMethod = "",
+    medicalBack = "",
+    medicalFront = "",
+    profile
   } = formData;
 
   const renderImageBox = (src, label) => {
@@ -39,40 +42,61 @@ export default function ReviewForm({ formData = {}, onBack }) {
     );
   };
 
-  const handleSubmit = async () => {
-    const requestBody = {
-      streetAddress: street,
-      apartment: apartment,
-      city: city,
-      state: state,
-      country: country,
-      zipCode: zip,
-      profileImage, // Profile image file URL or base64 string
-      medicalCardFront, // Medical card front image
-      medicalCardBack, // Medical card back image
-      licenseFront, // License front image
-      licenseBack, // License back image
-    };
+ const handleSubmit = async () => {
+  const token = localStorage.getItem("token");
+  console.log("Submitting profile with token:", token);
 
-    try {
-      const response = await axios.post('auth/set-profile', requestBody, {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
+  if (!token) {
+    ErrorToast("Authorization token missing. Please log in again.");
+    return;
+  }
 
-      if (response.status === 200) {
-        console.log('Profile updated successfully', response.data);
-        navigate("/auth/login"); // Redirect to login page after successful profile submission
-      } else {
-        console.error('Profile update failed', response.data);
-        // Handle error (display a message or alert)
-      }
-    } catch (error) {
-      console.error('An error occurred while updating the profile:', error);
-      // Handle network error (display a message or alert)
+  try {
+    const form = new FormData();
+
+    // Append text fields
+    form.append("streetAddress", street);
+    form.append("apartment", apartment);
+    form.append("city", city);
+    form.append("state", state);
+    form.append("country", country);
+    form.append("zipCode", zip);
+
+    // Append files (assuming they are File objects)
+    if (profileImage instanceof File) {
+      form.append("profileImage", profile);
     }
-  };
+    if (medicalCardFront instanceof File) {
+      form.append("medicalCardFront", medicalFront);
+    }
+    if (medicalCardBack instanceof File) {
+      form.append("medicalCardBack", medicalBack);
+    }
+    if (licenseFront instanceof File) {
+      form.append("licenseFront", licenseFront);
+    }
+    if (licenseBack instanceof File) {
+      form.append("licenseBack", licenseBack);
+    }
+
+    const response = await axios.post("auth/set-profile", form, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 200) {
+      console.log("Profile updated successfully", response.data);
+      navigate("/auth/login");
+    } else {
+      console.error("Profile update failed", response.data);
+    }
+  } catch (error) {
+    console.error("An error occurred while updating the profile:", error);
+  }
+};
+
+
 
   return (
     <div className="w-full max-w-full">

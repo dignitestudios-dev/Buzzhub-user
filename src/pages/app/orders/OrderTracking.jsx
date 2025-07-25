@@ -36,7 +36,7 @@ const OrderTracking = () => {
     // Navigate to the feedback page for the specific product
     navigate(`/app/feedback/${orderDetails?.dispensaryId?._id}`, {
   state: {
-    productId: orderDetails?.products[index]?._id,
+    productId: orderDetails?.products[index]?.productId,
   },
 });
   };

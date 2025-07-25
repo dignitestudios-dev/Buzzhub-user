@@ -8,7 +8,9 @@ export default function App() {
   const [formData, setFormData] = useState({
     address: {},
     images: {},
+    files: {},
   });
+  console.log("formData -- ", formData);
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
@@ -20,13 +22,16 @@ export default function App() {
   // Combine address and image data into a single object
  const combinedFormData = {
   ...formData.address, // Address data
+
+  ...formData.files, // File data
   profileImage: formData.images.profile,  // Ensure profile image is passed correctly
   medicalCardFront: formData.images.medicalFront,  // Pass medical card front
   medicalCardBack: formData.images.medicalBack,  // Pass medical card back
   licenseFront: formData.images.licenseFront,  // Pass license front
   licenseBack: formData.images.licenseBack,  // Pass license back
+
 };
-console.log(formData); // Log to inspect the object
+console.log("combinedFormData -- " ,combinedFormData); // Log to inspect the object
 
   // Step names
   const steps = ["Address", "Documents", "Review"];
