@@ -58,8 +58,9 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
 
   const handleSend = async () => {
     if (messageText.trim()) {
-      await sendMessage(chatId, userId, messageText, setLoading);
+      await sendMessage(chatId, userId, messageText, setLoading, setUpdate);
       setMessageText(""); // Clear input after sending
+      setUpdate((prev) => !prev);
     }
   };
 
@@ -128,11 +129,11 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
   return (
     <>
       {/* Header Section */}
-      <div className="bg-[#1D7C42] text-white px-6 py-2 rounded-xl flex items-center space-x-4 justify-between">
+      <div className="bg-[#1D7C42] text-white px-6  py-2 rounded-xl flex items-center space-x-4 justify-between">
         <div className="flex items-center space-x-3">
-          {selectedChat?.image ? (
+          {selectedChat?.image_url ? (
             <img
-              src={selectedChat?.image}
+              src={selectedChat?.image_url}
               className="w-12 h-12 rounded-full object-scale-down border bg-gray-50"
             />
           ) : (
@@ -140,7 +141,7 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
           )}
           <div>
             <p className="font-semibold text-lg">
-              {selectedChat?.name || "N/A"}
+              {selectedChat?.chat_name || "N/A"}
             </p>
           </div>
         </div>
@@ -192,7 +193,7 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
       </div>
 
       {/* Messages Section */}
-      <div className="flex-1 px-6 py-4 space-y-6 overflow-y-auto">
+      <div className="flex-1 px-6 py-4 space-y-6 overflow-y-auto   ">
         {messages?.map((msg) => (
           <div
             key={msg?.id}

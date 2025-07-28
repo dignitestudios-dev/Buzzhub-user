@@ -53,6 +53,21 @@ export const getExistingChatRoom = async (members) => {
 };
 
 // Get user chats list updated
+
+export const fetchUser = async (uid) => {
+  try {
+    const userRef = doc(db, "dispensaries", uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      return { id: userSnap.id, ...userSnap.data() };
+    }
+    return null;
+  } catch (err) {
+    console.error("🔥 Error fetching user:", err);
+    return null;
+  }
+};
+
 export const getChats = async (uid) => {
   try {
     const chatsRef = collection(db, "chats");
@@ -61,38 +76,32 @@ export const getChats = async (uid) => {
       where("members", "array-contains", uid),
       where("order_status", "!=", "Completed")
     );
+
     const chatSnapshot = await getDocs(q);
-    try {
-      const chatData = chatSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
 
-      const chatPromises = chatData.map(async (c) => {
-        const otherUserId = c.members.find((e) => e !== uid);
+    const chatData = chatSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
-        const userDocRef = doc(db, "users", otherUserId);
-        const userDocSnap = await getDoc(userDocRef);
+    const chatWithOtherUsers = await Promise.all(
+      chatData.map(async (chat) => {
+        console.log(chat, "chat==>");
+        const otherUserId = chat.members.find((memberId) => memberId !== uid);
+        console.log(otherUserId, "otherUserId====-090000");
+        const otherUser = await fetchUser(otherUserId);
 
-        if (userDocSnap.exists()) {
-          return { ...c, ...userDocSnap.data() };
-        }
+        return {
+          ...chat,
+          otherUser: otherUser, // attach here
+        };
+      })
+    );
 
-        return c;
-      });
-
-      const chats = await Promise.all(chatPromises);
-
-      return chats;
-    } catch (error) {
-      console.error("Error fetching chats:", error);
-      return [];
-    }
-
-    // const chats = chatSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    // console.log(chats)
+    console.log("Chat Data:", chatWithOtherUsers); // ✅ otherUser is now attached
+    return chatWithOtherUsers;
   } catch (error) {
-    console.error("Error fetching chats:", error);
+    console.error("🔥 Error fetching chats:", error);
     return [];
   }
 };
@@ -110,6 +119,16 @@ export const sendMessage = async (chatId, senderId, messageText) => {
   if (!chatId || !messageText.trim()) return;
 
   const messagesRef = collection(db, `chats/${chatId}/messages`);
+  const chatRef = doc(db, `chats`, chatId);
+  await updateDoc(chatRef, {
+    last_msg: {
+      content: messageText,
+      content_type: "text",
+      is_read: false,
+      sender_id: senderId,
+      timestamp: serverTimestamp(),
+    },
+  });
   await addDoc(messagesRef, {
     sender_id: senderId,
     content: messageText,
@@ -119,7 +138,6 @@ export const sendMessage = async (chatId, senderId, messageText) => {
 };
 
 export const getMessages = (chatId, callback, updatedAt) => {
-  console.log("updatedAt-- ", updatedAt);
   if (!chatId) return;
 
   const messagesRef = collection(db, `chats/${chatId}/messages`);

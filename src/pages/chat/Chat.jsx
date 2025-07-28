@@ -54,12 +54,13 @@ const Chat = () => {
           selectedChat={selectedChat}
           setUpdate={setUpdate}
           update={update}
+             chatId={selectedChat?.id}
         />
       </div>
 
       {/* Right Side - Chat Screen */}
       {selectedChat ? (
-        <div className="w-2/3 bg-white p-4 rounded-lg border flex flex-col">
+        <div className="w-2/3 bg-white h-[600px] p-4 rounded-lg border flex flex-col">
           <ChatScreen
             selectedChat={selectedChat}
             chatId={selectedChat?.id}

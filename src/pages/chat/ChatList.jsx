@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { useEffect, useState } from "react";
 import { getChats, markMessagesAsRead } from "../../firebase/firestoreService"; // Function to fetch chat list
 import useUnreadMessages from "./useUnreadMessages"; // Custom hook for unread counts
+import { fetchUser } from "../../firebase/firestoreService";
 
 // ChatList Component
 const ChatList = ({
@@ -17,8 +18,11 @@ const ChatList = ({
   const [chats, setChats] = useState([]);
 
   const unreadCounts = useUnreadMessages(userId);
+
   useEffect(() => {
     const fetchChats = async () => {
+      const user = await fetchUser(userId);
+      console.log(user, "user");
       const chatData = await getChats(userId);
       setChats(chatData);
     };
@@ -52,9 +56,9 @@ const ChatList = ({
             }}
           >
             <div className="flex items-center space-x-4">
-              {chat?.image ? (
+              {chat?.image_url ? (
                 <img
-                  src={chat?.image}
+                  src={chat?.image_url}
                   className="w-12 h-12 rounded-full object-scale-down border bg-gray-50"
                 />
               ) : (
@@ -62,7 +66,7 @@ const ChatList = ({
               )}
               <div>
                 <p className="text-lg font-semibold text-[#074F57]">
-                  {chat?.name || "N/A"}
+                  {chat?.chat_name || "N/A"}
                 </p>
                 <p className="text-sm font-medium text-gray-600">
                   {chat?.last_msg?.content || ""}
