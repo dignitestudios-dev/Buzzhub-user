@@ -22,7 +22,7 @@ const ChatList = ({
   useEffect(() => {
     const fetchChats = async () => {
       const user = await fetchUser(userId);
-      console.log(user, "user");
+  
       const chatData = await getChats(userId);
       setChats(chatData);
     };
@@ -56,9 +56,9 @@ const ChatList = ({
             }}
           >
             <div className="flex items-center space-x-4">
-              {chat?.image_url ? (
+              {chat?.otherUser?.image ? (
                 <img
-                  src={chat?.image_url}
+                  src={chat?.otherUser?.image}
                   className="w-12 h-12 rounded-full object-scale-down border bg-gray-50"
                 />
               ) : (
@@ -66,7 +66,7 @@ const ChatList = ({
               )}
               <div>
                 <p className="text-lg font-semibold text-[#074F57]">
-                  {chat?.chat_name || "N/A"}
+                  {chat?.otherUser?.name || "Unknown"}
                 </p>
                 <p className="text-sm font-medium text-gray-600">
                   {chat?.last_msg?.content || ""}

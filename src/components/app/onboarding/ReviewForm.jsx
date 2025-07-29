@@ -44,7 +44,7 @@ export default function ReviewForm({ formData = {}, onBack }) {
 
  const handleSubmit = async () => {
   const token = localStorage.getItem("token");
-  console.log("Submitting profile with token:", token);
+
 
   if (!token) {
     ErrorToast("Authorization token missing. Please log in again.");
@@ -86,7 +86,7 @@ export default function ReviewForm({ formData = {}, onBack }) {
     });
 
     if (response.status === 200) {
-      console.log("Profile updated successfully", response.data);
+  
       navigate("/auth/login");
     } else {
       console.error("Profile update failed", response.data);

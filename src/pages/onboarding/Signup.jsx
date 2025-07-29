@@ -75,7 +75,7 @@ const SignUp = () => {
     try {
       // Fetching the ID Token from Firebase
       const token = await getIdToken(auth.currentUser);
-  console.log("token== > ", token);
+  
 
       // if (token) {
       //   setIdToken(token);

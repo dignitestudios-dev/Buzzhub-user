@@ -53,6 +53,7 @@ const OrderHistory = () => {
           dispensarycity: order?.dispensaryDetails?.city,
           dispensarystate: order?.dispensaryDetails?.state,
           dispensarystreetAddress: order?.dispensaryDetails?.streetAddress,
+          dispensarystreetuid: order?.dispensaryDetails?.uid,
         }));
 
         setOrders(mappedOrders);
@@ -160,6 +161,7 @@ const OrderHistory = () => {
               key={i}
               className="rounded-2xl p-3 shadow-sm bg-[#F9FAFA] border border-[#E5E5E5]"
             >
+              {console.log(order,"order ==>")}
               {/* Order ID + Status */}
               <div className="flex justify-between items-center mb-2 border-b pb-2">
                 <p className="text-sm text-[#1D7C42] font-medium">

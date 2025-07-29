@@ -13,7 +13,7 @@ import BlockModal from "../../components/chat/BlockModal";
 import firebase from "firebase/compat/app";
 
 const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
-  console.log("selectedChat", selectedChat);
+ 
 
   const [messages, setMessages] = useState([]);
 
@@ -31,7 +31,7 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
   // };
 
   useEffect(() => {
-    console.log("update", update);
+    
     if (!chatId) return;
 
     const unsubscribe = getMessages(
@@ -131,9 +131,9 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
       {/* Header Section */}
       <div className="bg-[#1D7C42] text-white px-6  py-2 rounded-xl flex items-center space-x-4 justify-between">
         <div className="flex items-center space-x-3">
-          {selectedChat?.image_url ? (
+          {selectedChat?.otherUser?.image ? (
             <img
-              src={selectedChat?.image_url}
+              src={selectedChat?.otherUser?.image}
               className="w-12 h-12 rounded-full object-scale-down border bg-gray-50"
             />
           ) : (
@@ -141,7 +141,7 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
           )}
           <div>
             <p className="font-semibold text-lg">
-              {selectedChat?.chat_name || "N/A"}
+              {selectedChat?.otherUser?.name || "N/A"}
             </p>
           </div>
         </div>

@@ -4,6 +4,11 @@ import axios from "../../../axios";
 import { MdArrowBack } from "react-icons/md";
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { Loader } from "../../../components/global/Loader";
+import {
+  createChatRoom,
+  getChats,
+  getExistingChatRoom,
+} from "../../../firebase/firestoreService";
 
 const OrderDetails = () => {
   const [orderDetails, setOrderDetails] = useState(null);
@@ -12,8 +17,10 @@ const OrderDetails = () => {
   const { id } = useParams();
   const location = useLocation();
   const { order } = location?.state || {};
-console.log(order,"orderorderorder")
+  console.log(order, "orderorderorder");
   // Fetch order details from the API
+
+  
   const fetchOrderDetails = async () => {
     setLoading(true);
     try {
@@ -64,6 +71,7 @@ console.log(order,"orderorderorder")
     orderUvid,
     createdAt,
     phoneNumber,
+
   } = orderDetails || {};
   const totalAmount = order?.state?.order?.products
     ? order.state.order.products.reduce((sum, product) => {
@@ -75,10 +83,36 @@ console.log(order,"orderorderorder")
 
   const handleTrackOrderClick = () => {
     navigate(`/app/order-tracking/${id}`, {
-      state: { order: order, orderDetails:orderDetails }, 
+      state: { order: order, orderDetails: orderDetails },
     });
   };
-  console.log(order, "order");
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  const buyerId = userData?.uid; // user who placed order
+  const sellerId = order?.state?.order?.dispensarystreetuid; // seller
+  const orderId = orderDetails?._id;
+  
+  const handleCreateChat = async () => {
+    try {
+      const existingChatId = await getExistingChatRoom([sellerId, buyerId]);
+      const newChat = await createChatRoom({
+        members: [sellerId, buyerId],
+        sellerId,
+        buyerId,
+        chatName: "Order Chat",
+        imageUrl: "",
+        last_msg: null,
+      });
+      console.log(existingChatId, "existingChatId");
+
+      navigate("/app/chat", { state: { existingChatId } });
+
+      console.log("New chat created:", newChat);
+      // navigation ya state update kar sakte ho
+    } catch (e) {
+      console.error("Failed to create chat", e);
+    }
+  };
+
   return (
     <div className="w-full mx-auto bg-white border border-gray-200 p-4 pb-20 lg:pb-0 rounded-2xl">
       {/* Header */}
@@ -233,11 +267,10 @@ console.log(order,"orderorderorder")
           Track Order
         </button>
         <button
-          className="w-1/2 bg-white text-green-500 border border-green-500 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2" // Flex for icon and text alignment
-          // onClick={handleChatClick}
+          className="w-1/2 bg-white text-green-500 border border-green-500 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"
+          onClick={handleCreateChat}
         >
-          <IoChatbubbleEllipsesOutline size={20} />{" "}
-          {/* Adjust the icon size as needed */}
+          <IoChatbubbleEllipsesOutline size={20} />
           Chat
         </button>
       </div>

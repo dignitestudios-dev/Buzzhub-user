@@ -17,6 +17,7 @@ import {
   Timestamp,
   arrayUnion,
   getDoc,
+  setDoc,
 } from "firebase/firestore";
 
 // Get user's chat list
@@ -36,15 +37,50 @@ import {
 // };
 
 // Fetch existing chat room
+
+export const createChatRoom = async ({
+  members,
+  chatName = "Chat Room",
+  imageUrl = "",
+  sellerId,
+  buyerId,
+  last_msg,
+}) => {
+  try {
+    const chatBody = {
+      members: members,
+      last_msg: last_msg,
+      created_at: serverTimestamp(),
+      chat_name: chatName,
+      image_url: imageUrl,
+      order_status: "Approved",
+      updated_at: {
+        [sellerId]: serverTimestamp(),
+        [buyerId]: serverTimestamp(),
+      },
+    };
+
+    const chatDocRef = await addDoc(collection(db, "chats"), chatBody);
+    console.log(chatDocRef.id, "chatDocRef.id");
+    return {
+      id: chatDocRef.id,
+      ...chatBody,
+    };
+  } catch (error) {
+    console.error("Error creating chat room:", error);
+    throw error;
+  }
+};
+
 export const getExistingChatRoom = async (members) => {
   const chatsRef = collection(db, "chats");
-  const q = query(chatsRef, where("members", "array-contains", members[0]));
+  const q = query(chatsRef, where("members", "array-contains", members));
 
   const querySnapshot = await getDocs(q);
 
   for (let doc of querySnapshot.docs) {
     const data = doc.data();
-    if (data.members.includes(members[1])) {
+    if (data.members.includes(members)) {
       return doc.id;
     }
   }
@@ -61,6 +97,7 @@ export const fetchUser = async (uid) => {
     if (userSnap.exists()) {
       return { id: userSnap.id, ...userSnap.data() };
     }
+
     return null;
   } catch (err) {
     console.error("🔥 Error fetching user:", err);
@@ -86,9 +123,8 @@ export const getChats = async (uid) => {
 
     const chatWithOtherUsers = await Promise.all(
       chatData.map(async (chat) => {
-        console.log(chat, "chat==>");
         const otherUserId = chat.members.find((memberId) => memberId !== uid);
-        console.log(otherUserId, "otherUserId====-090000");
+
         const otherUser = await fetchUser(otherUserId);
 
         return {
@@ -97,8 +133,7 @@ export const getChats = async (uid) => {
         };
       })
     );
-
-    console.log("Chat Data:", chatWithOtherUsers); // ✅ otherUser is now attached
+    console.log(chatData, "chatData==>");
     return chatWithOtherUsers;
   } catch (error) {
     console.error("🔥 Error fetching chats:", error);

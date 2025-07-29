@@ -10,8 +10,8 @@ const Chat = () => {
   const navigate = useNavigate(); // Initialize the navigation function
 
   const location = useLocation();
-  // const { existingChatRoomId } = location?.state;
-  // console.log("existingChatRoomId- ", existingChatRoomId);
+  // const { existingChatId } = location?.state;
+  // console.log("existingChatRoomId- ", location?.state);
 
   const chats = [
     { id: 1, name: "Mike Smith", message: "Hi, how are you?", date: "1 Jan" },
@@ -54,7 +54,7 @@ const Chat = () => {
           selectedChat={selectedChat}
           setUpdate={setUpdate}
           update={update}
-             chatId={selectedChat?.id}
+          chatId={selectedChat?.id}
         />
       </div>
 
