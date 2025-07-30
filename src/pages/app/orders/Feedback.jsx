@@ -25,27 +25,28 @@ const Feedback = () => {
 
 
   const handleReview = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.post("user/add-reviews", {
-        dispensaryId ,
-        productId,
-        ratingNumber:rating.toString(),
-        review:review,
-      });
-      if (response.data.success) {
-        // Handle success, e.g., show a success message or navigate back
-        console.log("Feedback submitted successfully");
-        SuccessToast("Feedback submitted successfully");
-        navigate("/app/orders");
-      } 
-    } catch (error) {
-      console.error("Error submitting feedback:", error);
-      ErrorToast("Error submitting feedback");
-    }finally{
-      setLoading(false);
+  try {
+    setLoading(true);
+    const response = await axios.post("user/add-reviews", {
+      dispensaryId,
+      productId,
+      ratingNumber: rating.toString(),
+      review: review,
+    });
+
+    if (response.data.success) {
+      SuccessToast("Feedback submitted successfully");
+      navigate("/app/orders");
     }
+  } catch (error) {
+    console.error("Error submitting feedback:", error);
+    const message = error.response?.data?.message || "Error submitting feedback";
+    ErrorToast(message);
+  } finally {
+    setLoading(false);
   }
+};
+
 
   return (
     <div className="min-h-screen bg-white px-4 py-6">

@@ -4,6 +4,7 @@ import { CiFilter } from "react-icons/ci";
 import { useNavigate } from "react-router";
 import axios from "../../../axios"; // Import the axios instance from your custom setup
 import FilterModal from "../../../components/app/dashboard/FilterModal";
+import { getDistance } from 'geolib';
 
 const Products = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false); // State for showing filter modal
@@ -19,6 +20,7 @@ const Products = () => {
     productStrain: "",
   });
   const [searchQuery, setSearchQuery] = useState(""); // State for the search query
+  const [userLocation, setUserLocation] = useState([0, 0]); // User's location (latitude, longitude)
 
   const navigate = useNavigate();
 
@@ -53,6 +55,9 @@ const Products = () => {
   // Trigger fetch on page load
   useEffect(() => {
     fetchProducts(); // Fetch all products without any filters or search on page load
+    // Fetch user's location (e.g., from localStorage or an API)
+    const locationData = JSON.parse(localStorage.getItem("userData")) || [0, 0];
+    setUserLocation(locationData.location.coordinates || [0, 0]);
   }, []);
 
   // Function to handle the application of filters from FilterModal
@@ -131,50 +136,58 @@ const Products = () => {
 
       {/* Products Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {filteredProducts.length === 0 ? (
-  <p className="col-span-full text-center text-gray-500">No products available</p>
-) : (
-  filteredProducts.map((item) => (
-    <div
-      key={item._id}
-      className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[212px] w-full h-full"
-      onClick={() => navigate(`/app/product-details/${item._id}`)} // Navigate to product details with productId
-    >
-      <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-        {item.dispensaryId.city}, {item.dispensaryId.state}
-      </div>
-      <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
-        <FiHeart className="text-gray-400 hover:text-red-500 cursor-pointer" />
-      </div>
-      <img
-        src={item.productImage[0]} // Assuming the first image in the array
-        alt={item.productName}
-        className="w-full h-[130px] object-cover rounded-t-xl"
-      />
-      <div className="p-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-[13px] font-semibold text-gray-900">{item.productName}</h3>
-          <div className="flex items-center text-sm text-yellow-500 font-semibold">
-            <span className="mr-1">⭐</span> {item.averageRating || "0.0"}
-          </div>
-        </div>
-        <div className="text-sm text-gray-500 mt-1">{item.productType}</div>
-        <div className="flex items-center mt-1">
-          <img
-            src={item.dispensaryId.profilePicture}
-            alt="Dispensary Profile"
-            className="w-[24px] h-[24px] rounded-full object-cover mr-2"
-          />
-          <div className="flex justify-between w-full items-center">
-            <div className="text-[12px] text-green-600">Dispensary</div>
-            <div className="text-gray-800 font-semibold text-[14px]">${item.productPrice}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  ))
-)}
-
+        {filteredProducts.length === 0 ? (
+          <p className="col-span-full text-center text-gray-500">No products available</p>
+        ) : (
+          filteredProducts.map((item) => {
+            // Calculate distance for each product
+            const dispensaryCoordinates = item.dispensaryId.location.coordinates;
+            const distance = getDistance(
+              { latitude: dispensaryCoordinates[1], longitude: dispensaryCoordinates[0] },
+              { latitude: userLocation[1], longitude: userLocation[0] }
+            );
+            return (
+              <div
+                key={item._id}
+                className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[212px] w-full h-full"
+                onClick={() => navigate(`/app/product-details/${item._id}`)} // Navigate to product details with productId
+              >
+                {/* Distance */}
+                <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
+                  {distance ? `${(distance / 1609.34).toFixed(2)} miles` : "0.0 miles"}
+                </div>
+                <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
+                  <FiHeart className="text-gray-400 hover:text-red-500 cursor-pointer" />
+                </div>
+                <img
+                  src={item.productImage[0]} // Assuming the first image in the array
+                  alt={item.productName}
+                  className="w-full h-[130px] object-cover rounded-t-xl"
+                />
+                <div className="p-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-[13px] font-semibold text-gray-900">{item.productName}</h3>
+                    <div className="flex items-center text-sm text-yellow-500 font-semibold">
+                      <span className="mr-1">⭐</span> {item.averageRating || "0.0"}
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-500 mt-1">{item.productType}</div>
+                  <div className="flex items-center mt-1">
+                    <img
+                      src={item.dispensaryId.profilePicture}
+                      alt="Dispensary Profile"
+                      className="w-[24px] h-[24px] rounded-full object-cover mr-2"
+                    />
+                    <div className="flex justify-between w-full items-center">
+                      <div className="text-[12px] text-green-600">Dispensary</div>
+                      <div className="text-gray-800 font-semibold text-[14px]">${item.productPrice}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* Filter Modal */}

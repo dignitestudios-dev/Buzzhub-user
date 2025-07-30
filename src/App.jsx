@@ -30,6 +30,8 @@ import Products from "./pages/app/products/Products";
 import ForgotPassword from "./pages/onboarding/ForgotPassword";
 import UpdatePassword from "./pages/onboarding/UpdatePassword";
 import VerifySignup from "./pages/onboarding/VerifySignup";
+import "./App.css";
+
 
 function App() {
   return (

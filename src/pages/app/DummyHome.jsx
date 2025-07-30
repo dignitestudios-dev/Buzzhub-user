@@ -7,10 +7,42 @@ import FilterModal from "./../../components/app/dashboard/FilterModal";
 import axios from "../../axios"; // Importing the axios instance
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster"; // Importing Toasts
 import Loader from "../../components/global/Loader";
+import { getDistance } from 'geolib';
 
 // Dispensary Card Component
 const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
   const navigate = useNavigate();
+
+  const locationData = JSON.parse(localStorage.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
+
+  const [place1, setPlace1] = useState({
+    
+  });
+
+  const [place2, setPlace2] = useState({
+  });
+  console.log(place2,"place2.")
+  console.log(item.location,"item.location.")
+
+  useEffect(() => {
+    setPlace1({
+      latitude: item.location.coordinates[1],  // Assuming coordinates are in [longitude, latitude]
+      longitude: item.location.coordinates[0]
+    });
+
+    setPlace2({
+      latitude: locationData.location.coordinates[1],  // User's latitude
+      longitude: locationData.location.coordinates[0]   // User's longitude
+    });
+  }, [item.location.coordinates]);
+
+  
+
+
+  const distance = getDistance(place1, place2);
+
+  console.log("Distance between places:", distance, "meters");
+
 
   const handleCardClick = () => {
     navigate(`/app/dispensary-profile/${item._id}`);
@@ -29,8 +61,11 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
       onClick={handleCardClick}
     >
       <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-        {item.distance ? `${item.distance.toFixed(1)} miles` : "0.0"}
-      </div>
+  {distance 
+    ? `${(distance / 1609.34).toFixed(2)} miles` 
+    : "0.0 miles"}
+</div>
+
 
       <div className="absolute top-2 right-2 z-20 bg-white p-1 rounded-full shadow-lg">
         <FaHeart
@@ -92,35 +127,48 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
 const ProductCard = ({ item, addToWishlist, isLiked }) => {
   const navigate = useNavigate();
 
-  const handleCardClick = () => {
-    navigate(`/app/product-details/${item._id}`, {
-      state: { dispensary: item },
-    }); // Product Details page
-  };
+  const locationData = JSON.parse(localStorage.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
 
-  const handleWishlistClick = (e) => {
-    e.preventDefault(); // Prevent redirection
-    e.stopPropagation(); // Prevent event bubbling (which might trigger card click)
-    addToWishlist("product", item._id); // Call the addToWishlist function for product
-  };
+  const [place1, setPlace1] = useState({});
+  const [place2, setPlace2] = useState({});
+
+  useEffect(() => {
+    // Set product's dispensary location
+    setPlace1({
+      latitude: item.dispensaryId.location.coordinates[1],  // Dispensary latitude
+      longitude: item.dispensaryId.location.coordinates[0]  // Dispensary longitude
+    });
+
+    // Set user's location
+    setPlace2({
+      latitude: locationData.location.coordinates[1],  // User's latitude
+      longitude: locationData.location.coordinates[0]   // User's longitude
+    });
+  }, [item.dispensaryId.location.coordinates]);
+
+  // Calculate the distance between product's dispensary and user
+  const distance = getDistance(place1, place2);
 
   return (
     <div
       className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[250px] w-full h-full"
-      onClick={handleCardClick}
+      onClick={() => navigate(`/app/product-details/${item._id}`, { state: { dispensary: item } })}
     >
       {/* Location Badge */}
       <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-        {item.dispensaryId.city}, {item.dispensaryId.state}
+          {distance ? `${(distance / 1609.34).toFixed(2)} miles` : "0.0 miles"}
       </div>
+      
 
       {/* Wishlist Icon */}
       <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
         <FaHeart
-          className={`cursor-pointer ${
-            isLiked ? "text-red-500" : "text-gray-400 hover:text-red-500"
-          }`}
-          onClick={handleWishlistClick} // Trigger wishlist action on heart click
+          className={`cursor-pointer ${isLiked ? "text-red-500" : "text-gray-400 hover:text-red-500"}`}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            addToWishlist("product", item._id);
+          }}
         />
       </div>
 
@@ -134,17 +182,18 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
       {/* Product Details */}
       <div className="p-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-[13px] font-semibold text-gray-900">
-            {item.productName}
-          </h3>
+          <h3 className="text-[13px] font-semibold text-gray-900">{item.productName}</h3>
           <div className="flex items-center text-sm text-yellow-500 font-semibold">
             <FaStar className="mr-1" /> {item.averageRating || "0.0"}
           </div>
         </div>
 
-        <div className="text-sm text-gray-500 mt-1">
-          {item.productType || "Not Specified"}
-        </div>
+        <div className="text-sm text-gray-500 mt-1">{item.productType || "Not Specified"}</div>
+
+        {/* Display the calculated distance */}
+        {/* <div className="absolute top-2 right-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
+          {distance ? `${(distance / 1609.34).toFixed(2)} miles` : "0.0 miles"}
+        </div> */}
 
         <div className="flex items-center mt-2 justify-between">
           {/* Dispensary Name and Profile Picture */}
@@ -154,9 +203,7 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
               alt={item.dispensaryId.dispensaryName}
               className="w-8 h-8 rounded-full object-cover"
             />
-            <div className="text-sm text-gray-700 font-semibold">
-              {item.dispensaryId.dispensaryName}
-            </div>
+            <div className="text-sm text-gray-700 font-semibold">{item.dispensaryId.dispensaryName}</div>
           </div>
 
           {/* Price */}
@@ -239,6 +286,8 @@ const Section = ({
   );
 };
 
+
+
 // Main Home Component
 const DummyHome = () => {
   const [nearbyDispensaries, setNearbyDispensaries] = useState([]);
@@ -255,6 +304,8 @@ const DummyHome = () => {
   const [products, setProducts] = useState([]); // Loading state
   const [likedDispensaries, setLikedDispensaries] = useState([]);
   const [likedProducts, setLikedProducts] = useState([]);
+
+
 
   const fetchWishlist = async () => {
     try {
@@ -415,7 +466,7 @@ const DummyHome = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen mb-20">
       <div className="flex justify-end items-center mb-10 border-b border-gray-100 pb-5 px-2">
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="relative w-full md:w-72">
@@ -431,12 +482,12 @@ const DummyHome = () => {
             />
           </div>
 
-          <button
+          {/* <button
             onClick={() => setIsFilterOpen(true)}
             className="flex items-center gap-2 bg-[#F3F3F3] hover:border-green-500 text-gray-700 hover:text-green-600 px-2 py-2 rounded-full transition duration-200 text-sm"
           >
             <CiFilter className="text-lg" />
-          </button>
+          </button> */}
         </div>
       </div>
 

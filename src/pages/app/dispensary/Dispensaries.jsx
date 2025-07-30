@@ -166,9 +166,9 @@ const Dispensaries = () => {
                 navigate(`/app/dispensary-profile/${dispensary._id}`) // Navigate to dispensary profile with dispensaryId
               }
             >
-              <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
+              {/* <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
                 {dispensary.deliveryRadius} Miles Away
-              </div>
+              </div> */}
 
               <div
                 onClick={(e) => {

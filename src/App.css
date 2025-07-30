@@ -1,1 +1,14 @@
-/* All the Global CSS code goes here */
+.carousel-container {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+}
+
+.carousel-item {
+  width: 100%; /* Ensure each review takes up the full width of the container */
+  flex-shrink: 0; /* Prevent the items from shrinking */
+}
+.carousel-item img {
+  width: 100%; /* Make the image responsive */
+  height: auto; /* Maintain aspect ratio */
+}

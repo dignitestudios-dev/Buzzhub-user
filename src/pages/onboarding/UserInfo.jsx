@@ -27,8 +27,8 @@ export default function App() {
   profileImage: formData.images.profile,  // Ensure profile image is passed correctly
   medicalCardFront: formData.images.medicalFront,  // Pass medical card front
   medicalCardBack: formData.images.medicalBack,  // Pass medical card back
-  licenseFront: formData.images.licenseFront,  // Pass license front
-  licenseBack: formData.images.licenseBack,  // Pass license back
+  licenseCardFront: formData.images.licenseFront,  // Pass license front
+  licenseCardBack: formData.images.licenseBack,  // Pass license back
 
 };
 console.log("combinedFormData -- " ,combinedFormData); // Log to inspect the object

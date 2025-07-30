@@ -20,6 +20,22 @@ const ProductDetails = () => {
   const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
+
+const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % reviews.length); // Looping back to start
+  };
+
+  const goToPrev = () => {
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + reviews.length) % reviews.length // Looping back to end
+    );
+  };
+
+
+
+
   const fetchDispencaryDetails = async () => {
     try {
       const response = await axios.get("/user/get-nearby-dispensary");
@@ -156,7 +172,7 @@ const ProductDetails = () => {
       <div className="w-full mx-auto rounded-2xl overflow-hidden mb-20">
         <div className="relative">
           <img
-            src={product.productImage[0]}
+            src={product?.productImage[0]}
             alt={product.productName}
             className="w-full h-64 object-cover"
           />
@@ -312,73 +328,89 @@ const ProductDetails = () => {
           </div>
 
           {/* Product Reviews */}
-          {reviews.length > 0 ? (
-            <div className="mt-6 border-t pt-4">
-              <h3 className="text-base font-semibold text-gray-800 mb-4">
-                Reviews
-              </h3>
-              {reviews.map((review, idx) => (
-                <div
-                  key={idx}
-                  className="bg-gray-50 p-4 rounded-xl shadow-sm mb-4"
-                >
-                  <div className="flex items-center mb-2">
-                    <img
-                      src={product.productImage[0]} // Replacing user image with the first product image
-                      alt={product.productName}
-                      className="w-8 h-8 rounded-full object-cover mr-2" // Style it to match the user profile image
-                    />
-                    <div>
-                      <h4 className="text-sm font-semibold">
-                        {review.productId.productName}
-                      </h4>
-                      <p className="text-xs text-gray-500">
-                        {review.userId.city}, {review.userId.state}
-                      </p>
-                    </div>
-                    <span className="ml-auto text-green-600 font-bold">
-                      ${review.productId.productPrice}
-                    </span>
-                  </div>
-                  <div className="flex mb-1">
-                    {[...Array(5)].map((_, i) => (
-                      <FaStar
-                        key={i}
-                        className={`text-yellow-500 text-xs ${
-                          i < Math.round(review.ratingNumber) ? "filled" : ""
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-700">{review.review}</p>
+         {/* Reviews */}
+<div className="px-4 mb-6">
+  <h3 className="text-base font-semibold text-gray-800 mb-4">Reviews</h3>
 
-                  {/* User's profile and name below the review */}
-                  <div className="mt-4 flex items-center gap-2">
-                    <img
-                      src={review.userId.profilePicture} // Show user profile picture here
-                      alt={review.userId.fullName}
-                      className="w-8 h-8 rounded-full object-cover"
+  {reviews && reviews.length > 0 ? (
+    <div className="relative">
+      <div className="overflow-hidden">
+        <div
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        >
+          {reviews.map((review, idx) => (
+            <div key={idx} className="w-full px-4">
+              <div className="bg-gray-50 p-4 rounded-xl shadow-sm mb-4">
+                <div className="flex items-center mb-2">
+                  <img
+                    src={review.productId?.productImage[0]}
+                    alt={review.productId?.productName}
+                    className="w-8 h-8 rounded-full object-cover mr-2"
+                  />
+                  <div>
+                    <h4 className="text-sm font-semibold">
+                      {review.productId?.productName}
+                    </h4>
+                    <p className="text-xs text-gray-500">
+                      {review.userId.city}, {review.userId.state}
+                    </p>
+                  </div>
+                  <span className="ml-auto text-green-600 font-bold">
+                    ${review.productId?.productPrice}
+                  </span>
+                </div>
+                <div className="flex mb-1">
+                  {[...Array(5)].map((_, i) => (
+                    <FaStar
+                      key={i}
+                      className={`text-yellow-500 text-xs ${
+                        i < Math.round(review.ratingNumber) ? "filled" : ""
+                      }`}
                     />
-                    <div>
-                      <h5 className="text-sm font-semibold text-gray-800">
-                        {review.userId.fullName}
-                      </h5>
-                      {/* <a 
-              href={`/app/user-profile/${review.userId._id}`}  // Link to the user's profile
-              className="text-xs text-blue-500 hover:underline"
-            >
-              View Profile
-            </a> */}
-                    </div>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-700">{review.review}</p>
+
+                <div className="mt-4 flex items-center gap-2">
+                  <img
+                    src={review.userId.profilePicture}
+                    alt={review.userId.fullName}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div>
+                    <h5 className="text-sm font-semibold text-gray-800">
+                      {review.userId.fullName}
+                    </h5>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          ) : (
-            <div className="mt-6 border-t pt-4 text-sm text-gray-500 italic">
-              No reviews available for this product.
-            </div>
-          )}
+          ))}
+        </div>
+      </div>
+
+      {/* Navigation Buttons */}
+      <button
+        className="absolute top-1/2 left-0 transform -translate-y-1/2 text-gray-800 bg-gray-200 p-2 rounded-md shadow-lg"
+        onClick={goToPrev}
+      >
+        &#8249;
+      </button>
+      <button
+        className="absolute top-1/2 right-0 transform -translate-y-1/2 text-gray-800 bg-gray-200 p-2 rounded-md shadow-lg"
+        onClick={goToNext}
+      >
+        &#8250;
+      </button>
+    </div>
+  ) : (
+    <div className="mt-6 text-sm text-gray-500 italic">
+      No reviews available for this product.
+    </div>
+  )}
+</div>
+
 
           {/* Add to Cart Button */}
           {cartItemID?.includes(ProductId) ? (

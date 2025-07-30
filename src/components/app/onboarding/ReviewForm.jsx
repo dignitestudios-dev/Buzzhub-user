@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import axios from "../../../axios.js";
+import { ErrorToast } from "../../global/Toaster.jsx";
 
 export default function ReviewForm({ formData = {}, onBack }) {
   const navigate = useNavigate();
@@ -21,7 +22,9 @@ export default function ReviewForm({ formData = {}, onBack }) {
     paymentMethod = "",
     medicalBack = "",
     medicalFront = "",
-    profile
+    profile,
+    licenseCardFront = "",
+    licenseCardBack = "",
   } = formData;
 
   const renderImageBox = (src, label) => {
@@ -47,7 +50,7 @@ export default function ReviewForm({ formData = {}, onBack }) {
   console.log("Submitting profile with token:", token);
 
   if (!token) {
-    ErrorToast("Authorization token missing. Please log in again.");
+    ErrorToast("Authorization token missing. Please sign up again.");
     return;
   }
 
@@ -63,21 +66,21 @@ export default function ReviewForm({ formData = {}, onBack }) {
     form.append("zipCode", zip);
 
     // Append files (assuming they are File objects)
-    if (profileImage instanceof File) {
-      form.append("profileImage", profile);
+    if (profile instanceof File) {
+      form.append("profilePicture", profile);  // Corrected here
     }
-    if (medicalCardFront instanceof File) {
-      form.append("medicalCardFront", medicalFront);
+    if (medicalBack instanceof File) {
+      form.append("medicalCardBack", medicalBack);  // Corrected here
     }
-    if (medicalCardBack instanceof File) {
-      form.append("medicalCardBack", medicalBack);
+    if (medicalFront instanceof File) {
+      form.append("medicalCardFront", medicalFront);  // Corrected here
     }
     if (licenseFront instanceof File) {
-      form.append("licenseFront", licenseFront);
-    }
-    if (licenseBack instanceof File) {
-      form.append("licenseBack", licenseBack);
-    }
+  form.append("drivingLicenseFront", licenseFront);  // Use the correct files object
+}
+if (licenseBack instanceof File) {
+  form.append("drivingLicenseBack", licenseBack);  // Same here
+}
 
     const response = await axios.post("auth/set-profile", form, {
       headers: {
@@ -95,6 +98,7 @@ export default function ReviewForm({ formData = {}, onBack }) {
     console.error("An error occurred while updating the profile:", error);
   }
 };
+
 
 
 
@@ -144,8 +148,8 @@ export default function ReviewForm({ formData = {}, onBack }) {
         <div className="mt-6">
           <div className="text-sm font-medium mb-2">Driving License</div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {renderImageBox(licenseFront, "Front")}
-            {renderImageBox(licenseBack, "Back")}
+            {renderImageBox(licenseCardFront, "Front")}
+            {renderImageBox(licenseCardBack, "Back")}
           </div>
         </div>
 

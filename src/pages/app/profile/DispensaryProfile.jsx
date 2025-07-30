@@ -16,6 +16,17 @@ const DispensaryProfile = () => {
   const [reviews, setReviews] = useState([]); // New state for reviews
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % reviews.length); // Looping back to start
+  };
+
+  const goToPrev = () => {
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + reviews.length) % reviews.length // Looping back to end
+    );
+  };
 
   // Function to fetch dispensary data
   useEffect(() => {
@@ -147,13 +158,13 @@ const DispensaryProfile = () => {
             >
               <div className="relative">
                 <img
-                  src={product.productImage[0]}
-                  alt={product.productName}
+                  src={product?.productImage[0]}
+                  alt={product?.productName}
                   className="w-full h-28 object-cover"
                 />
               </div>
               <div className="p-2">
-                <h3 className="text-sm font-medium">{product.productName}</h3>
+                <h3 className="text-sm font-medium">{product?.productName}</h3>
                 <p className="text-xs text-gray-500 mb-1">
                   {product.productType}
                 </p>
@@ -174,61 +185,145 @@ const DispensaryProfile = () => {
       </div>
 
       {/* Reviews */}
-      <div className="px-4 mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="font-semibold text-gray-800">Reviews</h3>
-          <button className="text-green-500 text-xs underline">See all</button>
-        </div>
+    {/* Reviews */}
+{/* Reviews */}
+<div className="px-4 mb-6">
+  <div className="flex justify-between items-center mb-2">
+    <h3 className="font-semibold text-gray-800">Reviews</h3>
+    <button className="text-green-500 text-xs underline">See all</button>
+  </div>
 
-        {reviews && reviews.length > 0 ? (
-          reviews.map((review, idx) => (
-            <div key={idx} className="bg-gray-50 p-4 rounded-xl shadow-sm mb-3">
-              <div className="flex items-center mb-2">
-                <img
-                  src={review.productId.productImage[0]}
-                  className="w-8 h-8 rounded-full object-cover mr-2"
-                  alt={review.userId.fullName}
-                />
-                <div>
-                  <h4 className="text-sm font-semibold">
-                    {review.productId.productName}
-                  </h4>
-                  <p className="text-xs text-gray-400">{review.userId.city}, {review.userId.state}</p>
+  {reviews && reviews.length > 0 ? (
+    reviews.length > 1 ? (
+      <div className="relative">
+        {/* Carousel Container */}
+        <div className="overflow-hidden relative">
+          <div
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{
+              transform: `translateX(-${currentIndex * 100}%)`,
+              display: 'flex',
+              width: `${reviews.length * 100}%`, // Make sure the total width matches the number of reviews
+            }}
+          >
+            {reviews.map((review, idx) => (
+              <div key={idx} className="w-full flex-shrink-0 px-4"> {/* Fix flex-shrink */}
+                <div className="bg-gray-50 p-4 rounded-xl shadow-sm mb-3">
+                  <div className="flex items-center mb-2">
+                    <img
+                      src={review.productId?.productImage[0]}
+                      className="w-8 h-8 rounded-full object-cover mr-2"
+                      alt={review.userId.fullName}
+                    />
+                    <div>
+                      <h4 className="text-sm font-semibold">
+                        {review.productId?.productName}
+                      </h4>
+                      <p className="text-xs text-gray-400">
+                        {review.userId.city}, {review.userId.state}
+                      </p>
+                    </div>
+                    <span className="ml-auto font-bold text-green-600">
+                      ${review.productId?.productPrice}
+                    </span>
+                  </div>
+
+                  <div className="flex mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar
+                        key={i}
+                        className={`text-yellow-500 text-xs ${i < review.ratingNumber ? 'filled' : ''}`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-700">{review.review}</p>
+
+                  {/* User's profile and name below the review */}
+                  <div className="mt-4 flex items-center gap-2">
+                    <img
+                      src={review.userId.profilePicture}
+                      alt={review.userId.fullName}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <div>
+                      <h5 className="text-sm font-semibold text-gray-800">
+                        {review.userId.fullName}
+                      </h5>
+                    </div>
+                  </div>
                 </div>
-                <span className="ml-auto font-bold text-green-600">
-                  ${review.productId.productPrice}
-                </span>
               </div>
-              
-              <div className="flex mb-2">
-                {[...Array(5)].map((_, i) => (
-                  <FaStar key={i} className={`text-yellow-500 text-xs ${i < review.ratingNumber ? 'filled' : ''}`} />
-                ))}
-              </div>
-              <p className="text-xs text-gray-700">{review.review}</p>
-              {/* User's profile and name below the review */}
-        <div className="mt-4 flex items-center gap-2">
-          <img
-            src={review.userId.profilePicture}  // Show user profile picture here
-            alt={review.userId.fullName}
-            className="w-8 h-8 rounded-full object-cover"
-          />
-          <div>
-            <h5 className="text-sm font-semibold text-gray-800">{review.userId.fullName}</h5>
-            {/* <a 
-              href={`/app/user-profile/${review.userId._id}`}  // Link to the user's profile
-              className="text-xs text-blue-500 hover:underline"
-            >
-              View Profile
-            </a> */}
+            ))}
           </div>
         </div>
-            </div>
-          ))
-        ) : (
-          <div>No reviews available</div>
-        )}
+
+        {/* Navigation Buttons */}
+        <button
+          className="absolute top-1/2 left-0 transform -translate-y-1/2 text-gray-800 bg-gray-200 p-2 rounded-md shadow-lg"
+          onClick={goToPrev}
+        >
+          &#8249;
+        </button>
+        <button
+          className="absolute top-1/2 right-0 transform -translate-y-1/2 text-gray-800 bg-gray-200 p-2 rounded-md shadow-lg"
+          onClick={goToNext}
+        >
+          &#8250;
+        </button>
       </div>
+    ) : (
+      reviews.map((review, idx) => (
+        <div key={idx} className="bg-gray-50 p-4 rounded-xl shadow-sm mb-3">
+          <div className="flex items-center mb-2">
+            <img
+              src={review.productId?.productImage[0]}
+              className="w-8 h-8 rounded-full object-cover mr-2"
+              alt={review.userId.fullName}
+            />
+            <div>
+              <h4 className="text-sm font-semibold">
+                {review.productId?.productName}
+              </h4>
+              <p className="text-xs text-gray-400">
+                {review.userId.city}, {review.userId.state}
+              </p>
+            </div>
+            <span className="ml-auto font-bold text-green-600">
+              ${review.productId?.productPrice}
+            </span>
+          </div>
+
+          <div className="flex mb-2">
+            {[...Array(5)].map((_, i) => (
+              <FaStar
+                key={i}
+                className={`text-yellow-500 text-xs ${i < review.ratingNumber ? 'filled' : ''}`}
+              />
+            ))}
+          </div>
+          <p className="text-xs text-gray-700">{review.review}</p>
+
+          {/* User's profile and name below the review */}
+          <div className="mt-4 flex items-center gap-2">
+            <img
+              src={review.userId.profilePicture}
+              alt={review.userId.fullName}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <div>
+              <h5 className="text-sm font-semibold text-gray-800">
+                {review.userId.fullName}
+              </h5>
+            </div>
+          </div>
+        </div>
+      ))
+    )
+  ) : (
+    <div>No reviews available</div>
+  )}
+</div>
+
     </div>
   );
 };
