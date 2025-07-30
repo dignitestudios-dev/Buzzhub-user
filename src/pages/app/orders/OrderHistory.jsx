@@ -194,12 +194,12 @@ const OrderHistory = () => {
                       <p className="font-semibold text-base text-black">
                         {order.dispensaryName}
                       </p>
-                      <p className="font-bold text-lg text-black">
+                      {/* <p className="font-bold text-lg text-black">
                         Total: $
                         {(
                           parseFloat(order.totalPrice.replace("$", "")) * 1.02
                         ).toFixed(2)}
-                      </p>
+                      </p> */}
                     </div>
 
                     {/* Location + Fee Note */}
@@ -210,9 +210,9 @@ const OrderHistory = () => {
                           {order.dispensarycity}, {order.dispensarystate}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-400 italic">
+                      {/* <span className="text-xs text-gray-400 italic">
                         Includes 2% platform fee
-                      </span>
+                      </span> */}
                     </div>
                   </div>
                 </div>
