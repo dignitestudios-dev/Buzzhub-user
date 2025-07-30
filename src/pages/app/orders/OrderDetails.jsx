@@ -20,7 +20,6 @@ const OrderDetails = () => {
   console.log(order, "orderorderorder");
   // Fetch order details from the API
 
-  
   const fetchOrderDetails = async () => {
     setLoading(true);
     try {
@@ -71,7 +70,6 @@ const OrderDetails = () => {
     orderUvid,
     createdAt,
     phoneNumber,
-
   } = orderDetails || {};
   const totalAmount = order?.state?.order?.products
     ? order.state.order.products.reduce((sum, product) => {
@@ -90,24 +88,27 @@ const OrderDetails = () => {
   const buyerId = userData?.uid; // user who placed order
   const sellerId = order?.state?.order?.dispensarystreetuid; // seller
   const orderId = orderDetails?._id;
-  
+
   const handleCreateChat = async () => {
     try {
-      const existingChatId = await getExistingChatRoom([sellerId, buyerId]);
-      const newChat = await createChatRoom({
-        members: [sellerId, buyerId],
-        sellerId,
-        buyerId,
-        chatName: "Order Chat",
-        imageUrl: "",
-        last_msg: null,
-      });
-      console.log(existingChatId, "existingChatId");
+      const existingChat = await getExistingChatRoom([sellerId, buyerId]);
 
-      navigate("/app/chat", { state: { existingChatId } });
+      if (existingChat) {
+        console.log("Chat already exists:", existingChat.id);
+        navigate("/app/chat", { state: { existingChatId: existingChat.id } });
+      } else {
+        const newChat = await createChatRoom({
+          members: [sellerId, buyerId],
+          sellerId,
+          buyerId,
+          chatName: "Order Chat",
+          imageUrl: "",
+          last_msg: null,
+        });
 
-      console.log("New chat created:", newChat);
-      // navigation ya state update kar sakte ho
+        console.log("New chat created:", newChat.id);
+        navigate("/app/chat", { state: { existingChatId: newChat.id } });
+      }
     } catch (e) {
       console.error("Failed to create chat", e);
     }

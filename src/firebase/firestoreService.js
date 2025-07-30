@@ -74,14 +74,24 @@ export const createChatRoom = async ({
 
 export const getExistingChatRoom = async (members) => {
   const chatsRef = collection(db, "chats");
-  const q = query(chatsRef, where("members", "array-contains", members));
 
+  // Check chats where one member exists (broad filter)
+  const q = query(chatsRef, where("members", "array-contains", members[0]));
   const querySnapshot = await getDocs(q);
 
   for (let doc of querySnapshot.docs) {
     const data = doc.data();
-    if (data.members.includes(members)) {
-      return doc.id;
+
+    // Compare both arrays regardless of order
+    if (
+      Array.isArray(data.members) &&
+      data.members.length === members.length &&
+      data.members.every((id) => members.includes(id))
+    ) {
+      return {
+        id: doc.id,
+        ...data,
+      };
     }
   }
 
