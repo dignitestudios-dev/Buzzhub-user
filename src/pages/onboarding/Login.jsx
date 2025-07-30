@@ -34,7 +34,7 @@ const Login = () => {
     }
     return formErrors;
   };
-console.log(fcmToken,"fcmToken")
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});

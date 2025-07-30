@@ -78,7 +78,7 @@ const UpdatePassword = () => {
           },
         }
       );
-console.log(response.data,"testtt")
+
       if (response.data.success) {
         setIsUpdated(true);
         SuccessToast("Password updated successfully!");

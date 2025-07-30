@@ -64,7 +64,7 @@ export const AppContextProvider = ({ children }) => {
       const fcmTokenResponse = await getFCMToken();
       setFcmToken(fcmTokenResponse);
     } catch (err) {
-      console.log("🚀 ~ getFcm ~ err:", err);
+   
       ErrorToast(err);
     }
   };
@@ -77,7 +77,7 @@ export const AppContextProvider = ({ children }) => {
     const listenForMessages = async () => {
       try {
         const payload = await onMessageListener();
-        console.log(payload)
+     
         NotificationToast({
           title: payload.notification?.title,
           message: payload.notification?.body,

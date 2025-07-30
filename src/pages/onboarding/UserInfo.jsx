@@ -10,7 +10,7 @@ export default function App() {
     images: {},
     files: {},
   });
-  console.log("formData -- ", formData);
+  
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
@@ -31,7 +31,7 @@ export default function App() {
   licenseCardBack: formData.images.licenseBack,  // Pass license back
 
 };
-console.log("combinedFormData -- " ,combinedFormData); // Log to inspect the object
+
 
   // Step names
   const steps = ["Address", "Documents", "Review"];

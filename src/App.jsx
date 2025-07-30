@@ -7,7 +7,6 @@ import ProductDetails from "./pages/app/products/ProductDetails";
 import OrderHistory from "./pages/app/orders/OrderHistory";
 import Cart from "./pages/app/orders/Cart";
 import Profile from "./pages/app/profile/Profile";
-import Chat from "./pages/app/chat/Chat";
 import Notifications from "./pages/app/notifications/Notifications";
 import Favorites from "./pages/app/favorites/Favorites";
 import DispensaryProfile from "./pages/app/profile/DispensaryProfile";
@@ -32,16 +31,12 @@ import UpdatePassword from "./pages/onboarding/UpdatePassword";
 import VerifySignup from "./pages/onboarding/VerifySignup";
 import "./App.css";
 
+import Chat from "./pages/chat/Chat";
 
 function App() {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <Login />
-        }
-      />
+      <Route path="/" element={<Login />} />
 
       <Route path="app" element={<DashboardLayout />}>
         <Route path="dashboard" element={<DummyHome />} />
@@ -51,11 +46,11 @@ function App() {
         <Route path="product-details/:productId" element={<ProductDetails />} />
       </Route>
 
-        <Route path="app" element={<DashboardLayout />}>
+      <Route path="app" element={<DashboardLayout />}>
         <Route path="orders" element={<OrderHistory />} />
       </Route>
 
-       <Route path="app" element={<DashboardLayout />}>
+      <Route path="app" element={<DashboardLayout />}>
         <Route path="cart" element={<Cart />} />
       </Route>
 
@@ -67,17 +62,19 @@ function App() {
         <Route path="chat" element={<Chat />} />
       </Route>
 
-       <Route path="app" element={<DashboardLayout />}>
+      <Route path="app" element={<DashboardLayout />}>
         <Route path="notifications" element={<Notifications />} />
       </Route>
 
-       <Route path="app" element={<DashboardLayout />}>
+      <Route path="app" element={<DashboardLayout />}>
         <Route path="favorites" element={<Favorites />} />
       </Route>
 
-
       <Route path="app" element={<DashboardLayout />}>
-        <Route path="/app/dispensary-profile/:dispensaryId" element={<DispensaryProfile />} />
+        <Route
+          path="/app/dispensary-profile/:dispensaryId"
+          element={<DispensaryProfile />}
+        />
       </Route>
 
       <Route path="app" element={<DashboardLayout />}>
@@ -96,17 +93,15 @@ function App() {
         <Route path="order-tracking/:id" element={<OrderTracking />} />
       </Route>
 
-
       <Route path="app" element={<DashboardLayout />}>
         <Route path="documents" element={<Documents />} />
       </Route>
 
-       <Route path="app" element={<DashboardLayout />}>
+      <Route path="app" element={<DashboardLayout />}>
         <Route path="dispensaries" element={<Dispensaries />} />
       </Route>
 
-
-        <Route path="app" element={<DashboardLayout />}>
+      <Route path="app" element={<DashboardLayout />}>
         <Route path="products" element={<Products />} />
       </Route>
 
@@ -118,49 +113,45 @@ function App() {
         <Route path="delete-account" element={<DeleteAccount />} />
       </Route>
 
-       <Route path="app" element={<DashboardLayout />}>
+      <Route path="app" element={<DashboardLayout />}>
         <Route path="edit-profile" element={<EditProfile />} />
       </Route>
 
-       <Route path="app" element={<DashboardLayout />}>
+      <Route path="app" element={<DashboardLayout />}>
         <Route path="feedback/:id" element={<Feedback />} />
       </Route>
-
 
       <Route path="auth" element={<AuthLayout />}>
         <Route path="login" element={<Login />} />
       </Route>
 
-       <Route path="auth" element={<AuthLayout />}>
+      <Route path="auth" element={<AuthLayout />}>
         <Route path="signup" element={<SignUp />} />
       </Route>
 
-       <Route path="auth" element={<AuthLayout />}>
+      <Route path="auth" element={<AuthLayout />}>
         <Route path="verification" element={<Verification />} />
       </Route>
 
-         <Route path="auth" element={<AuthLayout />}>
+      <Route path="auth" element={<AuthLayout />}>
         <Route path="verify-otp" element={<VerifyOtp />} />
       </Route>
-
 
       <Route path="auth">
         <Route path="user-info" element={<UserInfo />} />
       </Route>
 
-          <Route path="auth">
+      <Route path="auth">
         <Route path="forgot-password" element={<ForgotPassword />} />
       </Route>
 
-        <Route path="auth">
+      <Route path="auth">
         <Route path="update-password" element={<UpdatePassword />} />
       </Route>
 
-       <Route path="auth">
+      <Route path="auth">
         <Route path="verifyisgnup" element={<VerifySignup />} />
       </Route>
-
-      
 
       <Route
         path="*"
