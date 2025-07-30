@@ -35,7 +35,7 @@ const FilterModal = ({ isOpen, onClose, onApplyFilters, filters }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center md:bg-black/50">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center md:bg-black/50">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black opacity-40 md:block hidden" onClick={onClose}></div>
 
@@ -83,27 +83,26 @@ const FilterModal = ({ isOpen, onClose, onApplyFilters, filters }) => {
 
           {/* Price Range */}
           <div className="mb-6">
-            <h3 className="font-semibold mb-2">Price Range</h3>
-            <div className="relative bg-[#F3F3F3] rounded-lg p-4">
-              <input
-                type="range"
-                min="0"
-                max="500"
-                value={priceRange[1]}
-                onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                className="w-full accent-[#1D7C42]"
-              />
-              <div className="mt-2">
-                {/* Static price ticks */}
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>$0</span>
-                  <span>$50</span>
-                  <span>$120</span>
-                  <span>$500</span>
-                </div>
-              </div>
-            </div>
-          </div>
+  <h3 className="font-semibold mb-2">Price Range</h3>
+  <div className="relative bg-[#F3F3F3] rounded-lg p-4">
+    <input
+      type="range"
+      min="0"
+      max="500"
+      value={priceRange[1]}
+      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+      className="w-full accent-[#1D7C42]"
+    />
+    <div className="mt-2">
+      {/* Display selected price */}
+      <div className="flex justify-between text-xs text-gray-500">
+        <span>${priceRange[0]}</span> {/* Starting price */}
+        <span>${priceRange[1]}</span> {/* Ending price */}
+      </div>
+    </div>
+  </div>
+</div>
+
 
           {/* Categories */}
           <div className="mb-6">
