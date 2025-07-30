@@ -9,6 +9,13 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"; // Eye ico
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster"; // Import toast components
 import SocialLogin from "./SocialLogin";
 import { AppContext } from "../../context/AppContext";
+import Modal from "../../components/global/Modal";
+
+
+
+
+
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,6 +24,18 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false); // To toggle password visibility
   const [loading, setLoading] = useState(false); // To manage loading state
   const [errors, setErrors] = useState({}); // To store validation errors
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  
+  const handleSignUpClick = () => {
+    setIsModalOpen(true); // Open the modal on "Edit Profile" click
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false); // Close the modal
+  };
+
+
+
 
   const { fcmToken } = useContext(AppContext);
   const validateForm = () => {
@@ -175,11 +194,11 @@ const Login = () => {
           {loading ? "Logging In..." : "Log in"}{" "}
           {/* Show loading text if loading */}
         </button>
-        <div className="flex justify-center items-center mb-6">
+        <div className="flex justify-center items-center ">
           <SocialLogin />
         </div>
         {/* Signup Redirect */}
-        <div className="w-full flex flex-col gap-1 justify-center items-center mt-4">
+        <div className="w-full flex flex-col gap-1 justify-center items-center ">
           <div className="w-full lg:w-[434px] flex gap-1 justify-center items-center">
             <span className="text-[13px] font-medium text-[#C2C6CB]">
               Don’t have an account?
@@ -187,7 +206,7 @@ const Login = () => {
             <button
               type="button"
               className="outline-none text-[13px] border-none text-green-600 font-bold"
-              onClick={() => navigate("/auth/signup")}
+          onClick={handleSignUpClick} // Open the modal instead of navigating
             >
               Create one
             </button>
@@ -211,6 +230,13 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal for "Edit Profile" */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        message="Use The Mobile App to Sign Up."
+      />
     </div>
   );
 };

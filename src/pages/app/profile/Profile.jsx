@@ -3,14 +3,25 @@ import { useNavigate } from "react-router-dom";
 import axios from "../../../axios"; // Importing the axios instance
 import { FiArrowLeft } from "react-icons/fi";
 import { Loader } from "../../../components/global/Loader";
+import Modal from "../../../components/global/Modal"; // Importing the Modal component
 
 const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+
 
   const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
+  };
+
+  const handleEditProfileClick = () => {
+    setIsModalOpen(true); // Open the modal on "Edit Profile" click
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false); // Close the modal
   };
 
   const fetchProfile = async () => {
@@ -90,8 +101,8 @@ const Profile = () => {
 
       {/* Navigation Buttons */}
       <div className="flex flex-col items-stretch gap-2 sm:gap-3">
-        <button
-          onClick={() => navigate("/app/edit-profile")}
+       <button
+          onClick={handleEditProfileClick} // Open the modal instead of navigating
           className="flex items-center justify-center gap-1 bg-[#1D7C42] hover:bg-green-700 text-white px-4 py-3 rounded-xl text-sm font-medium transition"
         >
           Edit Profile
@@ -128,6 +139,13 @@ const Profile = () => {
           <span className="text-[#B7B8B8]">&gt;</span>
         </button>
       </div>
+
+      {/* Modal for "Edit Profile" */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        message="Use the mobile app to edit your profile."
+      />
     </div>
   );
 };
