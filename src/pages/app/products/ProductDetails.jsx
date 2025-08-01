@@ -206,7 +206,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
             </div>
             <div className="flex items-center text-yellow-500 text-sm font-semibold">
               <FaStar className="mr-1" />
-              {product.averageRating || "N/A"}
+              {product.averageRating || "0.0"}
             </div>
           </div>
 
@@ -329,7 +329,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
 
           {/* Product Reviews */}
          {/* Reviews */}
-<div className="px-4 mb-6">
+<div className="mt-4 mb-6">
   <h3 className="text-base font-semibold text-gray-800 mb-4">Reviews</h3>
 
   {reviews && reviews.length > 0 ? (
@@ -421,17 +421,19 @@ const [currentIndex, setCurrentIndex] = useState(0);
               View Cart
             </button>
           ) : (
-            <button
-              onClick={handleAddToCart}
-              className="w-full bg-green-600 hover:bg-green-700 transition text-white font-semibold py-3 mt-4 rounded-xl flex items-center justify-center"
-              disabled={loading} // Disable the button while loading
-            >
-              {loading ? (
-                <FiLoader className="animate-spin text-white text-2xl" />
-              ) : (
-                "Add to Cart"
-              )}
-            </button>
+           <button
+  onClick={handleAddToCart}
+  className={`w-full transition text-white font-semibold py-3 mt-4 rounded-xl flex items-center justify-center 
+    ${loading || !grams ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+  disabled={loading || !grams} // Disable if loading or grams is empty
+>
+  {loading ? (
+    <FiLoader className="animate-spin text-white text-2xl" />
+  ) : (
+    "Add to Cart"
+  )}
+</button>
+
           )}
         </div>
       </div>

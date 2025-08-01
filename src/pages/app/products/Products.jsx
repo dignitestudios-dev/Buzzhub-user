@@ -35,8 +35,8 @@ const Products = () => {
       const response = await axios.get("user/get-all-products", {
         params: {
           ...filterParams,
-          page: 1,
-          limit: 10,
+          // page: 1,
+          // limit: 10,
         },
       });
 

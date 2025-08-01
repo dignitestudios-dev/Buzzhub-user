@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+ import React, { useState, useEffect } from "react";
 import { FaStar, FaHeart } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
 import { CiClock2, CiFilter } from "react-icons/ci";
@@ -366,7 +366,7 @@ const DummyHome = () => {
         if (response.data.success) {
           const products = response.data.data.popularProducts || [];
           setPopularProducts(products);
-          setFilteredProducts(products);
+setFilteredProducts(products.slice(0, 2)); // Only 2 products
         } else {
           console.error("Failed to fetch popular products");
           setPopularProducts([]);
@@ -384,7 +384,7 @@ const DummyHome = () => {
         if (response.data.success) {
           const products = response.data.data.products || [];
           setProducts(products);
-          setFilteredNewProducts(products);
+          setFilteredNewProducts(products.slice(0, 2));  // Slice to only show 2 new products
 
         } else {
           console.error("Failed to fetch popular products");
