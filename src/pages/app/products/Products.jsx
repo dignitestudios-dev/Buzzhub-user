@@ -103,7 +103,7 @@ const Products = () => {
   }
 
   return (
-    <div className="w-full mx-auto bg-white min-h-screen">
+    <div className="w-full mx-auto pb-20 bg-white min-h-screen">
       <div className="flex items-center justify-between mb-8">
         <button className="text-gray-800 pr-3" onClick={handleBackClick}>
           <FiArrowLeft size={20} />

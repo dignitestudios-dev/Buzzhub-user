@@ -48,7 +48,7 @@ const Chat = () => {
       <div
         className={`${
           selectedChat ? "block" : "hidden md:block"
-        } w-full md:w-2/3 bg-white h-[600px] p-4 rounded-lg border flex flex-col`}
+        } w-full md:w-2/3 bg-white h-[600px] pb-20 lg:pb-0  rounded-lg  flex flex-col`}
       >
         {selectedChat ? (
           <>
