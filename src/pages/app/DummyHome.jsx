@@ -70,7 +70,7 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
       <div className="absolute top-2 right-2 z-20 bg-white p-1 rounded-full shadow-lg">
         <FaHeart
           className={`cursor-pointer ${
-            isLiked ? "text-red-500" : "text-gray-400 hover:text-red-500"
+            isLiked ? "text-red-500" : "text-gray-400 "
           }`}
           onClick={handleWishlistClick} // Trigger    wishlist action on heart click
         />
@@ -163,7 +163,7 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
       {/* Wishlist Icon */}
       <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
         <FaHeart
-          className={`cursor-pointer ${isLiked ? "text-red-500" : "text-gray-400 hover:text-red-500"}`}
+          className={`cursor-pointer ${isLiked ? "text-red-500" : "text-gray-400 "}`}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
