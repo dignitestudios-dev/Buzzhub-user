@@ -20,8 +20,8 @@ const Dispensaries = () => {
       const response = await axios.get("user/get-all-dispensaries", {
         params: {
           ...filterParams,
-          // page: 1,
-          // limit: 10,
+          page: 1,
+          limit: 100,
         },
       });
       if (response.data.success) {
@@ -122,7 +122,7 @@ const Dispensaries = () => {
   };
 
   return (
-    <div className="w-full mx-auto bg-white min-h-screen">
+    <div className="w-full mx-auto bg-white min-h-screen pb-20">
       <div className="flex items-center justify-between mb-8">
         {/* Back Button */}
         <button className="text-gray-800 pr-3" onClick={handleBackClick}>
