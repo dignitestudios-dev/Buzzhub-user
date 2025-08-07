@@ -13,7 +13,7 @@ import { getDistance } from 'geolib';
 const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
   const navigate = useNavigate();
 
-  const locationData = JSON.parse(localStorage.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
+  const locationData = JSON.parse(localStorage?.getItem("userData")) || JSON?.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
 
   const [place1, setPlace1] = useState({
     
@@ -26,15 +26,15 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
 
   useEffect(() => {
     setPlace1({
-      latitude: item.location.coordinates[1],  // Assuming coordinates are in [longitude, latitude]
-      longitude: item.location.coordinates[0]
+      latitude: item?.location?.coordinates[1],  // Assuming coordinates are in [longitude, latitude]
+      longitude: item?.location?.coordinates[0]
     });
 
     setPlace2({
-      latitude: locationData.location.coordinates[1],  // User's latitude
-      longitude: locationData.location.coordinates[0]   // User's longitude
+      latitude: locationData?.location?.coordinates[1],  // User's latitude
+      longitude: locationData?.location?.coordinates[0]   // User's longitude
     });
-  }, [item.location.coordinates]);
+  }, [item?.location?.coordinates]);
 
   
 
@@ -125,26 +125,32 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
 
 // Product Card Component
 const ProductCard = ({ item, addToWishlist, isLiked }) => {
+  console.log(item, "item in product card");
   const navigate = useNavigate();
 
-  const locationData = JSON.parse(localStorage.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
+  const locationData = JSON.parse(localStorage?.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
 
   const [place1, setPlace1] = useState({});
   const [place2, setPlace2] = useState({});
 
   useEffect(() => {
     // Set product's dispensary location
-    setPlace1({
-      latitude: item.dispensaryId.location.coordinates[1],  // Dispensary latitude
-      longitude: item.dispensaryId.location.coordinates[0]  // Dispensary longitude
+    if(item?.dispensaryId?.location) {
+      setPlace1({
+      latitude: item?.dispensaryId?.location?.coordinates[1],  // Dispensary latitude
+      longitude: item?.dispensaryId?.location?.coordinates[0]  // Dispensary longitude
     });
+    }
 
-    // Set user's location
+    if(locationData?.location) {
+      // Set user's location
     setPlace2({
-      latitude: locationData.location.coordinates[1],  // User's latitude
-      longitude: locationData.location.coordinates[0]   // User's longitude
+      latitude: locationData?.location?.coordinates[1],  // User's latitude
+      longitude: locationData?.location?.coordinates[0]   // User's longitude
     });
-  }, [item.dispensaryId.location.coordinates]);
+    }
+    
+  }, [item?.dispensaryId?.location?.coordinates]);
 
   // Calculate the distance between product's dispensary and user
   const distance = getDistance(place1, place2);

@@ -141,11 +141,19 @@ const Products = () => {
         ) : (
           filteredProducts.map((item) => {
             // Calculate distance for each product
-            const dispensaryCoordinates = item.dispensaryId.location.coordinates;
-            const distance = getDistance(
-              { latitude: dispensaryCoordinates[1], longitude: dispensaryCoordinates[0] },
-              { latitude: userLocation[1], longitude: userLocation[0] }
-            );
+            const dispensaryCoordinates = item?.dispensaryId?.location?.coordinates;
+
+// Check if coordinates are valid, otherwise show a fallback or default behavior
+let distance = null;
+if (dispensaryCoordinates?.length === 2) {
+  distance = getDistance(
+    { latitude: dispensaryCoordinates[1], longitude: dispensaryCoordinates[0] },
+    { latitude: userLocation[1], longitude: userLocation[0] }
+  );
+} else {
+  // Handle case when coordinates are missing, can show default message or skip calculation
+  distance = 'Location data unavailable';
+}
             return (
               <div
                 key={item._id}
