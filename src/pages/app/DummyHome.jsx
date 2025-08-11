@@ -205,18 +205,18 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
   {/* Dispensary Name and Profile Picture */}
   <div className="flex items-center space-x-2 min-w-0">
     <img
-      src={item.dispensaryId.profilePicture}
-      alt={item.dispensaryId.dispensaryName}
+      src={item?.dispensaryId?.profilePicture}
+      alt={item?.dispensaryId?.dispensaryName}
       className="w-8 h-8 rounded-full object-cover flex-shrink-0"
     />
     <div className="text-sm text-gray-700 font-semibold truncate">
-      {item.dispensaryId.dispensaryName}
+      {item?.dispensaryId?.dispensaryName}
     </div>
   </div>
 
   {/* Price */}
   <div className="text-green-600 font-semibold text-[14px] sm:text-right">
-    ${item.productPrice?.toFixed(2) || "0.0"}
+    ${item?.productPrice?.toFixed(2) || "0.0"}
   </div>
 </div>
 
