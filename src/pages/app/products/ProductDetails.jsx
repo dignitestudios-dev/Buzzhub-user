@@ -350,14 +350,14 @@ const [currentIndex, setCurrentIndex] = useState(0);
                   />
                   <div>
                     <h4 className="text-sm font-semibold">
-                      {review.productId?.productName}
+                      {review?.productId?.productName}
                     </h4>
                     <p className="text-xs text-gray-500">
-                      {review.userId.city}, {review.userId.state}
+                      {review?.userId?.city}, {review?.userId?.state}
                     </p>
                   </div>
                   <span className="ml-auto text-green-600 font-bold">
-                    ${review.productId?.productPrice}
+                    ${review?.productId?.productPrice}
                   </span>
                 </div>
                 <div className="flex mb-1">
@@ -365,22 +365,22 @@ const [currentIndex, setCurrentIndex] = useState(0);
                     <FaStar
                       key={i}
                       className={`text-yellow-500 text-xs ${
-                        i < Math.round(review.ratingNumber) ? "filled" : ""
+                        i < Math.round(review?.ratingNumber) ? "filled" : ""
                       }`}
                     />
                   ))}
                 </div>
-                <p className="text-sm text-gray-700">{review.review}</p>
+                <p className="text-sm text-gray-700">{review?.review}</p>
 
                 <div className="mt-4 flex items-center gap-2">
                   <img
-                    src={review.userId.profilePicture}
-                    alt={review.userId.fullName}
+                    src={review?.userId?.profilePicture}
+                    alt={review?.userId?.fullName}
                     className="w-8 h-8 rounded-full object-cover"
                   />
                   <div>
                     <h5 className="text-sm font-semibold text-gray-800">
-                      {review.userId.fullName}
+                      {review?.userId?.fullName}
                     </h5>
                   </div>
                 </div>
