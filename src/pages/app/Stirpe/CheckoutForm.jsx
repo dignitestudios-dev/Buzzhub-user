@@ -75,8 +75,9 @@ export default function CheckoutForm({
       ErrorToast(error.message || "Something went wrong.");
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
       SuccessToast("Payment succeeded!");
+      await handleOrderCreate();
     } else {
-      handleOrderCreate();
+      await handleOrderCreate();
     }
 
     setIsSubmitting(false);
