@@ -225,16 +225,16 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
             value={messageText}
             onChange={(e) => setMessageText(e.target.value)}
             placeholder="Type a message"
-            className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-green-600 placeholder-gray-400 text-gray-800"
+            className="flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 placeholder-gray-400 text-gray-800"
           />
           <button
             onClick={() => handleSend()}
-            className="ml-3 bg-[#1D7C42] p-4 rounded-full text-white hover:bg-green-600 transition duration-200"
+            className="ml-3 bg-[#1D7C42] p-3 rounded-md text-white hover:bg-green-600 transition duration-200"
           >
             {loading ? (
-              <FiLoader className="text-xl animate-spin" />
+              <FiLoader className="text-md animate-spin" />
             ) : (
-              <FaPaperPlane className="text-xl " />
+              <FaPaperPlane className="text-md " />
             )}
           </button>
         </div>

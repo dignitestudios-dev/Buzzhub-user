@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+ import React, { useState, useEffect } from "react";
 import { FaStar, FaHeart } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
 import { CiClock2, CiFilter } from "react-icons/ci";
@@ -13,7 +13,7 @@ import { getDistance } from 'geolib';
 const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
   const navigate = useNavigate();
 
-  const locationData = JSON.parse(localStorage.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
+  const locationData = JSON.parse(localStorage?.getItem("userData")) || JSON?.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
 
   const [place1, setPlace1] = useState({
     
@@ -26,15 +26,15 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
 
   useEffect(() => {
     setPlace1({
-      latitude: item.location.coordinates[1],  // Assuming coordinates are in [longitude, latitude]
-      longitude: item.location.coordinates[0]
+      latitude: item?.location?.coordinates[1],  // Assuming coordinates are in [longitude, latitude]
+      longitude: item?.location?.coordinates[0]
     });
 
     setPlace2({
-      latitude: locationData.location.coordinates[1],  // User's latitude
-      longitude: locationData.location.coordinates[0]   // User's longitude
+      latitude: locationData?.location?.coordinates[1],  // User's latitude
+      longitude: locationData?.location?.coordinates[0]   // User's longitude
     });
-  }, [item.location.coordinates]);
+  }, [item?.location?.coordinates]);
 
   
 
@@ -70,7 +70,7 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
       <div className="absolute top-2 right-2 z-20 bg-white p-1 rounded-full shadow-lg">
         <FaHeart
           className={`cursor-pointer ${
-            isLiked ? "text-red-500" : "text-gray-400 hover:text-red-500"
+            isLiked ? "text-red-500" : "text-gray-400 "
           }`}
           onClick={handleWishlistClick} // Trigger    wishlist action on heart click
         />
@@ -125,26 +125,32 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
 
 // Product Card Component
 const ProductCard = ({ item, addToWishlist, isLiked }) => {
+  console.log(item, "item in product card");
   const navigate = useNavigate();
 
-  const locationData = JSON.parse(localStorage.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
+  const locationData = JSON.parse(localStorage?.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
 
   const [place1, setPlace1] = useState({});
   const [place2, setPlace2] = useState({});
 
   useEffect(() => {
     // Set product's dispensary location
-    setPlace1({
-      latitude: item.dispensaryId.location.coordinates[1],  // Dispensary latitude
-      longitude: item.dispensaryId.location.coordinates[0]  // Dispensary longitude
+    if(item?.dispensaryId?.location) {
+      setPlace1({
+      latitude: item?.dispensaryId?.location?.coordinates[1],  // Dispensary latitude
+      longitude: item?.dispensaryId?.location?.coordinates[0]  // Dispensary longitude
     });
+    }
 
-    // Set user's location
+    if(locationData?.location) {
+      // Set user's location
     setPlace2({
-      latitude: locationData.location.coordinates[1],  // User's latitude
-      longitude: locationData.location.coordinates[0]   // User's longitude
+      latitude: locationData?.location?.coordinates[1],  // User's latitude
+      longitude: locationData?.location?.coordinates[0]   // User's longitude
     });
-  }, [item.dispensaryId.location.coordinates]);
+    }
+    
+  }, [item?.dispensaryId?.location?.coordinates]);
 
   // Calculate the distance between product's dispensary and user
   const distance = getDistance(place1, place2);
@@ -163,7 +169,7 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
       {/* Wishlist Icon */}
       <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
         <FaHeart
-          className={`cursor-pointer ${isLiked ? "text-red-500" : "text-gray-400 hover:text-red-500"}`}
+          className={`cursor-pointer ${isLiked ? "text-red-500" : "text-gray-400 "}`}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -195,22 +201,25 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
           {distance ? `${(distance / 1609.34).toFixed(2)} miles` : "0.0 miles"}
         </div> */}
 
-        <div className="flex items-center mt-2 justify-between">
-          {/* Dispensary Name and Profile Picture */}
-          <div className="flex items-center space-x-2">
-            <img
-              src={item.dispensaryId.profilePicture}
-              alt={item.dispensaryId.dispensaryName}
-              className="w-8 h-8 rounded-full object-cover"
-            />
-            <div className="text-sm text-gray-700 font-semibold">{item.dispensaryId.dispensaryName}</div>
-          </div>
+       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 space-y-2 sm:space-y-0">
+  {/* Dispensary Name and Profile Picture */}
+  <div className="flex items-center space-x-2 min-w-0">
+    <img
+      src={item?.dispensaryId?.profilePicture}
+      alt={item?.dispensaryId?.dispensaryName}
+      className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+    />
+    <div className="text-sm text-gray-700 font-semibold truncate">
+      {item?.dispensaryId?.dispensaryName}
+    </div>
+  </div>
 
-          {/* Price */}
-          <div className="text-green-600 font-semibold text-[14px]">
-            ${item.productPrice?.toFixed(2) || "0.0"}
-          </div>
-        </div>
+  {/* Price */}
+  <div className="text-green-600 font-semibold text-[14px] sm:text-right">
+    ${item?.productPrice?.toFixed(2) || "0.0"}
+  </div>
+</div>
+
       </div>
     </div>
   );
@@ -366,7 +375,7 @@ const DummyHome = () => {
         if (response.data.success) {
           const products = response.data.data.popularProducts || [];
           setPopularProducts(products);
-          setFilteredProducts(products);
+setFilteredProducts(products.slice(0, 2)); // Only 2 products
         } else {
           console.error("Failed to fetch popular products");
           setPopularProducts([]);
@@ -384,7 +393,7 @@ const DummyHome = () => {
         if (response.data.success) {
           const products = response.data.data.products || [];
           setProducts(products);
-          setFilteredNewProducts(products);
+          setFilteredNewProducts(products.slice(0, 2));  // Slice to only show 2 new products
 
         } else {
           console.error("Failed to fetch popular products");

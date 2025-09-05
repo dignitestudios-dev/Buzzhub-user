@@ -36,13 +36,13 @@ const Products = () => {
         params: {
           ...filterParams,
           page: 1,
-          limit: 10,
+          limit: 100,
         },
       });
 
-      if (response.data.success) {
-        setProducts(response.data.data.products || []); // Set products to empty array if no products found
-        setFilteredProducts(response.data.data.products || []); // Initially set filtered products to all fetched products
+      if (response?.data?.success) {
+        setProducts(response?.data?.data?.products || []); // Set products to empty array if no products found
+        setFilteredProducts(response?.data?.data?.products || []); // Initially set filtered products to all fetched products
       }
     } catch (error) {
       setError("Failed to fetch products");
@@ -56,8 +56,8 @@ const Products = () => {
   useEffect(() => {
     fetchProducts(); // Fetch all products without any filters or search on page load
     // Fetch user's location (e.g., from localStorage or an API)
-    const locationData = JSON.parse(localStorage.getItem("userData")) || [0, 0];
-    setUserLocation(locationData.location.coordinates || [0, 0]);
+    const locationData = JSON.parse(localStorage?.getItem("userData")) || [0, 0];
+    setUserLocation(locationData?.location?.coordinates || [0, 0]);
   }, []);
 
   // Function to handle the application of filters from FilterModal
@@ -78,8 +78,8 @@ const Products = () => {
       setFilteredProducts(products);
     } else {
       // Otherwise, filter products by name
-      const filtered = products.filter((product) =>
-        product.productName.toLowerCase().includes(query.toLowerCase())
+      const filtered = products?.filter((product) =>
+        product?.productName?.toLowerCase()?.includes(query?.toLowerCase())
       );
       setFilteredProducts(filtered);
     }
@@ -103,7 +103,7 @@ const Products = () => {
   }
 
   return (
-    <div className="w-full mx-auto bg-white min-h-screen">
+    <div className="w-full mx-auto pb-20 bg-white min-h-screen">
       <div className="flex items-center justify-between mb-8">
         <button className="text-gray-800 pr-3" onClick={handleBackClick}>
           <FiArrowLeft size={20} />
@@ -136,16 +136,24 @@ const Products = () => {
 
       {/* Products Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredProducts.length === 0 ? (
+        {filteredProducts?.length === 0 ? (
           <p className="col-span-full text-center text-gray-500">No products available</p>
         ) : (
-          filteredProducts.map((item) => {
+          filteredProducts?.map((item) => {
             // Calculate distance for each product
-            const dispensaryCoordinates = item.dispensaryId.location.coordinates;
-            const distance = getDistance(
-              { latitude: dispensaryCoordinates[1], longitude: dispensaryCoordinates[0] },
-              { latitude: userLocation[1], longitude: userLocation[0] }
-            );
+            const dispensaryCoordinates = item?.dispensaryId?.location?.coordinates;
+
+// Check if coordinates are valid, otherwise show a fallback or default behavior
+let distance = null;
+if (dispensaryCoordinates?.length === 2) {
+  distance = getDistance(
+    { latitude: dispensaryCoordinates[1], longitude: dispensaryCoordinates[0] },
+    { latitude: userLocation[1], longitude: userLocation[0] }
+  );
+} else {
+  // Handle case when coordinates are missing, can show default message or skip calculation
+  distance = 'Location data unavailable';
+}
             return (
               <div
                 key={item._id}
@@ -160,27 +168,27 @@ const Products = () => {
                   <FiHeart className="text-gray-400 hover:text-red-500 cursor-pointer" />
                 </div>
                 <img
-                  src={item.productImage[0]} // Assuming the first image in the array
-                  alt={item.productName}
+                  src={item?.productImage[0]} // Assuming the first image in the array
+                  alt={item?.productName}
                   className="w-full h-[130px] object-cover rounded-t-xl"
                 />
                 <div className="p-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-[13px] font-semibold text-gray-900">{item.productName}</h3>
+                    <h3 className="text-[13px] font-semibold text-gray-900">{item?.productName}</h3>
                     <div className="flex items-center text-sm text-yellow-500 font-semibold">
-                      <span className="mr-1">⭐</span> {item.averageRating || "0.0"}
+                      <span className="mr-1">⭐</span> {item?.averageRating || "0.0"}
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">{item.productType}</div>
+                  <div className="text-sm text-gray-500 mt-1">{item?.productType}</div>
                   <div className="flex items-center mt-1">
                     <img
-                      src={item.dispensaryId.profilePicture}
+                      src={item?.dispensaryId?.profilePicture}
                       alt="Dispensary Profile"
                       className="w-[24px] h-[24px] rounded-full object-cover mr-2"
                     />
                     <div className="flex justify-between w-full items-center">
                       <div className="text-[12px] text-green-600">Dispensary</div>
-                      <div className="text-gray-800 font-semibold text-[14px]">${item.productPrice}</div>
+                      <div className="text-gray-800 font-semibold text-[14px]">${item?.productPrice}</div>
                     </div>
                   </div>
                 </div>

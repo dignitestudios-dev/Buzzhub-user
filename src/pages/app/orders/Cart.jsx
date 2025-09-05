@@ -74,7 +74,7 @@ const Cart = () => {
     setPaymentLoading(true);
 
     try {
-      const amount = Number((subtotal * 1.02).toFixed(2)); // 2% fee
+const amount = Math.round(subtotal * 1.02 * 100); // convert to cents & round to integer
 
       const dispensaryId = [
         ...new Set(
@@ -211,11 +211,13 @@ const Cart = () => {
         </div>
         <div className="flex justify-between font-semibold text-green-700 text-base">
           <span>Total</span>
-          <span>${(subtotal * 1.02)?.toFixed(2)}</span>{" "}
+          <span>${(subtotal * 1.02)?.toFixed(2)}
+            </span>{" "}
           {/* Total me 2% add ho gaya */}
         </div>
       </div>
 
+   
       {/* Checkout Button */}
       <button
         type="button"

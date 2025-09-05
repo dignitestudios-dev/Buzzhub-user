@@ -15,20 +15,26 @@ const Dispensaries = () => {
   const navigate = useNavigate();
 
   // Fetch dispensaries data on component mount
-  useEffect(() => {
-    const fetchDispensaries = async () => {
-      try {
-        const response = await axios.get("user/get-all-dispensaries");
-        if (response.data.success) {
-          setDispensaries(response.data.data); // Store dispensary data
-          setFilteredDispensaries(response.data.data); // Initially show all dispensaries
-        } else {
-          console.log("No dispensaries found or failed to fetch");
-        }
-      } catch (error) {
-        console.error("Error fetching dispensaries:", error);
+  const fetchDispensaries = async (filterParams = {}) => {
+    try {
+      const response = await axios.get("user/get-all-dispensaries", {
+        params: {
+          ...filterParams,
+          page: 1,
+          limit: 100,
+        },
+      });
+      if (response.data.success) {
+        setDispensaries(response.data.data); // Store dispensary data
+        setFilteredDispensaries(response.data.data); // Initially show all dispensaries
+      } else {
+        console.log("No dispensaries found or failed to fetch");
       }
-    };
+    } catch (error) {
+      console.error("Error fetching dispensaries:", error);
+    }
+  };
+  useEffect(() => {
 
     fetchDispensaries(); // Call the function to fetch data
   }, []);
@@ -112,10 +118,11 @@ const Dispensaries = () => {
     });
 
     setFilteredDispensaries(filtered);
+    fetchDispensaries(appliedFilters)
   };
 
   return (
-    <div className="w-full mx-auto bg-white min-h-screen">
+    <div className="w-full mx-auto bg-white min-h-screen pb-20">
       <div className="flex items-center justify-between mb-8">
         {/* Back Button */}
         <button className="text-gray-800 pr-3" onClick={handleBackClick}>

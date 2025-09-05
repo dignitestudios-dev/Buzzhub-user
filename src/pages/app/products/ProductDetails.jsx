@@ -108,7 +108,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
     const hasDifferentDispensary =
       addtoCart.length > 0 &&
       addtoCart.some(
-        (item) => item.dispensaryId._id !== product.dispensaryId._id
+        (item) => item?.dispensaryId?._id !== product?.dispensaryId?._id
       );
 
     if (hasDifferentDispensary) {
@@ -122,7 +122,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
     try {
       const response = await axios.post("/user/add-to-cart", {
         productId: productId,
-        dispensaryId: product.dispensaryId._id,
+        dispensaryId: product?.dispensaryId?._id,
         grams: grams,
         fullfillmentMethod: DispencaryFullFillMentMethod[0],
       });
@@ -133,7 +133,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
         fetchCartItems();
         navigate("/app/cart");
       } else {
-        ErrorToast(response.data.message);
+        ErrorToast(response?.data?.message);
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
@@ -173,7 +173,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
         <div className="relative">
           <img
             src={product?.productImage[0]}
-            alt={product.productName}
+            alt={product?.productName}
             className="w-full h-64 object-cover"
           />
         </div>
@@ -182,47 +182,47 @@ const [currentIndex, setCurrentIndex] = useState(0);
           <div className="flex justify-between items-start mb-2 mt-2">
             <div>
               <h2 className="text-xl font-semibold text-gray-800">
-                {product.productName}
+                {product?.productName}
               </h2>
               <p className="text-sm text-gray-500">
                 Category:{" "}
                 <span className="font-medium text-gray-700">
-                  {product.productType}
+                  {product?.productType}
                 </span>
               </p>
               <p className="text-sm text-gray-500 mb-1">
                 Subcategory:{" "}
                 <span className="font-medium text-gray-700">
-                  {product.subTypes.join(", ")}
+                  {product?.subTypes.join(", ")}
                 </span>
               </p>
               <p className="text-green-600 font-bold text-xl mt-1">
-                ${product.productPrice}{" "}
+                ${product?.productPrice}{" "}
                 <span className="text-sm text-gray-500">/gram</span>
               </p>
               <p className="text-sm text-gray-500">
-                Total Grams : {product.weightQuantity} {product.weightType}
+                Total Grams : {product?.weightQuantity} {product?.weightType}
               </p>
             </div>
             <div className="flex items-center text-yellow-500 text-sm font-semibold">
               <FaStar className="mr-1" />
-              {product.averageRating || "N/A"}
+              {product?.averageRating || "0.0"}
             </div>
           </div>
 
           <div className="mt-6 flex justify-between items-center p-4">
             <div className="flex gap-3 items-center">
               <img
-                src={product.dispensaryId.profilePicture}
-                alt={product.dispensaryId.dispensaryName}
+                src={product?.dispensaryId?.profilePicture}
+                alt={product?.dispensaryId?.dispensaryName}
                 className="w-12 h-12 rounded-full object-cover"
               />
               <div>
                 <p className="text-sm font-semibold text-gray-800">
-                  {product.dispensaryId.dispensaryName}
+                  {product?.dispensaryId?.dispensaryName}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {product.dispensaryId.city}, {product?.dispensaryId?.state}
+                  {product?.dispensaryId?.city}, {product?.dispensaryId?.state}
                   {/* {product.dispensaryId.distance} */}
                 </p>
               </div>
@@ -235,7 +235,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
                 className="text-blue-600 text-xs underline"
                 onClick={() =>
                   navigate(
-                    `/app/dispensary-profile/${product.dispensaryId._id}`
+                    `/app/dispensary-profile/${product?.dispensaryId?._id}`
                   )
                 }
               >
@@ -292,15 +292,15 @@ const [currentIndex, setCurrentIndex] = useState(0);
                 <h4 className="text-[15px] font-semibold text-black mb-1">
                   Category
                 </h4>
-                <p className="text-[15px] text-black">{product.productType}</p>
+                <p className="text-[15px] text-black">{product?.productType}</p>
               </div>
               <div className="flex-1 pl-4">
                 <h4 className="text-[15px] font-semibold text-black mb-1">
                   Sub Category
                 </h4>
                 <p className="text-[15px] text-black">
-                  {product.subTypes && product.subTypes.length > 0
-                    ? product.subTypes.join(", ")
+                  {product?.subTypes && product?.subTypes.length > 0
+                    ? product?.subTypes.join(", ")
                     : "N/A"}
                 </p>
               </div>
@@ -329,7 +329,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
 
           {/* Product Reviews */}
          {/* Reviews */}
-<div className="px-4 mb-6">
+<div className="mt-4 mb-6">
   <h3 className="text-base font-semibold text-gray-800 mb-4">Reviews</h3>
 
   {reviews && reviews.length > 0 ? (
@@ -350,14 +350,14 @@ const [currentIndex, setCurrentIndex] = useState(0);
                   />
                   <div>
                     <h4 className="text-sm font-semibold">
-                      {review.productId?.productName}
+                      {review?.productId?.productName}
                     </h4>
                     <p className="text-xs text-gray-500">
-                      {review.userId.city}, {review.userId.state}
+                      {review?.userId?.city}, {review?.userId?.state}
                     </p>
                   </div>
                   <span className="ml-auto text-green-600 font-bold">
-                    ${review.productId?.productPrice}
+                    ${review?.productId?.productPrice}
                   </span>
                 </div>
                 <div className="flex mb-1">
@@ -365,22 +365,22 @@ const [currentIndex, setCurrentIndex] = useState(0);
                     <FaStar
                       key={i}
                       className={`text-yellow-500 text-xs ${
-                        i < Math.round(review.ratingNumber) ? "filled" : ""
+                        i < Math.round(review?.ratingNumber) ? "filled" : ""
                       }`}
                     />
                   ))}
                 </div>
-                <p className="text-sm text-gray-700">{review.review}</p>
+                <p className="text-sm text-gray-700">{review?.review}</p>
 
                 <div className="mt-4 flex items-center gap-2">
                   <img
-                    src={review.userId.profilePicture}
-                    alt={review.userId.fullName}
+                    src={review?.userId?.profilePicture}
+                    alt={review?.userId?.fullName}
                     className="w-8 h-8 rounded-full object-cover"
                   />
                   <div>
                     <h5 className="text-sm font-semibold text-gray-800">
-                      {review.userId.fullName}
+                      {review?.userId?.fullName}
                     </h5>
                   </div>
                 </div>
@@ -421,17 +421,19 @@ const [currentIndex, setCurrentIndex] = useState(0);
               View Cart
             </button>
           ) : (
-            <button
-              onClick={handleAddToCart}
-              className="w-full bg-green-600 hover:bg-green-700 transition text-white font-semibold py-3 mt-4 rounded-xl flex items-center justify-center"
-              disabled={loading} // Disable the button while loading
-            >
-              {loading ? (
-                <FiLoader className="animate-spin text-white text-2xl" />
-              ) : (
-                "Add to Cart"
-              )}
-            </button>
+           <button
+  onClick={handleAddToCart}
+  className={`w-full transition text-white font-semibold py-3 mt-4 rounded-xl flex items-center justify-center 
+    ${loading || !grams ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+  disabled={loading || !grams} // Disable if loading or grams is empty
+>
+  {loading ? (
+    <FiLoader className="animate-spin text-white text-2xl" />
+  ) : (
+    "Add to Cart"
+  )}
+</button>
+
           )}
         </div>
       </div>
