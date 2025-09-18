@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FaStar, FaHeart } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
 import { CiClock2, CiFilter } from "react-icons/ci";
@@ -7,42 +7,37 @@ import FilterModal from "./../../components/app/dashboard/FilterModal";
 import axios from "../../axios"; // Importing the axios instance
 import { ErrorToast, SuccessToast } from "../../components/global/Toaster"; // Importing Toasts
 import Loader from "../../components/global/Loader";
-import { getDistance } from 'geolib';
+import { getDistance } from "geolib";
+import { AppContext } from "../../context/AppContext";
 
 // Dispensary Card Component
 const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
   const navigate = useNavigate();
+  const { user } = useContext(AppContext);
 
-  const locationData = JSON.parse(localStorage?.getItem("userData")) || JSON?.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
+  const locationData =
+    JSON.parse(localStorage?.getItem("userData")) || JSON?.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
+  const [place1, setPlace1] = useState({});
 
-  const [place1, setPlace1] = useState({
-    
-  });
-
-  const [place2, setPlace2] = useState({
-  });
-  console.log(place2,"place2.")
-  console.log(item.location,"item.location.")
+  const [place2, setPlace2] = useState({});
 
   useEffect(() => {
-    setPlace1({
-      latitude: item?.location?.coordinates[1],  // Assuming coordinates are in [longitude, latitude]
-      longitude: item?.location?.coordinates[0]
-    });
+    if (item?.location?.coordinates && user?.location?.coordinates) {
+      setPlace1({
+        latitude: item.location.coordinates[1],
+        longitude: item.location.coordinates[0],
+      });
 
-    setPlace2({
-      latitude: locationData?.location?.coordinates[1],  // User's latitude
-      longitude: locationData?.location?.coordinates[0]   // User's longitude
-    });
-  }, [item?.location?.coordinates]);
-
-  
-
+      setPlace2({
+        latitude: user.location.coordinates[1],
+        longitude: user.location.coordinates[0],
+      });
+    }
+  }, [item?.location?.coordinates, user?.location?.coordinates]);
 
   const distance = getDistance(place1, place2);
 
   console.log("Distance between places:", distance, "meters");
-
 
   const handleCardClick = () => {
     navigate(`/app/dispensary-profile/${item._id}`);
@@ -53,7 +48,7 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
     e.stopPropagation(); // Prevent event bubbling (which might trigger card click)
     addToWishlist("dispensary", item._id); // Call the addToWishlist function for dispensary
   };
-
+  console.log(distance, "distance======MYYYY");
   return (
     <div
       className="relative cursor-pointer bg-white rounded-xl shadow hover:shadow-lg transition duration-300 
@@ -61,11 +56,10 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
       onClick={handleCardClick}
     >
       <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-  {distance 
-    ? `${(distance / 1609.34).toFixed(2)} miles` 
-    : "0.0 miles"}
-</div>
-
+        {distance
+          ? `${(distance * 0.000621371).toFixed(2)} miles`
+          : "0.0 miles"}
+      </div>
 
       <div className="absolute top-2 right-2 z-20 bg-white p-1 rounded-full shadow-lg">
         <FaHeart
@@ -127,49 +121,51 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
 const ProductCard = ({ item, addToWishlist, isLiked }) => {
   console.log(item, "item in product card");
   const navigate = useNavigate();
-
-  const locationData = JSON.parse(localStorage?.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
+  const { user } = useContext(AppContext);
+  const locationData =
+    JSON.parse(localStorage?.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
 
   const [place1, setPlace1] = useState({});
   const [place2, setPlace2] = useState({});
-
   useEffect(() => {
-    // Set product's dispensary location
-    if(item?.dispensaryId?.location) {
+    if (item?.dispensaryId?.location && user?.location?.coordinates) {
       setPlace1({
-      latitude: item?.dispensaryId?.location?.coordinates[1],  // Dispensary latitude
-      longitude: item?.dispensaryId?.location?.coordinates[0]  // Dispensary longitude
-    });
-    }
+        latitude: item?.dispensaryId?.location.coordinates[1],
+        longitude: item?.dispensaryId?.location.coordinates[0],
+      });
 
-    if(locationData?.location) {
-      // Set user's location
-    setPlace2({
-      latitude: locationData?.location?.coordinates[1],  // User's latitude
-      longitude: locationData?.location?.coordinates[0]   // User's longitude
-    });
+      setPlace2({
+        latitude: user.location.coordinates[1],
+        longitude: user.location.coordinates[0],
+      });
     }
-    
-  }, [item?.dispensaryId?.location?.coordinates]);
+  }, [item?.location?.coordinates, user?.location?.coordinates]);
 
   // Calculate the distance between product's dispensary and user
   const distance = getDistance(place1, place2);
-
+  console.log(distance, "distance");
   return (
     <div
       className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[250px] w-full h-full"
-      onClick={() => navigate(`/app/product-details/${item._id}`, { state: { dispensary: item } })}
+      onClick={() =>
+        navigate(`/app/product-details/${item._id}`, {
+          state: { dispensary: item },
+        })
+      }
     >
       {/* Location Badge */}
       <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-          {distance ? `${(distance / 1609.34).toFixed(2)} miles` : "0.0 miles"}
+        {distance
+          ? `${(distance * 0.000621371).toFixed(2)} miles`
+          : "0.0 miles"}
       </div>
-      
 
       {/* Wishlist Icon */}
       <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
         <FaHeart
-          className={`cursor-pointer ${isLiked ? "text-red-500" : "text-gray-400 "}`}
+          className={`cursor-pointer ${
+            isLiked ? "text-red-500" : "text-gray-400 "
+          }`}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -188,38 +184,41 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
       {/* Product Details */}
       <div className="p-4">
         <div className="flex justify-between items-center">
-          <h3 className="text-[13px] font-semibold text-gray-900">{item.productName}</h3>
+          <h3 className="text-[13px] font-semibold text-gray-900">
+            {item.productName}
+          </h3>
           <div className="flex items-center text-sm text-yellow-500 font-semibold">
             <FaStar className="mr-1" /> {item.averageRating || "0.0"}
           </div>
         </div>
 
-        <div className="text-sm text-gray-500 mt-1">{item.productType || "Not Specified"}</div>
+        <div className="text-sm text-gray-500 mt-1">
+          {item.productType || "Not Specified"}
+        </div>
 
         {/* Display the calculated distance */}
         {/* <div className="absolute top-2 right-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
           {distance ? `${(distance / 1609.34).toFixed(2)} miles` : "0.0 miles"}
         </div> */}
 
-       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 space-y-2 sm:space-y-0">
-  {/* Dispensary Name and Profile Picture */}
-  <div className="flex items-center space-x-2 min-w-0">
-    <img
-      src={item?.dispensaryId?.profilePicture}
-      alt={item?.dispensaryId?.dispensaryName}
-      className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-    />
-    <div className="text-sm text-gray-700 font-semibold truncate">
-      {item?.dispensaryId?.dispensaryName}
-    </div>
-  </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 space-y-2 sm:space-y-0">
+          {/* Dispensary Name and Profile Picture */}
+          <div className="flex items-center space-x-2 min-w-0">
+            <img
+              src={item?.dispensaryId?.profilePicture}
+              alt={item?.dispensaryId?.dispensaryName}
+              className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+            />
+            <div className="text-sm text-gray-700 font-semibold truncate">
+              {item?.dispensaryId?.dispensaryName}
+            </div>
+          </div>
 
-  {/* Price */}
-  <div className="text-green-600 font-semibold text-[14px] sm:text-right">
-    ${item?.productPrice?.toFixed(2) || "0.0"}
-  </div>
-</div>
-
+          {/* Price */}
+          <div className="text-green-600 font-semibold text-[14px] sm:text-right">
+            ${item?.productPrice?.toFixed(2) || "0.0"}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -295,8 +294,6 @@ const Section = ({
   );
 };
 
-
-
 // Main Home Component
 const DummyHome = () => {
   const [nearbyDispensaries, setNearbyDispensaries] = useState([]);
@@ -313,8 +310,6 @@ const DummyHome = () => {
   const [products, setProducts] = useState([]); // Loading state
   const [likedDispensaries, setLikedDispensaries] = useState([]);
   const [likedProducts, setLikedProducts] = useState([]);
-
-
 
   const fetchWishlist = async () => {
     try {
@@ -375,7 +370,7 @@ const DummyHome = () => {
         if (response.data.success) {
           const products = response.data.data.popularProducts || [];
           setPopularProducts(products);
-setFilteredProducts(products.slice(0, 2)); // Only 2 products
+          setFilteredProducts(products.slice(0, 2)); // Only 2 products
         } else {
           console.error("Failed to fetch popular products");
           setPopularProducts([]);
@@ -393,8 +388,7 @@ setFilteredProducts(products.slice(0, 2)); // Only 2 products
         if (response.data.success) {
           const products = response.data.data.products || [];
           setProducts(products);
-          setFilteredNewProducts(products.slice(0, 2));  // Slice to only show 2 new products
-
+          setFilteredNewProducts(products.slice(0, 2)); // Slice to only show 2 new products
         } else {
           console.error("Failed to fetch popular products");
           setProducts([]);
@@ -404,8 +398,8 @@ setFilteredProducts(products.slice(0, 2)); // Only 2 products
         console.error("Error fetching popular products:", error);
         setProducts([]);
         setFilteredNewProducts([]);
-      }finally{
-         setLoading(false);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -419,35 +413,34 @@ setFilteredProducts(products.slice(0, 2)); // Only 2 products
   }, []);
 
   // Handle search input change and filter results
- const handleSearchChange = (event) => {
-  const query = event.target.value.toLowerCase();
-  setSearchQuery(query);
+  const handleSearchChange = (event) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
 
-  // Filter dispensaries
-  const filteredDispensaries = nearbyDispensaries.filter(
-    (dispensary) =>
-      dispensary.dispensaryName.toLowerCase().includes(query) ||
-      dispensary.city.toLowerCase().includes(query)
-  );
-  setFilteredDispensaries(filteredDispensaries);
+    // Filter dispensaries
+    const filteredDispensaries = nearbyDispensaries.filter(
+      (dispensary) =>
+        dispensary.dispensaryName.toLowerCase().includes(query) ||
+        dispensary.city.toLowerCase().includes(query)
+    );
+    setFilteredDispensaries(filteredDispensaries);
 
-  // Filter products
-  const filteredProducts = popularProducts.filter(
-    (product) =>
-      product.productName.toLowerCase().includes(query) ||
-      product.productType.toLowerCase().includes(query)
-  );
-  setFilteredProducts(filteredProducts);
+    // Filter products
+    const filteredProducts = popularProducts.filter(
+      (product) =>
+        product.productName.toLowerCase().includes(query) ||
+        product.productType.toLowerCase().includes(query)
+    );
+    setFilteredProducts(filteredProducts);
 
-  // Filter new products
-  const filteredNewProducts = products.filter(
-    (product) =>
-      product.productName.toLowerCase().includes(query) ||
-      product.productType.toLowerCase().includes(query)
-  );
-  setFilteredNewProducts(filteredNewProducts);
-};
-
+    // Filter new products
+    const filteredNewProducts = products.filter(
+      (product) =>
+        product.productName.toLowerCase().includes(query) ||
+        product.productType.toLowerCase().includes(query)
+    );
+    setFilteredNewProducts(filteredNewProducts);
+  };
 
   // Function to handle adding/removing from wishlist
   const addToWishlist = async (type, id) => {

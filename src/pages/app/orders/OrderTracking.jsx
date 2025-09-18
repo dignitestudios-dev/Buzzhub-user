@@ -10,7 +10,7 @@ const OrderTracking = () => {
   const order = location?.state?.order?.state?.order;
   const orderDetails = location?.state?.orderDetails;
   const { dispensaryId, products } = location.state || {};
-  console.log("orderDetails -- > ", orderDetails, "order -- > ", order);
+
 
   // Define the order statuses for progression
   const statuses = [

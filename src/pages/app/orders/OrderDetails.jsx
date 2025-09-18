@@ -17,8 +17,7 @@ const OrderDetails = () => {
   const { id } = useParams();
   const location = useLocation();
   const { order } = location?.state || {};
-  console.log(order, "orderorderorder");
-  // Fetch order details from the API
+
 
   const fetchOrderDetails = async () => {
     setLoading(true);

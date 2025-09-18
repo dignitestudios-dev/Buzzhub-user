@@ -14,6 +14,7 @@ export const AppContextProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fcmToken, setFcmToken] = useState("");
+  const [user, setUser] = useState(null);
   const fetchCartItems = async () => {
     try {
       const response = await axios.get("user/get-cart-items");
@@ -51,6 +52,24 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get("/user/get-my-profile");
+      if (response?.data?.success) {
+        setUser(response?.data?.data);
+      } else {
+        console.error("Failed to fetch profile");
+      }
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
   useEffect(() => {
     getNotification();
   }, []);
@@ -64,7 +83,6 @@ export const AppContextProvider = ({ children }) => {
       const fcmTokenResponse = await getFCMToken();
       setFcmToken(fcmTokenResponse);
     } catch (err) {
-   
       ErrorToast(err);
     }
   };
@@ -77,12 +95,12 @@ export const AppContextProvider = ({ children }) => {
     const listenForMessages = async () => {
       try {
         const payload = await onMessageListener();
-     
+
         NotificationToast({
           title: payload.notification?.title,
           message: payload.notification?.body,
         });
-        getNotification(); 
+        getNotification();
       } catch (err) {
         console.log("onMessageListener failed:", err);
       }
@@ -100,6 +118,7 @@ export const AppContextProvider = ({ children }) => {
         notifications,
         loading,
         fcmToken,
+        user,
       }}
     >
       {children}
