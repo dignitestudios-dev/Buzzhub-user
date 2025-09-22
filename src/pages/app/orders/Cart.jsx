@@ -15,7 +15,8 @@ const Cart = () => {
   const [deletingItem, setDeletingItem] = useState(null); // Track the item being deleted
   const [paymentLoading, setPaymentLoading] = useState(false);
 
-  const { setAddToCart, addtoCart, setUpdate } = useContext(AppContext);
+  const { setAddToCart, addtoCart, setUpdate, addtoCartId } =
+    useContext(AppContext);
   const handleRemove = async (item) => {
     const productId = item.productId._id;
 
@@ -44,22 +45,44 @@ const Cart = () => {
     }
   };
 
-  const handleAddGrams = (id) => {
-    setAddToCart((prev) =>
-      prev.map((item) =>
-        item._id === id ? { ...item, grams: (item.grams || 1) + 1 } : item
-      )
-    );
+  // ✅ Update grams in backend// ✅ Update grams in backend
+  const updateGrams = async (item, grams) => {
+    try {
+      const response = await axios.post("/user/add-to-cart", {
+        cartId: addtoCartId._id, // cart item id
+        productId: item.productId._id, // product id
+        dispensaryId: item.dispensaryId._id, // dispensary id
+        grams, // updated grams
+      });
+
+      if (response.data.success) {
+        setAddToCart((prev) =>
+          prev.map((cartItem) =>
+            cartItem._id === item._id ? { ...cartItem, grams } : cartItem
+          )
+        );
+        setUpdate((prev) => !prev); // refresh if needed
+      } else {
+        ErrorToast("Failed to update quantity. Try again!");
+      }
+    } catch (err) {
+      console.error("Update grams error:", err);
+      ErrorToast("Something went wrong while updating grams.");
+    }
   };
 
-  const handleReduceGrams = (id) => {
-    setAddToCart((prev) =>
-      prev.map((item) =>
-        item._id === id && item.grams > 1
-          ? { ...item, grams: item.grams - 1 }
-          : item
-      )
-    );
+  // ✅ Increment
+  const handleAddGrams = (item) => {
+    const newGrams = (item.grams || 1) + 1;
+    updateGrams(item, newGrams);
+  };
+
+  // ✅ Decrement
+  const handleReduceGrams = (item) => {
+    if (item.grams > 1) {
+      const newGrams = item.grams - 1;
+      updateGrams(item, newGrams);
+    }
   };
 
   const subtotal = addtoCart?.reduce(
@@ -74,7 +97,7 @@ const Cart = () => {
     setPaymentLoading(true);
 
     try {
-const amount = Math.round(subtotal * 1.02 * 100); // convert to cents & round to integer
+      const amount = Math.round(subtotal * 1.02 * 100); // convert to cents & round to integer
 
       const dispensaryId = [
         ...new Set(
@@ -106,21 +129,22 @@ const amount = Math.round(subtotal * 1.02 * 100); // convert to cents & round to
       setPaymentLoading(false);
     }
   };
- const handleBackClick = () => {
+  const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
+  console.log(addtoCart, "addtoCart");
   const isDisabled = addtoCart.length === 0 || paymentLoading;
   return (
     <div className="w-full mx-auto bg-white min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-              <button className="text-gray-800 pr-3" onClick={handleBackClick}>
-                <FiArrowLeft size={20} />
-              </button>
-              <h3 className="text-[16px] lg:text-xl font-semibold text-gray-800 mx-auto sm:mx-0 sm:flex-1 sm:text-left">
-                Cart  
-              </h3>
-            </div>
+        <button className="text-gray-800 pr-3" onClick={handleBackClick}>
+          <FiArrowLeft size={20} />
+        </button>
+        <h3 className="text-[16px] lg:text-xl font-semibold text-gray-800 mx-auto sm:mx-0 sm:flex-1 sm:text-left">
+          Cart
+        </h3>
+      </div>
 
       {/* Cart Items */}
       <div className="space-y-4 mb-6">
@@ -173,9 +197,9 @@ const amount = Math.round(subtotal * 1.02 * 100); // convert to cents & round to
                 {/* Gram Control Buttons BELOW Delete */}
                 {/* Gram Control Buttons BELOW Delete */}
                 {/* Gram Control Buttons BELOW Delete */}
-                <div className="flex items-center mt-4  p-1 border border-gray-400 rounded-md">
+                <div className="flex items-center mt-4 p-1 border border-gray-400 rounded-md">
                   <button
-                    onClick={() => handleReduceGrams(item._id)} // Call the handleReduceGrams function when minus button is clicked
+                    onClick={() => handleReduceGrams(item)}
                     className="w-6 h-6 sm:w-7 sm:h-7 bg-[#1D7C42] text-white text-xs sm:text-sm pb-0.5 font-bold rounded-md"
                   >
                     -
@@ -184,7 +208,7 @@ const amount = Math.round(subtotal * 1.02 * 100); // convert to cents & round to
                     {item.grams || 1} gram{item.grams > 1 ? "s" : ""}
                   </span>
                   <button
-                    onClick={() => handleAddGrams(item._id)}
+                    onClick={() => handleAddGrams(item)}
                     className="w-6 h-6 sm:w-7 sm:h-7 bg-[#1D7C42] text-white text-xs sm:text-sm pb-0.5 font-bold rounded-md"
                   >
                     +
@@ -211,13 +235,11 @@ const amount = Math.round(subtotal * 1.02 * 100); // convert to cents & round to
         </div>
         <div className="flex justify-between font-semibold text-green-700 text-base">
           <span>Total</span>
-          <span>${(subtotal * 1.02)?.toFixed(2)}
-            </span>{" "}
+          <span>${(subtotal * 1.02)?.toFixed(2)}</span>{" "}
           {/* Total me 2% add ho gaya */}
         </div>
       </div>
 
-   
       {/* Checkout Button */}
       <button
         type="button"

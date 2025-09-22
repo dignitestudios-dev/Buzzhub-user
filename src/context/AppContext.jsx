@@ -9,6 +9,7 @@ export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
   const [addtoCart, setAddToCart] = useState([]);
+  const [addtoCartId, setAddToCartId] = useState([]);
   const [update, setUpdate] = useState(false);
   const [message, setMessage] = useState("");
   const [notifications, setNotifications] = useState([]);
@@ -21,6 +22,7 @@ export const AppContextProvider = ({ children }) => {
 
       if (response.status === 200) {
         setAddToCart(response?.data?.data?.items);
+        setAddToCartId(response?.data?.data);
       }
     } catch (error) {
       if (error?.status === 404) {
@@ -119,6 +121,7 @@ export const AppContextProvider = ({ children }) => {
         loading,
         fcmToken,
         user,
+        addtoCartId,
       }}
     >
       {children}
