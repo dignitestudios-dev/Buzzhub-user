@@ -119,7 +119,7 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
 
 // Product Card Component
 const ProductCard = ({ item, addToWishlist, isLiked }) => {
-  console.log(item, "item in product card");
+
   const navigate = useNavigate();
   const { user } = useContext(AppContext);
   const locationData =

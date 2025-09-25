@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FiArrowLeft, FiHeart, FiSearch } from "react-icons/fi";
 import { CiFilter } from "react-icons/ci";
 import { useNavigate } from "react-router";
 import FilterModal from "../../../components/app/dashboard/FilterModal"; // Adjust the import path as necessary
 import axios from "../../../axios"; // Assuming you have a custom axios instance for API calls
 import { ErrorToast, SuccessToast } from "../../../components/global/Toaster";
+import { AppContext } from "../../../context/AppContext";
+import { getDistance } from "geolib";
 
 const Dispensaries = () => {
   const [dispensaries, setDispensaries] = useState([]); // State for storing dispensaries data
@@ -35,7 +37,6 @@ const Dispensaries = () => {
     }
   };
   useEffect(() => {
-
     fetchDispensaries(); // Call the function to fetch data
   }, []);
 
@@ -97,7 +98,10 @@ const Dispensaries = () => {
       let isMatch = true;
 
       // Check fulfillment method
-      if (appliedFilters.fulfillmentMethod && dispensary.fulfillmentMethod !== appliedFilters.fulfillmentMethod) {
+      if (
+        appliedFilters.fulfillmentMethod &&
+        dispensary.fulfillmentMethod !== appliedFilters.fulfillmentMethod
+      ) {
         isMatch = false;
       }
 
@@ -110,7 +114,10 @@ const Dispensaries = () => {
       }
 
       // Check ratings (assuming dispensary has a `rating` property)
-      if (appliedFilters.productRating && dispensary.rating < appliedFilters.productRating) {
+      if (
+        appliedFilters.productRating &&
+        dispensary.rating < appliedFilters.productRating
+      ) {
         isMatch = false;
       }
 
@@ -118,9 +125,25 @@ const Dispensaries = () => {
     });
 
     setFilteredDispensaries(filtered);
-    fetchDispensaries(appliedFilters)
+    fetchDispensaries(appliedFilters);
   };
+  const { user } = useContext(AppContext);
+  const locationData =
+    JSON.parse(localStorage?.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
 
+  const [place1, setPlace1] = useState({});
+  const [place2, setPlace2] = useState({});
+  useEffect(() => {
+    if (user?.location?.coordinates) {
+      setPlace2({
+        latitude: user.location.coordinates[1],
+        longitude: user.location.coordinates[0],
+      });
+    }
+  }, [user?.location?.coordinates]);
+
+  // Calculate the distance between product's dispensary and user
+  const distance = getDistance(place1, place2);
   return (
     <div className="w-full mx-auto bg-white min-h-screen pb-20">
       <div className="flex items-center justify-between mb-8">
@@ -163,19 +186,23 @@ const Dispensaries = () => {
       {/* Dispensary Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredDispensaries.length === 0 ? (
-          <p className="col-span-full text-center text-gray-500">No dispensaries available</p>
+          <p className="col-span-full text-center text-gray-500">
+            No dispensaries available
+          </p>
         ) : (
           filteredDispensaries.map((dispensary) => (
             <div
               key={dispensary._id}
               className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[212px] w-full h-full"
-              onClick={() =>
-                navigate(`/app/dispensary-profile/${dispensary._id}`) // Navigate to dispensary profile with dispensaryId
+              onClick={
+                () => navigate(`/app/dispensary-profile/${dispensary._id}`) // Navigate to dispensary profile with dispensaryId
               }
             >
-              {/* <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-                {dispensary.deliveryRadius} Miles Away
-              </div> */}
+              <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
+                {distance
+                  ? `${(distance * 0.000621371).toFixed(2)} miles`
+                  : "0.0 miles"}
+              </div>
 
               <div
                 onClick={(e) => {
