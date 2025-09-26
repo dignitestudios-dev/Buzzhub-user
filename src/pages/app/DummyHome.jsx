@@ -37,8 +37,6 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
 
   const distance = getDistance(place1, place2);
 
-  console.log("Distance between places:", distance, "meters");
-
   const handleCardClick = () => {
     navigate(`/app/dispensary-profile/${item._id}`);
   };
@@ -119,7 +117,6 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
 
 // Product Card Component
 const ProductCard = ({ item, addToWishlist, isLiked }) => {
-
   const navigate = useNavigate();
   const { user } = useContext(AppContext);
   const locationData =
@@ -141,9 +138,12 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
     }
   }, [item?.location?.coordinates, user?.location?.coordinates]);
 
-  // Calculate the distance between product's dispensary and user
   const distance = getDistance(place1, place2);
+
+  
   console.log(distance, "distance");
+
+
   return (
     <div
       className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[250px] w-full h-full"

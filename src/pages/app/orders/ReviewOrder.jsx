@@ -1,11 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import StripeCheckout from "../Stirpe/StripeCheckout";
 import ModalWrapper from "../Stirpe/ModalWrapper";
+import {
+  Autocomplete,
+  LoadScript,
+  useLoadScript,
+} from "@react-google-maps/api";
+const libraries = ["places"];
 
 const ReviewOrder = () => {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const [cartData, setCartData] = useState(state?.addtoCart || []);
   const [fulfillmentMethod, setFulfillmentMethod] = useState("Delivery");
   const [isStripe, setIsStripe] = useState(false);
@@ -15,15 +22,39 @@ const ReviewOrder = () => {
     front: "",
     back: "",
   });
-  console.log(cartData, "cartData");
+
   const [drivingLicense, setDrivingLicense] = useState({
     front: "",
     back: "",
   });
   const [phoneNumber, setPhoneNumber] = useState("");
 
-  const navigate = useNavigate();
+  const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
 
+  const autocompleteRef = useRef(null);
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+    libraries,
+  });
+
+  const handlePlaceChanged = () => {
+    if (autocompleteRef.current) {
+      const place = autocompleteRef.current.getPlace();
+      if (place.formatted_address) {
+        setShippingAddress(place.formatted_address);
+      }
+
+      if (place.geometry?.location) {
+        setCoordinates({
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        });
+      }
+
+      console.log("Selected place:", place);
+    }
+  };
   const handleBackClick = () => {
     navigate(-1);
   };
@@ -99,19 +130,29 @@ const ReviewOrder = () => {
               />
               Self Pickup
             </label>
+
             {fulfillmentMethod === "Delivery" && (
               <>
                 <span className="font-medium block mb-1 mt-2">
                   Shipping Address
                 </span>
                 <div className="p-1 rounded-xl text-sm space-y-2">
-                  <input
-                    type="text"
-                    value={shippingAddress}
-                    onChange={(e) => setShippingAddress(e.target.value)}
-                    className="w-full text-gray-700 p-2 rounded-md border"
-                    placeholder="Enter your delivery address"
-                  />
+                  {isLoaded && (
+                    <Autocomplete
+                      onLoad={(autocomplete) =>
+                        (autocompleteRef.current = autocomplete)
+                      }
+                      onPlaceChanged={handlePlaceChanged}
+                    >
+                      <input
+                        type="text"
+                        value={shippingAddress}
+                        onChange={(e) => setShippingAddress(e.target.value)}
+                        className="w-full text-gray-700 p-2 rounded-md border"
+                        placeholder="Enter your delivery address"
+                      />
+                    </Autocomplete>
+                  )}
                 </div>
               </>
             )}
@@ -133,18 +174,27 @@ const ReviewOrder = () => {
       </div>
       {/* Conditionally render Shipping Address */}
       {cartDataFullMethod[0] === "Deliver at home" && (
-        <>
+        <div>
           <span className="font-medium block mb-1 mt-2">Shipping Address</span>
           <div className="p-1 rounded-xl text-sm space-y-2">
-            <input
-              type="text"
-              value={shippingAddress}
-              onChange={(e) => setShippingAddress(e.target.value)}
-              className="w-full text-gray-700 p-2 rounded-md border"
-              placeholder="Enter your delivery address"
-            />
+            {isLoaded && (
+              <Autocomplete
+                onLoad={(autocomplete) =>
+                  (autocompleteRef.current = autocomplete)
+                }
+                onPlaceChanged={handlePlaceChanged}
+              >
+                <input
+                  type="text"
+                  value={shippingAddress}
+                  onChange={(e) => setShippingAddress(e.target.value)}
+                  className="w-full text-gray-700 p-2 rounded-md border"
+                  placeholder="Enter your delivery address"
+                />
+              </Autocomplete>
+            )}
           </div>
-        </>
+        </div>
       )}
 
       {cartDataFullMethod[0] === "Self Pickup" && (

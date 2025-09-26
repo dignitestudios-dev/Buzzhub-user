@@ -133,8 +133,13 @@ const Dispensaries = () => {
 
   const [place1, setPlace1] = useState({});
   const [place2, setPlace2] = useState({});
+
   useEffect(() => {
     if (user?.location?.coordinates) {
+      setPlace1({
+        latitude: user.location.coordinates[1],
+        longitude: user.location.coordinates[0],
+      });
       setPlace2({
         latitude: user.location.coordinates[1],
         longitude: user.location.coordinates[0],
@@ -144,6 +149,7 @@ const Dispensaries = () => {
 
   // Calculate the distance between product's dispensary and user
   const distance = getDistance(place1, place2);
+  console.log(dispensaries, "dispensaries");
   return (
     <div className="w-full mx-auto bg-white min-h-screen pb-20">
       <div className="flex items-center justify-between mb-8">
@@ -190,47 +196,70 @@ const Dispensaries = () => {
             No dispensaries available
           </p>
         ) : (
-          filteredDispensaries.map((dispensary) => (
-            <div
-              key={dispensary._id}
-              className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[212px] w-full h-full"
-              onClick={
-                () => navigate(`/app/dispensary-profile/${dispensary._id}`) // Navigate to dispensary profile with dispensaryId
-              }
-            >
-              <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-                {distance
-                  ? `${(distance * 0.000621371).toFixed(2)} miles`
-                  : "0.0 miles"}
-              </div>
+          filteredDispensaries.map((dispensary) => {
+            let distance = 0;
 
+            if (
+              dispensary?.location?.coordinates &&
+              user?.location?.coordinates
+            ) {
+              const place1 = {
+                latitude: dispensary.location.coordinates[1],
+                longitude: dispensary.location.coordinates[0],
+              };
+
+              const place2 = {
+                latitude: user.location.coordinates[1],
+                longitude: user.location.coordinates[0],
+              };
+
+              distance = getDistance(place1, place2); // in meters
+            }
+
+            return (
               <div
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent navigating to profile
-                  handleWishlistClick("dispensary", dispensary._id); // Handle wishlist click
-                }}
-                className="absolute top-2 right-2 bg-white p-1 rounded-full shadow cursor-pointer"
+                key={dispensary._id}
+                className="relative bg-white rounded-xl shadow-lg hover:shadow-xl transition duration-300 min-w-[168px] min-h-[212px] w-full h-full"
+                onClick={() =>
+                  navigate(`/app/dispensary-profile/${dispensary._id}`)
+                }
               >
-                <FiHeart className="text-gray-400 hover:text-red-500" />
-              </div>
+                {/* Distance Badge */}
+                <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
+                  {distance
+                    ? `${(distance / 1000).toFixed(2)} km` // OR convert to miles
+                    : "N/A"}
+                </div>
 
-              <img
-                src={dispensary.profilePicture}
-                alt={dispensary.dispensaryName}
-                className="w-full h-[130px] object-cover rounded-t-xl"
-              />
-              <div className="p-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-[13px] font-semibold text-gray-900">
-                    {dispensary.dispensaryName}
-                  </h3>
+                {/* Wishlist Button */}
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleWishlistClick("dispensary", dispensary._id);
+                  }}
+                  className="absolute top-2 right-2 bg-white p-1 rounded-full shadow cursor-pointer"
+                >
+                  <FiHeart className="text-gray-400 hover:text-red-500" />
                 </div>
-                <div className="text-sm text-gray-500 mt-1">
-                  {dispensary.fulfillmentMethod}
+
+                <img
+                  src={dispensary.profilePicture}
+                  alt={dispensary.dispensaryName}
+                  className="w-full h-[130px] object-cover rounded-t-xl"
+                />
+                <div className="p-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-[13px] font-semibold text-gray-900">
+                      {dispensary.dispensaryName}
+                    </h3>
+                  </div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {dispensary.fulfillmentMethod}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
