@@ -134,7 +134,7 @@ const ReviewOrder = () => {
             {fulfillmentMethod === "Delivery" && (
               <>
                 <span className="font-medium block mb-1 mt-2">
-                  Shipping Address
+                  Enter Your Location
                 </span>
                 <div className="p-1 rounded-xl text-sm space-y-2">
                   {isLoaded && (
@@ -149,10 +149,22 @@ const ReviewOrder = () => {
                         value={shippingAddress}
                         onChange={(e) => setShippingAddress(e.target.value)}
                         className="w-full text-gray-700 p-2 rounded-md border"
-                        placeholder="Enter your delivery address"
+                        placeholder="Enter Your Location"
                       />
                     </Autocomplete>
                   )}
+                </div>
+                <div className="p-1 rounded-xl text-sm space-y-2">
+                  <span className="font-medium block mb-1 mt-2">
+                  Enter Your Complete Address
+                  </span>
+                  <input
+                    type="text"
+                    // value={shippingAddress}
+                    // onChange={(e) => setShippingAddress(e.target.value)}
+                    className="w-full text-gray-700 p-2 rounded-md border"
+                    placeholder="Enter Your Complete Address including House No"
+                  />
                 </div>
               </>
             )}

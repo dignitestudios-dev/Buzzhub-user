@@ -56,6 +56,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
   const DispencaryFullFillMentMethod = dispencary?.map(
     (item) => item?.fulfillmentMethod
   );
+  console.log(product,"productproductproduct")
   // Fetch product details from API
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -65,7 +66,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
         });
 
         if (response.data.success) {
-          setProduct(response.data.data.products);
+          setProduct(response?.data?.data?.products);
           setReviews(response.data.data.reviews || []); // Initialize reviews state
         } else {
           console.error("Failed to fetch product details");
@@ -124,7 +125,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
         productId: productId,
         dispensaryId: product?.dispensaryId?._id,
         grams: grams,
-        fullfillmentMethod: DispencaryFullFillMentMethod[0],
+        fullfillmentMethod: product?.dispensaryId?.fulfillmentMethod,
       });
 
       if (response.status === 200) {
@@ -227,6 +228,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
                 </p>
               </div>
             </div>
+            {console.log(product, "product")}
             <div className="text-right">
               <p className="text-red-500 text-sm font-semibold">
                 {product?.fullfillmentMethod}

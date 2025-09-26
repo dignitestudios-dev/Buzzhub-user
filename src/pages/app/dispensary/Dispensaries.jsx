@@ -227,8 +227,8 @@ const Dispensaries = () => {
                 {/* Distance Badge */}
                 <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
                   {distance
-                    ? `${(distance / 1000).toFixed(2)} km` // OR convert to miles
-                    : "N/A"}
+                    ? `${(distance * 0.000621371).toFixed(2)} miles`
+                    : "0.0 miles"}
                 </div>
 
                 {/* Wishlist Button */}

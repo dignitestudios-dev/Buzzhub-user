@@ -69,6 +69,8 @@ const OrderDetails = () => {
     orderUvid,
     createdAt,
     phoneNumber,
+    rejectionReason
+
   } = orderDetails || {};
   const totalAmount = order?.state?.order?.products
     ? order.state.order.products.reduce((sum, product) => {
@@ -77,7 +79,7 @@ const OrderDetails = () => {
         return sum + price * weight;
       }, 0)
     : 0;
-
+console.log(rejectionReason,"rejectionReason")
   const handleTrackOrderClick = () => {
     navigate(`/app/order-tracking/${id}`, {
       state: { order: order, orderDetails: orderDetails },
@@ -172,7 +174,7 @@ const OrderDetails = () => {
         </div>
 
         {/* Status */}
-        <div className="flex justify-between text-gray-600">
+        <div className="flex justify-between border-b pb-3 text-gray-600">
           <span className="font-medium">Status</span>
           <span
             className={`font-semibold ${
@@ -185,6 +187,10 @@ const OrderDetails = () => {
           >
             {orderStatus}
           </span>
+        </div>
+        <div className="flex justify-between border-b pb-3 text-gray-600">
+          <span className="font-medium">Rejection Reason</span>
+          <span className="text-gray-900">{rejectionReason || "N/A"}</span>
         </div>
       </div>
 
