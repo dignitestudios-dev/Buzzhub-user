@@ -22,7 +22,7 @@ const ReviewOrder = () => {
     front: "",
     back: "",
   });
-
+  const [completeAddress, setCompleteAddress] = useState("");
   const [drivingLicense, setDrivingLicense] = useState({
     front: "",
     back: "",
@@ -156,12 +156,12 @@ const ReviewOrder = () => {
                 </div>
                 <div className="p-1 rounded-xl text-sm space-y-2">
                   <span className="font-medium block mb-1 mt-2">
-                  Enter Your Complete Address
+                    Enter Your Complete Address
                   </span>
                   <input
                     type="text"
-                    // value={shippingAddress}
-                    // onChange={(e) => setShippingAddress(e.target.value)}
+                    value={completeAddress}
+                    onChange={(e) => setCompleteAddress(e.target.value)}
                     className="w-full text-gray-700 p-2 rounded-md border"
                     placeholder="Enter Your Complete Address including House No"
                   />
@@ -343,6 +343,7 @@ const ReviewOrder = () => {
             shippingAddress={
               shippingAddress ? shippingAddress : userData?.streetAddress
             }
+            completeAddress={completeAddress}
             phoneNumber={phoneNumber}
           />
         </ModalWrapper>

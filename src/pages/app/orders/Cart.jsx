@@ -132,7 +132,7 @@ const Cart = () => {
   const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
-  console.log(addtoCart, "addtoCart");
+  
   const isDisabled = addtoCart.length === 0 || paymentLoading;
   return (
     <div className="w-full mx-auto bg-white min-h-screen">
@@ -219,7 +219,16 @@ const Cart = () => {
           ))
         )}
       </div>
-
+      {addtoCart?.length !== 0 && (
+        <div className="flex justify-end mb-6">
+          <button
+            onClick={() => navigate("/app/dashboard")} // Navigate to dashboard on click
+            className="w-[150px] h-[44px] bg-[#1D7C42] text-white text-xs sm:text-sm pb-0.5 font-bold rounded-md"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      )}
       {/* Additional Details */}
 
       {/* Billing Summary */}

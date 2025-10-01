@@ -10,7 +10,8 @@ export default function StripeCheckout({
   products,
   shippingAddress,
   paymentIntentId,
-  phoneNumber
+  phoneNumber,
+  completeAddress
 }) {
   const [stripePromise, setStripePromise] = useState(null);
   const publishableKey = import.meta.env.VITE_APP_STRIPE_API_KEY;
@@ -51,6 +52,7 @@ export default function StripeCheckout({
   return (
     <Elements stripe={stripePromise} options={elementsOptions}>
       <CheckoutForm
+      completeAddress={completeAddress}
         dispensaryId={dispensaryId}
         products={products}
         stripeAccountId={stripeAccountId}

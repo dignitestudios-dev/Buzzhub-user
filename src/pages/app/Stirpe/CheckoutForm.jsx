@@ -19,6 +19,7 @@ export default function CheckoutForm({
   stripeAccountId,
   paymentIntentId,
   phoneNumber,
+  completeAddress
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -34,6 +35,7 @@ export default function CheckoutForm({
     dispensaryId: dispensaryId,
     products: product,
     shippingAddress: shippingAddress,
+    completeShippingAddress: completeAddress,
     phoneNumber: phoneNumber,
     client_secret: clientSecret,
     stripeAccountId: stripeAccountId,
@@ -70,7 +72,7 @@ export default function CheckoutForm({
       },
       redirect: "if_required", // keep user on-page for card payments
     });
-    console.log(paymentIntent, "paymentIntent=>");
+    
     if (error) {
       ErrorToast(error.message || "Something went wrong.");
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
