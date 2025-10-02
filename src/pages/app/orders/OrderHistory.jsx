@@ -49,14 +49,18 @@ const OrderHistory = () => {
               ? "Pickup"
               : "Delivery",
           dispensaryName: order?.dispensaryDetails?.dispensaryName,
+          dispensarycreateAt: order?.createdAt,
           dispensaryProfile: order?.dispensaryDetails?.profilePicture,
           dispensarycity: order?.dispensaryDetails?.city,
           dispensarystate: order?.dispensaryDetails?.state,
           dispensarystreetAddress: order?.dispensaryDetails?.streetAddress,
           dispensarystreetuid: order?.dispensaryDetails?.uid,
         }));
-
-        setOrders(mappedOrders);
+        const sortedOrders = mappedOrders?.sort(
+          (a, b) =>
+            new Date(b.dispensarycreateAt) - new Date(a.dispensarycreateAt)
+        );
+        setOrders(sortedOrders);
       }
     } catch (error) {
       console.error("Failed to fetch orders", error);
@@ -161,7 +165,6 @@ const OrderHistory = () => {
               key={i}
               className="rounded-2xl p-3 shadow-sm bg-[#F9FAFA] border border-[#E5E5E5]"
             >
-              {console.log(order,"order ==>")}
               {/* Order ID + Status */}
               <div className="flex justify-between items-center mb-2 border-b pb-2">
                 <p className="text-sm text-[#1D7C42] font-medium">
@@ -210,9 +213,17 @@ const OrderHistory = () => {
                           {order.dispensarycity}, {order.dispensarystate}
                         </span>
                       </div>
-                      {/* <span className="text-xs text-gray-400 italic">
-                        Includes 2% platform fee
-                      </span> */}
+                      <div className=" pb-3 text-gray-600">
+                        <span className="text-gray-900">
+                          {new Date(order?.dispensarycreateAt).toLocaleString(
+                            "en-US",
+                            {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            }
+                          )}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -223,7 +234,7 @@ const OrderHistory = () => {
               {/* Buttons */}
               <div className="flex justify-end items-center gap-2 mt-2">
                 {/* Track order button - Only shown if order status matches one of the specified statuses */}
-               
+
                 {/* Order Details button */}
                 <button
                   onClick={() =>

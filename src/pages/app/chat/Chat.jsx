@@ -18,9 +18,7 @@ const mockChats = [
     name: "Mark Wayne",
     lastMessage: "Can you send the file?",
     avatar: "https://i.pravatar.cc/100?img=12",
-    messages: [
-      { id: 1, text: "Can you send the file?", sender: "Mark" },
-    ],
+    messages: [{ id: 1, text: "Can you send the file?", sender: "Mark" }],
   },
 ];
 
@@ -28,7 +26,7 @@ const Chat = () => {
   const [selectedChatId, setSelectedChatId] = useState(null);
   const [input, setInput] = useState("");
 
-  const selectedChat = mockChats.find(chat => chat.id === selectedChatId);
+  const selectedChat = mockChats.find((chat) => chat.id === selectedChatId);
 
   const handleSend = () => {
     if (input.trim()) {
@@ -102,53 +100,56 @@ const Chat = () => {
 
           {/* Messages */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50 h-full">
-  {selectedChat.messages.map((msg) => {
-    const isMe = msg.sender === "me";
+            {selectedChat.messages.map((msg) => {
+              const isMe = msg.sender === "me";
 
-    return (
-      <div key={msg.id} className={`relative flex ${isMe ? "justify-end" : "justify-start"}`}>
-        <div
-          className={`relative max-w-xs px-4 py-2 rounded-2xl text-sm ${
-            isMe
-              ? "bg-[#1D7C42] text-white rounded-br-none"
-              : "bg-[#F3F3F3] text-gray-900 rounded-bl-none"
-          }`}
-        >
-          {msg.text}
-          {/* Tail triangle */}
-          <div
-            className={`absolute top-0 ${
-              isMe
-                ? "right-[-6px]  border-t-transparent  border-l-[#1D7C42] border-b-[8px] border-b-transparent"
-                : " border-r-[8px] border-r-[#F3F3F3] border-b-[8px] border-b-transparent"
-            }`}
-          />
-        </div>
-      </div>
-    );
-  })}
-</div>
-
+              return (
+                <div
+                  key={msg.id}
+                  className={`relative flex ${
+                    isMe ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`relative max-w-xs px-4 py-2 rounded-2xl text-sm ${
+                      isMe
+                        ? "bg-[#1D7C42] text-white rounded-br-none"
+                        : "bg-[#F3F3F3] text-gray-900 rounded-bl-none"
+                    }`}
+                  >
+                    {msg.text}
+                    {/* Tail triangle */}
+                    <div
+                      className={`absolute top-0 ${
+                        isMe
+                          ? "right-[-6px]  border-t-transparent  border-l-[#1D7C42] border-b-[8px] border-b-transparent"
+                          : " border-r-[8px] border-r-[#F3F3F3] border-b-[8px] border-b-transparent"
+                      }`}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
           {/* Input */}
 
-<div className="p-4 border-t flex items-center gap-2 bg-white">
-  <input
-    type="text"
-    placeholder="Type a message..."
-    value={input}
-    onChange={(e) => setInput(e.target.value)}
-    className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none"
-  />
-  <button
-    onClick={handleSend}
-    className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full flex items-center justify-center"
-    aria-label="Send message"
-  >
-    <FiSend size={20} />
-  </button>
-</div>
-
+          <div className="p-4 border-t flex items-center gap-2 bg-white">
+            <input
+              type="text"
+              placeholder="Type a message..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none"
+            />
+            <button
+              onClick={handleSend}
+              className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full flex items-center justify-center"
+              aria-label="Send message"
+            >
+              <FiSend size={20} />
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -27,6 +27,7 @@ const ReviewOrder = () => {
     front: "",
     back: "",
   });
+  console.log(cartData, "cartData");
   const [phoneNumber, setPhoneNumber] = useState("");
 
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
@@ -92,6 +93,9 @@ const ReviewOrder = () => {
   }, [fulfillmentMethod]);
 
   const cartDataFullMethod = cartData?.map((item) => item?.fullfillmentMethod);
+  const cartDataAddress = cartData?.map(
+    (item) => item?.dispensaryId?.streetAddress
+  );
 
   return (
     <div className="w-full mx-auto bg-white lg:border lg:border-gray-200 lg:p-4 pb-20 lg:pb-4 rounded-2xl">
@@ -209,11 +213,24 @@ const ReviewOrder = () => {
         </div>
       )}
 
+      {cartDataFullMethod[0] === "Pickup" && (
+        <>
+          <span className="font-medium block mb-1 mt-2">Pickup Address</span>
+          <div className="p-1 rounded-xl text-sm space-y-2">
+            <p className="text-gray-700 leading-6">
+              {cartDataAddress}
+            </p>
+          </div>
+        </>
+      )}
       {cartDataFullMethod[0] === "Self Pickup" && (
         <>
           <span className="font-medium block mb-1 mt-2">Pickup Address</span>
           <div className="p-1 rounded-xl text-sm space-y-2">
-            <p className="text-gray-700 leading-6">{userData?.streetAddress}</p>
+            <p className="text-gray-700 leading-6">
+              {" "}
+              {cartDataAddress}
+            </p>
           </div>
         </>
       )}
