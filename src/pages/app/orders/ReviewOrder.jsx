@@ -109,7 +109,7 @@ const ReviewOrder = () => {
       </div>
       {/* Fulfillment Method */}
       <div className="mb-4">
-        {cartDataFullMethod[0] === "Both" && (
+        {cartDataFullMethod[0] === "Pickup" && (
           <div className=" gap-4">
             <span className="font-medium block mb-2">Fulfillment Method</span>
             <label className="flex items-center">
@@ -137,8 +137,20 @@ const ReviewOrder = () => {
 
             {fulfillmentMethod === "Delivery" && (
               <>
+                <div className="p-1 rounded-xl text-sm space-y-2">
+                  <span className="font-medium block mb-1 mt-2">
+                    Enter House No
+                  </span>
+                  <input
+                    type="text"
+                    value={completeAddress}
+                    onChange={(e) => setCompleteAddress(e.target.value)}
+                    className="w-full text-gray-700 p-2 rounded-md border"
+                    placeholder="Enter House No"
+                  />
+                </div>
                 <span className="font-medium block mb-1 mt-2">
-                  Enter Your Location
+                  Enter Street Address
                 </span>
                 <div className="p-1 rounded-xl text-sm space-y-2">
                   {isLoaded && (
@@ -157,18 +169,6 @@ const ReviewOrder = () => {
                       />
                     </Autocomplete>
                   )}
-                </div>
-                <div className="p-1 rounded-xl text-sm space-y-2">
-                  <span className="font-medium block mb-1 mt-2">
-                    Enter Your Complete Address
-                  </span>
-                  <input
-                    type="text"
-                    value={completeAddress}
-                    onChange={(e) => setCompleteAddress(e.target.value)}
-                    className="w-full text-gray-700 p-2 rounded-md border"
-                    placeholder="Enter Your Complete Address including House No"
-                  />
                 </div>
               </>
             )}
@@ -217,9 +217,7 @@ const ReviewOrder = () => {
         <>
           <span className="font-medium block mb-1 mt-2">Pickup Address</span>
           <div className="p-1 rounded-xl text-sm space-y-2">
-            <p className="text-gray-700 leading-6">
-              {cartDataAddress}
-            </p>
+            <p className="text-gray-700 leading-6">{cartDataAddress}</p>
           </div>
         </>
       )}
@@ -227,10 +225,7 @@ const ReviewOrder = () => {
         <>
           <span className="font-medium block mb-1 mt-2">Pickup Address</span>
           <div className="p-1 rounded-xl text-sm space-y-2">
-            <p className="text-gray-700 leading-6">
-              {" "}
-              {cartDataAddress}
-            </p>
+            <p className="text-gray-700 leading-6"> {cartDataAddress}</p>
           </div>
         </>
       )}

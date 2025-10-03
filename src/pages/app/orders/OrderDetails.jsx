@@ -18,7 +18,6 @@ const OrderDetails = () => {
   const location = useLocation();
   const { order } = location?.state || {};
 
-
   const fetchOrderDetails = async () => {
     setLoading(true);
     try {
@@ -69,8 +68,7 @@ const OrderDetails = () => {
     orderUvid,
     createdAt,
     phoneNumber,
-    rejectionReason
-
+    rejectionReason,
   } = orderDetails || {};
   const totalAmount = order?.state?.order?.products
     ? order.state.order.products.reduce((sum, product) => {
@@ -79,7 +77,7 @@ const OrderDetails = () => {
         return sum + price * weight;
       }, 0)
     : 0;
-console.log(rejectionReason,"rejectionReason")
+  console.log(rejectionReason, "rejectionReason");
   const handleTrackOrderClick = () => {
     navigate(`/app/order-tracking/${id}`, {
       state: { order: order, orderDetails: orderDetails },
@@ -149,6 +147,7 @@ console.log(rejectionReason,"rejectionReason")
             {new Date(createdAt).toLocaleString("en-US", {
               dateStyle: "medium",
               timeStyle: "short",
+              timeZone: "UTC",
             })}
           </span>
         </div>

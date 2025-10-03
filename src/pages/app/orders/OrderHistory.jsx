@@ -220,6 +220,7 @@ const OrderHistory = () => {
                             {
                               dateStyle: "medium",
                               timeStyle: "short",
+                              timeZone: "UTC", // 👈 force UTC
                             }
                           )}
                         </span>
