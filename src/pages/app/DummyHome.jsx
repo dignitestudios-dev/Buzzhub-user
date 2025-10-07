@@ -46,7 +46,7 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
     e.stopPropagation(); // Prevent event bubbling (which might trigger card click)
     addToWishlist("dispensary", item._id); // Call the addToWishlist function for dispensary
   };
-  console.log(distance, "distance======MYYYY");
+
   return (
     <div
       className="relative cursor-pointer bg-white rounded-xl shadow hover:shadow-lg transition duration-300 
@@ -89,7 +89,9 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
           </div>
         </div>
 
-        <div className="text-sm text-gray-500 mt-1">{item?.streetAddress || "N/A"}</div>
+        <div className="text-sm text-gray-500 mt-1">
+          {item?.streetAddress || "N/A"}
+        </div>
         {/* <div className="text-sm text-gray-500 mt-1">{item.city || "N/A"}</div>
 
         <div className="text-[12px] text-gray-500 mt-1">
@@ -141,8 +143,6 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
 
   const distance = getDistance(place1, place2);
 
-  
-  console.log(distance, "distance");
 
 
   return (

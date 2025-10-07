@@ -4,7 +4,7 @@ import { CiFilter } from "react-icons/ci";
 import { useNavigate } from "react-router";
 import axios from "../../../axios"; // Import the axios instance from your custom setup
 import FilterModal from "../../../components/app/dashboard/FilterModal";
-import { getDistance } from 'geolib';
+import { getDistance } from "geolib";
 
 const Products = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false); // State for showing filter modal
@@ -56,7 +56,9 @@ const Products = () => {
   useEffect(() => {
     fetchProducts(); // Fetch all products without any filters or search on page load
     // Fetch user's location (e.g., from localStorage or an API)
-    const locationData = JSON.parse(localStorage?.getItem("userData")) || [0, 0];
+    const locationData = JSON.parse(localStorage?.getItem("userData")) || [
+      0, 0,
+    ];
     setUserLocation(locationData?.location?.coordinates || [0, 0]);
   }, []);
 
@@ -137,23 +139,29 @@ const Products = () => {
       {/* Products Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredProducts?.length === 0 ? (
-          <p className="col-span-full text-center text-gray-500">No products available</p>
+          <p className="col-span-full text-center text-gray-500">
+            No products available
+          </p>
         ) : (
           filteredProducts?.map((item) => {
             // Calculate distance for each product
-            const dispensaryCoordinates = item?.dispensaryId?.location?.coordinates;
+            const dispensaryCoordinates =
+              item?.dispensaryId?.location?.coordinates;
 
-// Check if coordinates are valid, otherwise show a fallback or default behavior
-let distance = null;
-if (dispensaryCoordinates?.length === 2) {
-  distance = getDistance(
-    { latitude: dispensaryCoordinates[1], longitude: dispensaryCoordinates[0] },
-    { latitude: userLocation[1], longitude: userLocation[0] }
-  );
-} else {
-  // Handle case when coordinates are missing, can show default message or skip calculation
-  distance = 'Location data unavailable';
-}
+            // Check if coordinates are valid, otherwise show a fallback or default behavior
+            let distance = null;
+            if (dispensaryCoordinates?.length === 2) {
+              distance = getDistance(
+                {
+                  latitude: dispensaryCoordinates[1],
+                  longitude: dispensaryCoordinates[0],
+                },
+                { latitude: userLocation[1], longitude: userLocation[0] }
+              );
+            } else {
+              // Handle case when coordinates are missing, can show default message or skip calculation
+              distance = "Location data unavailable";
+            }
             return (
               <div
                 key={item._id}
@@ -162,7 +170,9 @@ if (dispensaryCoordinates?.length === 2) {
               >
                 {/* Distance */}
                 <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-                  {distance ? `${(distance / 1609.34).toFixed(2)} miles` : "0.0 miles"}
+                  {distance
+                    ? `${(distance / 1609.34).toFixed(2)} miles`
+                    : "0.0 miles"}
                 </div>
                 <div className="absolute top-2 right-2 bg-white p-1 rounded-full shadow">
                   <FiHeart className="text-gray-400 hover:text-red-500 cursor-pointer" />
@@ -174,12 +184,17 @@ if (dispensaryCoordinates?.length === 2) {
                 />
                 <div className="p-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-[13px] font-semibold text-gray-900">{item?.productName}</h3>
+                    <h3 className="text-[13px] font-semibold text-gray-900">
+                      {item?.productName}
+                    </h3>
                     <div className="flex items-center text-sm text-yellow-500 font-semibold">
-                      <span className="mr-1">⭐</span> {item?.averageRating || "0.0"}
+                      <span className="mr-1">⭐</span>{" "}
+                      {item?.averageRating || "0.0"}
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500 mt-1">{item?.productType}</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {item?.productType}
+                  </div>
                   <div className="flex items-center mt-1">
                     <img
                       src={item?.dispensaryId?.profilePicture}
@@ -187,8 +202,12 @@ if (dispensaryCoordinates?.length === 2) {
                       className="w-[24px] h-[24px] rounded-full object-cover mr-2"
                     />
                     <div className="flex justify-between w-full items-center">
-                      <div className="text-[12px] text-green-600">Dispensary</div>
-                      <div className="text-gray-800 font-semibold text-[14px]">${item?.productPrice}</div>
+                      <div className="text-[12px] text-green-600">
+                        Dispensary
+                      </div>
+                      <div className="text-gray-800 font-semibold text-[14px]">
+                        ${item?.productPrice}
+                      </div>
                     </div>
                   </div>
                 </div>
