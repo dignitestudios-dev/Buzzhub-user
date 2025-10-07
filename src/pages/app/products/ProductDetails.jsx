@@ -17,11 +17,12 @@ const ProductDetails = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  console.log(location?.state?.dispensary, "dispensaryIddispensaryId");
   const handleBackClick = () => {
     navigate(-1); // Navigate one step back in history
   };
 
-const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const goToNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % reviews.length); // Looping back to start
@@ -32,9 +33,6 @@ const [currentIndex, setCurrentIndex] = useState(0);
       (prevIndex) => (prevIndex - 1 + reviews.length) % reviews.length // Looping back to end
     );
   };
-
-
-
 
   const fetchDispencaryDetails = async () => {
     try {
@@ -56,7 +54,7 @@ const [currentIndex, setCurrentIndex] = useState(0);
   const DispencaryFullFillMentMethod = dispencary?.map(
     (item) => item?.fulfillmentMethod
   );
-  console.log(product,"productproductproduct")
+  console.log(product, "productproductproduct");
   // Fetch product details from API
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -223,15 +221,14 @@ const [currentIndex, setCurrentIndex] = useState(0);
                   {product?.dispensaryId?.dispensaryName}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {product?.dispensaryId?.city}, {product?.dispensaryId?.state}
-                  {/* {product.dispensaryId.distance} */}
+                  {/* {product?.dispensaryId?.city}, {product?.dispensaryId?.state} */}
+                  {location?.state?.dispensary?.streetAddress}
                 </p>
               </div>
             </div>
-            {console.log(product, "product")}
             <div className="text-right">
               <p className="text-red-500 text-sm font-semibold">
-                {product?.fullfillmentMethod}
+                {product?.dispensaryId?.fulfillmentMethod}
               </p>
               <button
                 className="text-blue-600 text-xs underline"
@@ -330,89 +327,94 @@ const [currentIndex, setCurrentIndex] = useState(0);
           </div>
 
           {/* Product Reviews */}
-         {/* Reviews */}
-<div className="mt-4 mb-6">
-  <h3 className="text-base font-semibold text-gray-800 mb-4">Reviews</h3>
+          {/* Reviews */}
+          <div className="mt-4 mb-6">
+            <h3 className="text-base font-semibold text-gray-800 mb-4">
+              Reviews
+            </h3>
 
-  {reviews && reviews.length > 0 ? (
-    <div className="relative">
-      <div className="overflow-hidden">
-        <div
-          className="flex transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-        >
-          {reviews.map((review, idx) => (
-            <div key={idx} className="w-full px-4">
-              <div className="bg-gray-50 p-4 rounded-xl shadow-sm mb-4">
-                <div className="flex items-center mb-2">
-                  <img
-                    src={review.productId?.productImage[0]}
-                    alt={review.productId?.productName}
-                    className="w-8 h-8 rounded-full object-cover mr-2"
-                  />
-                  <div>
-                    <h4 className="text-sm font-semibold">
-                      {review?.productId?.productName}
-                    </h4>
-                    <p className="text-xs text-gray-500">
-                      {review?.userId?.city}, {review?.userId?.state}
-                    </p>
-                  </div>
-                  <span className="ml-auto text-green-600 font-bold">
-                    ${review?.productId?.productPrice}
-                  </span>
-                </div>
-                <div className="flex mb-1">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar
-                      key={i}
-                      className={`text-yellow-500 text-xs ${
-                        i < Math.round(review?.ratingNumber) ? "filled" : ""
-                      }`}
-                    />
-                  ))}
-                </div>
-                <p className="text-sm text-gray-700">{review?.review}</p>
+            {reviews && reviews.length > 0 ? (
+              <div className="relative">
+                <div className="overflow-hidden">
+                  <div
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                  >
+                    {reviews.map((review, idx) => (
+                      <div key={idx} className="w-full px-4">
+                        <div className="bg-gray-50 p-4 rounded-xl shadow-sm mb-4">
+                          <div className="flex items-center mb-2">
+                            <img
+                              src={review.productId?.productImage[0]}
+                              alt={review.productId?.productName}
+                              className="w-8 h-8 rounded-full object-cover mr-2"
+                            />
+                            <div>
+                              <h4 className="text-sm font-semibold">
+                                {review?.productId?.productName}
+                              </h4>
+                              <p className="text-xs text-gray-500">
+                                {review?.userId?.city}, {review?.userId?.state}
+                              </p>
+                            </div>
+                            <span className="ml-auto text-green-600 font-bold">
+                              ${review?.productId?.productPrice}
+                            </span>
+                          </div>
+                          <div className="flex mb-1">
+                            {[...Array(5)].map((_, i) => (
+                              <FaStar
+                                key={i}
+                                className={`text-yellow-500 text-xs ${
+                                  i < Math.round(review?.ratingNumber)
+                                    ? "filled"
+                                    : ""
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <p className="text-sm text-gray-700">
+                            {review?.review}
+                          </p>
 
-                <div className="mt-4 flex items-center gap-2">
-                  <img
-                    src={review?.userId?.profilePicture}
-                    alt={review?.userId?.fullName}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                  <div>
-                    <h5 className="text-sm font-semibold text-gray-800">
-                      {review?.userId?.fullName}
-                    </h5>
+                          <div className="mt-4 flex items-center gap-2">
+                            <img
+                              src={review?.userId?.profilePicture}
+                              alt={review?.userId?.fullName}
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+                            <div>
+                              <h5 className="text-sm font-semibold text-gray-800">
+                                {review?.userId?.fullName}
+                              </h5>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
+
+                {/* Navigation Buttons */}
+                <button
+                  className="absolute top-1/2 left-0 transform -translate-y-1/2 text-gray-800 bg-gray-200 p-2 rounded-md shadow-lg"
+                  onClick={goToPrev}
+                >
+                  &#8249;
+                </button>
+                <button
+                  className="absolute top-1/2 right-0 transform -translate-y-1/2 text-gray-800 bg-gray-200 p-2 rounded-md shadow-lg"
+                  onClick={goToNext}
+                >
+                  &#8250;
+                </button>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Navigation Buttons */}
-      <button
-        className="absolute top-1/2 left-0 transform -translate-y-1/2 text-gray-800 bg-gray-200 p-2 rounded-md shadow-lg"
-        onClick={goToPrev}
-      >
-        &#8249;
-      </button>
-      <button
-        className="absolute top-1/2 right-0 transform -translate-y-1/2 text-gray-800 bg-gray-200 p-2 rounded-md shadow-lg"
-        onClick={goToNext}
-      >
-        &#8250;
-      </button>
-    </div>
-  ) : (
-    <div className="mt-6 text-sm text-gray-500 italic">
-      No reviews available for this product.
-    </div>
-  )}
-</div>
-
+            ) : (
+              <div className="mt-6 text-sm text-gray-500 italic">
+                No reviews available for this product.
+              </div>
+            )}
+          </div>
 
           {/* Add to Cart Button */}
           {cartItemID?.includes(ProductId) ? (
@@ -423,19 +425,22 @@ const [currentIndex, setCurrentIndex] = useState(0);
               View Cart
             </button>
           ) : (
-           <button
-  onClick={handleAddToCart}
-  className={`w-full transition text-white font-semibold py-3 mt-4 rounded-xl flex items-center justify-center 
-    ${loading || !grams ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
-  disabled={loading || !grams} // Disable if loading or grams is empty
->
-  {loading ? (
-    <FiLoader className="animate-spin text-white text-2xl" />
-  ) : (
-    "Add to Cart"
-  )}
-</button>
-
+            <button
+              onClick={handleAddToCart}
+              className={`w-full transition text-white font-semibold py-3 mt-4 rounded-xl flex items-center justify-center 
+    ${
+      loading || !grams
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-green-600 hover:bg-green-700"
+    }`}
+              disabled={loading || !grams} // Disable if loading or grams is empty
+            >
+              {loading ? (
+                <FiLoader className="animate-spin text-white text-2xl" />
+              ) : (
+                "Add to Cart"
+              )}
+            </button>
           )}
         </div>
       </div>

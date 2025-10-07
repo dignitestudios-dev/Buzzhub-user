@@ -89,11 +89,12 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
           </div>
         </div>
 
-        <div className="text-sm text-gray-500 mt-1">{item.city || "N/A"}</div>
+        <div className="text-sm text-gray-500 mt-1">{item?.streetAddress || "N/A"}</div>
+        {/* <div className="text-sm text-gray-500 mt-1">{item.city || "N/A"}</div>
 
         <div className="text-[12px] text-gray-500 mt-1">
           {item.state || "N/A"}
-        </div>
+        </div> */}
         <div className="flex mt-3 items-center font-[600] gap-2 text-[12px] text-gray-600">
           <CiClock2 className="text-lg" />
           <span>{item?.createdAt?.split("T")[1]?.slice(0, 5)}</span>
