@@ -109,7 +109,7 @@ const ReviewOrder = () => {
       </div>
       {/* Fulfillment Method */}
       <div className="mb-4">
-        {cartDataFullMethod[0] === "Pickup" && (
+        {cartDataFullMethod[0] === "Both" && (
           <div className=" gap-4">
             <span className="font-medium block mb-2">Fulfillment Method</span>
             <label className="flex items-center">
