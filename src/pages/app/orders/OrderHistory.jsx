@@ -10,7 +10,7 @@ const statusColors = {
   Approved: "text-green-600",
   Rejected: "text-red-500",
   InProcess: "text-orange-500", // New status color
-  OutForDelivery: "text-blue-500", // New status color
+  OutforDelivery: "text-blue-500", // 👈 spaces hata diye
   Ready: "text-purple-500", // New status color
   Completed: "text-green-600", // New status color
 };
@@ -84,9 +84,11 @@ const OrderHistory = () => {
   const filteredOrders = orders.filter((order) => {
     if (filter === "All") return true;
 
-    return activeTab === "Order Request"
-      ? order.status === filter
-      : order.status === filter; // For "Order Tracking", use the status filter
+    // Normalize spacing for both order.status and filter
+    const normalizedStatus = order.status?.replace(/\s+/g, "").toLowerCase();
+    const normalizedFilter = filter.replace(/\s+/g, "").toLowerCase();
+
+    return normalizedStatus === normalizedFilter;
   });
 
   const handleOrderDetailsClick = (orderId, order) => {
