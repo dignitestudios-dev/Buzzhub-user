@@ -7,13 +7,13 @@ const ReportModal = ({
   onClose,
   onConfirm,
   chatId,
-  userId,
-  userType = "user",
+
 }) => {
   if (!isOpen) return null;
 
   const [selectedReason, setSelectedReason] = useState("");
   const [loading, setLoading] = useState(false);
+  const [customReason, setCustomReason] = useState(""); // 👈 for "Others"
 
   const reportReasons = [
     "Non-Payment or Fraudulent Activities",
@@ -27,8 +27,13 @@ const ReportModal = ({
   ];
 
   const handleSubmit = async () => {
-    if (!selectedReason) {
-      alert("Please select a reason.");
+        const finalReason =
+      selectedReason === "Others" && customReason.trim() !== ""
+        ? customReason
+        : selectedReason;
+
+    if (!finalReason) {
+      ErrorToast("Please select a reason.");
       return;
     }
 
@@ -40,20 +45,20 @@ const ReportModal = ({
 
       // ✅ Make API request
       const response = await axios.post(endpoint, {
-        reason: selectedReason,
+        reason: finalReason,
         uid: chatId, // Chat UID
       });
 
       if (response.data.success) {
         SuccessToast(response?.data?.message);
-        onConfirm(selectedReason);
+        onConfirm(finalReason);
         onClose();
       } else {
         response.data.message || "Something went wrong.";
       }
     } catch (err) {
       console.error("Report error:", err);
-      ErrorToast(response?.err?.data?.message);
+      ErrorToast(err?.response?.data?.message);
     } finally {
       setLoading(false);
     }
@@ -85,9 +90,10 @@ const ReportModal = ({
           {selectedReason === "Others" && (
             <input
               type="text"
+              value={customReason}
               placeholder="Please specify"
               className="mt-2 px-4 py-2 w-full border rounded-lg"
-              onChange={(e) => setSelectedReason(e.target.value)}
+              onChange={(e) => setCustomReason(e.target.value)}
             />
           )}
         </div>
