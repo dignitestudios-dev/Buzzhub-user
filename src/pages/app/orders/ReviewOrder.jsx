@@ -35,7 +35,7 @@ const ReviewOrder = () => {
   const autocompleteRef = useRef(null);
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+    googleMapsApiKey: import.meta.env.VITE_APP_GOOGLE_MAP_API_KEY,
     libraries,
   });
 

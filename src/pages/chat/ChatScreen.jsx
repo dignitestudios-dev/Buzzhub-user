@@ -13,8 +13,6 @@ import BlockModal from "../../components/chat/BlockModal";
 import firebase from "firebase/compat/app";
 
 const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
- 
-
   const [messages, setMessages] = useState([]);
 
   // const parseUpdatedAt = (selectedChat, userId) => {
@@ -31,7 +29,6 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
   // };
 
   useEffect(() => {
-    
     if (!chatId) return;
 
     const unsubscribe = getMessages(
@@ -125,7 +122,7 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
 
     checkBlockUser();
   }, [selectedChat]);
-
+  
   return (
     <>
       {/* Header Section */}
@@ -270,6 +267,7 @@ const ChatScreen = ({ selectedChat, chatId, userId, update, setUpdate }) => {
         onConfirm={() => {
           closeReportModal();
         }}
+        chatId={selectedChat?.otherUser?.uid}
       />
     </>
   );

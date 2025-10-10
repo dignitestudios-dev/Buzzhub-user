@@ -9,34 +9,50 @@ import { ErrorToast, SuccessToast } from "../../components/global/Toaster"; // I
 import Loader from "../../components/global/Loader";
 import { getDistance } from "geolib";
 import { AppContext } from "../../context/AppContext";
+import LocationModal from "../../components/app/dashboard/LocationModal";
 
 // Dispensary Card Component
 const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
   const navigate = useNavigate();
   const { user } = useContext(AppContext);
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [distance, setDistance] = useState(null);
 
   const locationData =
     JSON.parse(localStorage?.getItem("userData")) || JSON?.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
   const [place1, setPlace1] = useState({});
 
   const [place2, setPlace2] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    if (item?.location?.coordinates && user?.location?.coordinates) {
-      setPlace1({
+    // ✅ Fetch user's current location (real-time)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCurrentLocation({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        });
+      },
+      (err) => {
+        console.warn("Location denied:", err);
+        setCurrentLocation(null);
+      }
+    );
+  }, []);
+
+  useEffect(() => {
+    if (currentLocation && item?.location?.coordinates?.length === 2) {
+      const dispensaryLocation = {
         latitude: item.location.coordinates[1],
         longitude: item.location.coordinates[0],
-      });
+      };
 
-      setPlace2({
-        latitude: user.location.coordinates[1],
-        longitude: user.location.coordinates[0],
-      });
+      const dist = getDistance(currentLocation, dispensaryLocation);
+      setDistance((dist * 0.000621371).toFixed(2)); // convert meters → miles
     }
-  }, [item?.location?.coordinates, user?.location?.coordinates]);
-
-  const distance = getDistance(place1, place2);
-
+  }, [currentLocation, item?.location?.coordinates]);
   const handleCardClick = () => {
     navigate(`/app/dispensary-profile/${item._id}`);
   };
@@ -46,104 +62,150 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
     e.stopPropagation(); // Prevent event bubbling (which might trigger card click)
     addToWishlist("dispensary", item._id); // Call the addToWishlist function for dispensary
   };
+  useEffect(() => {
+    checkLocation();
+  }, []);
+
+  const checkLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        console.log("✅ Location allowed:", pos.coords);
+        setIsModalOpen(false);
+      },
+      (err) => {
+        console.warn("❌ Location denied:", err);
+        if (err.code === 1) {
+          setErrorMsg(
+            "Location is blocked. Please enable it from your browser settings."
+          );
+        } else {
+          setErrorMsg("Unable to get location. Try again.");
+        }
+        setIsModalOpen(true);
+      }
+    );
+  };
+
+  const handleEnableLocation = () => {
+    checkLocation();
+  };
 
   return (
-    <div
-      className="relative cursor-pointer bg-white rounded-xl shadow hover:shadow-lg transition duration-300 
+    <>
+      <div
+        className="relative cursor-pointer bg-white rounded-xl shadow hover:shadow-lg transition duration-300 
         min-w-[168px] min-h-[212px] w-full h-full"
-      onClick={handleCardClick}
-    >
-      <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-        {distance
-          ? `${(distance * 0.000621371).toFixed(2)} miles`
-          : "0.0 miles"}
-      </div>
-
-      <div className="absolute top-2 right-2 z-20 bg-white p-1 rounded-full shadow-lg">
-        <FaHeart
-          className={`cursor-pointer ${
-            isLiked ? "text-red-500" : "text-gray-400 "
-          }`}
-          onClick={handleWishlistClick} // Trigger    wishlist action on heart click
-        />
-      </div>
-
-      <div className="relative">
-        <img
-          src={item.profilePicture}
-          alt={item.dispensaryName}
-          className="w-full h-[130px] object-cover rounded-t-xl"
-        />
-        <div className="absolute bottom-2 right-2 bg-gray-50 text-xs font-medium px-2 py-1 rounded-md shadow text-gray-700">
-          {item.disType}
+        onClick={handleCardClick}
+      >
+        <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
+           {distance ? `${distance} miles` : "0.0 miles"}
         </div>
-      </div>
 
-      <div className="p-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-[13px] font-semibold text-gray-900">
-            {item.dispensaryName}
-          </h3>
-          <div className="flex items-center text-sm text-yellow-500 font-semibold">
-            <FaStar className="mr-1" /> {item.rating || "0.0"}
+        <div className="absolute top-2 right-2 z-20 bg-white p-1 rounded-full shadow-lg">
+          <FaHeart
+            className={`cursor-pointer ${
+              isLiked ? "text-red-500" : "text-gray-400 "
+            }`}
+            onClick={handleWishlistClick} // Trigger    wishlist action on heart click
+          />
+        </div>
+
+        <div className="relative">
+          <img
+            src={item.profilePicture}
+            alt={item.dispensaryName}
+            className="w-full h-[130px] object-cover rounded-t-xl"
+          />
+          <div className="absolute bottom-2 right-2 bg-gray-50 text-xs font-medium px-2 py-1 rounded-md shadow text-gray-700">
+            {item.disType}
           </div>
         </div>
 
-        <div className="text-sm text-gray-500 mt-1">
-          {item?.streetAddress || "N/A"}
-        </div>
-        {/* <div className="text-sm text-gray-500 mt-1">{item.city || "N/A"}</div>
+        <div className="p-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-[13px] font-semibold text-gray-900">
+              {item.dispensaryName}
+            </h3>
+            <div className="flex items-center text-sm text-yellow-500 font-semibold">
+              <FaStar className="mr-1" /> {item.rating || "0.0"}
+            </div>
+          </div>
+
+          <div className="text-sm text-gray-500 mt-1">
+            {item?.streetAddress || "N/A"}
+          </div>
+          {/* <div className="text-sm text-gray-500 mt-1">{item.city || "N/A"}</div>
 
         <div className="text-[12px] text-gray-500 mt-1">
           {item.state || "N/A"}
         </div> */}
-        <div className="flex mt-3 items-center font-[600] gap-2 text-[12px] text-gray-600">
-          <CiClock2 className="text-lg" />
-          <span>{item?.createdAt?.split("T")[1]?.slice(0, 5)}</span>
-          {"-"}
-          <span>
-            {" "}
-            {(() => {
-              const [h, m] =
-                item?.closingHourTime?.split("T")[1]?.slice(0, 5)?.split(":") ||
-                [];
-              const hr = +h % 12 || 12;
-              const ampm = +h >= 12 ? "PM" : "AM";
-              return `${hr}:${m} ${ampm}`;
-            })()}
-          </span>
+          <div className="flex mt-3 items-center font-[600] gap-2 text-[12px] text-gray-600">
+            <CiClock2 className="text-lg" />
+            <span>{item?.createdAt?.split("T")[1]?.slice(0, 5)}</span>
+            {"-"}
+            <span>
+              {" "}
+              {(() => {
+                const [h, m] =
+                  item?.closingHourTime
+                    ?.split("T")[1]
+                    ?.slice(0, 5)
+                    ?.split(":") || [];
+                const hr = +h % 12 || 12;
+                const ampm = +h >= 12 ? "PM" : "AM";
+                return `${hr}:${m} ${ampm}`;
+              })()}
+            </span>
+          </div>
         </div>
       </div>
-    </div>
+      {isModalOpen && (
+        <LocationModal
+          isOpen={isModalOpen}
+          onEnableLocation={handleEnableLocation}
+          errorMsg={errorMsg}
+        />
+      )}
+    </>
   );
 };
 
-// Product Card Component
 const ProductCard = ({ item, addToWishlist, isLiked }) => {
   const navigate = useNavigate();
-  const { user } = useContext(AppContext);
-  const locationData =
-    JSON.parse(localStorage?.getItem("userData")) || JSON.stringify([0, 0]); // Fallback to [0, 0] if coordinates are not available
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [distance, setDistance] = useState(null);
 
-  const [place1, setPlace1] = useState({});
-  const [place2, setPlace2] = useState({});
   useEffect(() => {
-    if (item?.dispensaryId?.location && user?.location?.coordinates) {
-      setPlace1({
-        latitude: item?.dispensaryId?.location.coordinates[1],
-        longitude: item?.dispensaryId?.location.coordinates[0],
-      });
+    // ✅ Fetch user's current location (real-time)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCurrentLocation({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        });
+      },
+      (err) => {
+        console.warn("Location denied:", err);
+        setCurrentLocation(null);
+      }
+    );
+  }, []);
 
-      setPlace2({
-        latitude: user.location.coordinates[1],
-        longitude: user.location.coordinates[0],
-      });
+
+  useEffect(() => {
+    if (
+      currentLocation &&
+      item?.dispensaryId?.location?.coordinates?.length === 2
+    ) {
+      const dispensaryLocation = {
+        latitude: item?.dispensaryId?.location?.coordinates[1],
+        longitude: item?.dispensaryId?.location?.coordinates[0],
+      };
+
+      const dist = getDistance(currentLocation, dispensaryLocation);
+      setDistance((dist * 0.000621371).toFixed(2)); // convert meters → miles
     }
-  }, [item?.location?.coordinates, user?.location?.coordinates]);
-
-  const distance = getDistance(place1, place2);
-
-
+  }, [currentLocation, item?.dispensaryId?.location.coordinates]);
 
   return (
     <div
@@ -156,9 +218,7 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
     >
       {/* Location Badge */}
       <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-        {distance
-          ? `${(distance * 0.000621371).toFixed(2)} miles`
-          : "0.0 miles"}
+        {distance ? `${distance} miles` : "0.0 miles"}
       </div>
 
       {/* Wishlist Icon */}

@@ -89,7 +89,7 @@ const EditProfile = () => {
   const startLocationRef = useRef();
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+    googleMapsApiKey: import.meta.env.VITE_APP_GOOGLE_MAP_API_KEY,
     libraries: ["places"],
   });
 

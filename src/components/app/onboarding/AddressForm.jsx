@@ -161,7 +161,7 @@ export default function AddressForm({ onNext, updateData }) {
 
   // Load Google Maps API for autocomplete functionality
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+    googleMapsApiKey: import.meta.env.VITE_APP_GOOGLE_MAP_API_KEY,
     libraries: ["places"],
   });
 
