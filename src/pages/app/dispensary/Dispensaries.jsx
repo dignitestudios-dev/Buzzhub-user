@@ -171,7 +171,7 @@ const Dispensaries = () => {
               </div>
 
               <img
-                src={dispensary.profilePicture}
+                src={dispensary.profilePicture || "https://placehold.co/600x400"}
                 alt={dispensary.dispensaryName}
                 className="w-full h-[130px] object-cover rounded-t-xl"
               />

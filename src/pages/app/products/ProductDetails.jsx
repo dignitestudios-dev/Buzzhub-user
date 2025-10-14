@@ -171,7 +171,7 @@ const ProductDetails = () => {
       <div className="w-full mx-auto rounded-2xl overflow-hidden mb-20">
         <div className="relative">
           <img
-            src={product?.productImage[0]}
+            src={product?.productImage[0] || "https://placehold.co/600x400  "}
             alt={product?.productName}
             className="w-full h-64 object-cover"
           />

@@ -405,25 +405,59 @@ const DummyHome = () => {
   }, []);
 
   useEffect(() => {
-    const fetchNearbyDispensaries = async () => {
-      setLoading(true);
+   const fetchNearbyDispensaries = async () => {
+    setLoading(true);
 
-      try {
-        const response = await axios.get("/user/get-nearby-dispensary");
-        if (response.data.success) {
-          setNearbyDispensaries(response.data.data || []);
-          setFilteredDispensaries(response.data.data || []);
-        } else {
-          console.error("Failed to fetch dispensaries");
-          setNearbyDispensaries([]);
-          setFilteredDispensaries([]);
-        }
-      } catch (error) {
-        console.error("Error fetching nearby dispensaries:", error);
+    try {
+      const response = await axios.get("/user/get-nearby-dispensary");
+      if (response.data.success) {
+        const data = response.data.data || [];
+
+        // ✅ Step 1: get current user location
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const userLocation = {
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude,
+            };
+
+            // ✅ Step 2: Filter dispensaries within 100 miles
+            const filtered = data.filter((disp) => {
+              if (!disp?.location?.coordinates) return false;
+              const dispLoc = {
+                latitude: disp.location.coordinates[1],
+                longitude: disp.location.coordinates[0],
+              };
+              const dist =
+                getDistance(userLocation, dispLoc) * 0.000621371; // meters → miles
+              return dist <= 100; // ✅ only keep within 100 miles
+            });
+
+            setNearbyDispensaries(filtered);
+            setFilteredDispensaries(filtered);
+            setLoading(false);
+          },
+          (err) => {
+            console.warn("Location not available:", err);
+            // Agar location deny ho gayi, fallback (show all)
+            setNearbyDispensaries(data);
+            setFilteredDispensaries(data);
+            setLoading(false);
+          }
+        );
+      } else {
+        console.error("Failed to fetch dispensaries");
         setNearbyDispensaries([]);
         setFilteredDispensaries([]);
+        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching nearby dispensaries:", error);
+      setNearbyDispensaries([]);
+      setFilteredDispensaries([]);
+      setLoading(false);
+    }
+  };
 
     const fetchPopularProducts = async () => {
       try {

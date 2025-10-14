@@ -178,7 +178,7 @@ const Products = () => {
                   <FiHeart className="text-gray-400 hover:text-red-500 cursor-pointer" />
                 </div>
                 <img
-                  src={item?.productImage[0]} // Assuming the first image in the array
+                  src={item?.productImage[0] || "https://placehold.co/600x400"} // Assuming the first image in the array
                   alt={item?.productName}
                   className="w-full h-[130px] object-cover rounded-t-xl"
                 />
