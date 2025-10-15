@@ -159,7 +159,7 @@ const Cart = () => {
               className="flex gap-3 items-start p-1.5 bg-[#F9FAFA] border border-gray-200 rounded-xl shadow-sm relative"
             >
               <img
-                src={item.productImage}
+                src={item.productImage  || "https://placehold.co/600x400"}
                 alt={item.productName}
                 className="w-16 h-16 rounded-lg object-cover"
               />

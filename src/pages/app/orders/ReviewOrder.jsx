@@ -247,7 +247,7 @@ const ReviewOrder = () => {
         <div className="flex gap-3">
           {medicalCards.front ? (
             <img
-              src={medicalCards.front}
+              src={medicalCards.front }
               alt="Medical Card Front"
               className="w-28 h-16 object-cover rounded-lg border"
             />
@@ -298,7 +298,7 @@ const ReviewOrder = () => {
           {cartData?.map((item) => (
             <div key={item._id} className="flex items-start gap-3">
               <img
-                src={item.productImage}
+                src={item.productImage  || "https://placehold.co/600x400"}
                 alt={item.productName}
                 className="w-16 h-16 rounded-lg object-cover"
               />

@@ -105,7 +105,7 @@ const DispensaryProfile = () => {
           <h2 className="text-lg font-semibold">
             {dispensary.dispensaryName}{" "}
             <span className="text-yellow-500 text-sm">
-              ★ {dispensary.averageRating || 4.8}
+              ★ {dispensary.averageRating || '0.0'}
             </span>
           </h2>
           <p className="text-sm text-gray-500 flex items-center justify-center md:justify-start gap-1">
@@ -158,7 +158,7 @@ const DispensaryProfile = () => {
             >
               <div className="relative">
                 <img
-                  src={product?.productImage[0]}
+                  src={product?.productImage[0]  || "https://placehold.co/600x400"}
                   alt={product?.productName}
                   className="w-full h-28 object-cover"
                 />
@@ -173,7 +173,7 @@ const DispensaryProfile = () => {
                     ${product.productPrice}
                   </p>
                   <span className="text-yellow-500 text-sm flex items-center gap-1">
-                    <FaStar size={12} /> {product.averageRating || 4.8}
+                    <FaStar size={12} /> {product.averageRating || '0.0'}
                   </span>
                 </div>
               </div>
