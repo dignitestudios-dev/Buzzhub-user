@@ -98,7 +98,7 @@ const DispensaryCard = ({ item, addToWishlist, isLiked }) => {
         onClick={handleCardClick}
       >
         <div className="absolute top-2 left-2 bg-white text-[#1D7C42] text-[10px] font-semibold px-3 py-1 rounded-full shadow-sm z-10">
-           {distance ? `${distance} miles` : "0.0 miles"}
+          {distance ? `${distance} miles` : "0.0 miles"}
         </div>
 
         <div className="absolute top-2 right-2 z-20 bg-white p-1 rounded-full shadow-lg">
@@ -190,7 +190,6 @@ const ProductCard = ({ item, addToWishlist, isLiked }) => {
       }
     );
   }, []);
-
 
   useEffect(() => {
     if (
@@ -405,59 +404,49 @@ const DummyHome = () => {
   }, []);
 
   useEffect(() => {
-   const fetchNearbyDispensaries = async () => {
-    setLoading(true);
+   const fetchNearbyDispensaries = async (latitude, longitude) => {
+  setLoading(true);
+  try {
+    let url = "/user/get-nearby-dispensary";
 
-    try {
-      const response = await axios.get("/user/get-nearby-dispensary");
-      if (response.data.success) {
-        const data = response.data.data || [];
+    // ✅ Only add params if we actually have valid location
+    if (latitude && longitude) {
+      url += `?latitude=${latitude}&longitude=${longitude}`;
+    }
 
-        // ✅ Step 1: get current user location
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const userLocation = {
-              latitude: pos.coords.latitude,
-              longitude: pos.coords.longitude,
-            };
+    const response = await axios.get(url);
 
-            // ✅ Step 2: Filter dispensaries within 100 miles
-            const filtered = data.filter((disp) => {
-              if (!disp?.location?.coordinates) return false;
-              const dispLoc = {
-                latitude: disp.location.coordinates[1],
-                longitude: disp.location.coordinates[0],
-              };
-              const dist =
-                getDistance(userLocation, dispLoc) * 0.000621371; // meters → miles
-              return dist <= 100; // ✅ only keep within 100 miles
-            });
-
-            setNearbyDispensaries(filtered);
-            setFilteredDispensaries(filtered);
-            setLoading(false);
-          },
-          (err) => {
-            console.warn("Location not available:", err);
-            // Agar location deny ho gayi, fallback (show all)
-            setNearbyDispensaries(data);
-            setFilteredDispensaries(data);
-            setLoading(false);
-          }
-        );
-      } else {
-        console.error("Failed to fetch dispensaries");
-        setNearbyDispensaries([]);
-        setFilteredDispensaries([]);
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Error fetching nearby dispensaries:", error);
+    if (response.data.success) {
+      setNearbyDispensaries(response.data.data || []);
+      setFilteredDispensaries(response.data.data || []);
+    } else {
+      console.error("Failed to fetch dispensaries");
       setNearbyDispensaries([]);
       setFilteredDispensaries([]);
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching nearby dispensaries:", error);
+    setNearbyDispensaries([]);
+    setFilteredDispensaries([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// ✅ Ask for user's live location
+navigator.geolocation.getCurrentPosition(
+  (pos) => {
+    const latitude = pos.coords.latitude;
+    const longitude = pos.coords.longitude;
+    fetchNearbyDispensaries(latitude, longitude);
+  },
+  (err) => {
+    console.warn("❌ Location denied or unavailable:", err);
+
+    // ✅ Call without params if location blocked
+    fetchNearbyDispensaries();
+  }
+);
 
     const fetchPopularProducts = async () => {
       try {
@@ -477,6 +466,7 @@ const DummyHome = () => {
         setFilteredProducts([]);
       }
     };
+    
     const fetchNewPopularProducts = async () => {
       try {
         const response = await axios.get("/user/get-all-products");
@@ -499,8 +489,7 @@ const DummyHome = () => {
     };
 
     // Start loading
-
-    fetchNearbyDispensaries();
+  
     fetchPopularProducts();
     fetchNewPopularProducts();
 
